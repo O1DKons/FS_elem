@@ -85,8 +85,8 @@ flowchart TD
 
 ## Основания описания
 
-- [Описание v4, команда и замеры](../../research/axel-single-recipe-runtime-2026-10-01.md).
-- [Состояние исследовательских запусков](../../axel-runtime.md).
+- Описание v4, команда и замеры — `docs/grant/2026-10-02/../../research/axel-single-recipe-runtime-2026-10-01.md` (внутренний источник; не включён в публичную копию).
+- Состояние исследовательских запусков — `docs/grant/2026-10-02/../../axel-runtime.md` (внутренний источник; не включён в публичную копию).
 - [Схема хранения](../../schema-v2.md).
-- [Принятие последнего сравнения моделей](../../research/audit-evidence-2026-10-01/nominal81d-matched-fit-v3-actual-posthoc-coordinator-acceptance-2026-10-02.json).
+- Принятие последнего сравнения моделей — `docs/grant/2026-10-02/../../research/audit-evidence-2026-10-01/nominal81d-matched-fit-v3-actual-posthoc-coordinator-acceptance-2026-10-02.json` (внутренний источник; не включён в публичную копию).
 - [Снимок технических свидетельств](development-state.json).
