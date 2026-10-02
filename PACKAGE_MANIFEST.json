@@ -14,8 +14,8 @@
     },
     {
       "path": "PUBLICATION.md",
-      "bytes": 4090,
-      "sha256": "15a6a4071bc0dbb9f4f01367cf691557e9039c45acbec221326e49f73429d974"
+      "bytes": 4120,
+      "sha256": "7e2251e8efaa781146261e20b5493bed8c5573cd49d381e38318f6c11b09f36b"
     },
     {
       "path": "PUBLICATION_MANIFEST.json",
@@ -494,8 +494,8 @@
     },
     {
       "path": "docs/grant/2026-10-02/architecture.md",
-      "bytes": 14940,
-      "sha256": "87ac2e842f81376adae76913b2a8fd7945a51ab840718e7de7bad773b37ddc65"
+      "bytes": 15248,
+      "sha256": "f1732985f9d5802d6c08e36746cb67fbf330b5ebe0f1b3d5430113c8a1e06d80"
     },
     {
       "path": "docs/grant/2026-10-02/development-state.json",
