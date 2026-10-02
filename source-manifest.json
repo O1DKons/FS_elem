@@ -1,8 +1,9 @@
 {
   "schemaVersion": 1,
-  "version": "grant-prototype-2026-10-02",
+  "version": "grant-prototype-video-2026-10-02",
   "sourceCommit": "de3592a9738e60486bf536faedb083accc32eb70",
-  "kind": "frozen_public_code_ui_configuration_tests_helpers",
+  "kind": "public_code_ui_configuration_tests_helpers_and_two_approved_demo_media",
+  "previousVersionTag": "grant-prototype-2026-10-02",
   "files": [
     {
       "path": ".gitignore",
@@ -38,6 +39,11 @@
       "path": "apps/web/app/page.tsx",
       "bytes": 12530,
       "sha256": "8599ae58d0908c174336e82b00272055292eb849aa8494f6efe40750e76a0f69"
+    },
+    {
+      "path": "apps/web/components.json",
+      "bytes": 516,
+      "sha256": "9928283696d86836422959a2c520df83a718d31ffbcab533a14ca8dca2c8d475"
     },
     {
       "path": "apps/web/components/editor/EpisodePanel.tsx",
@@ -355,11 +361,6 @@
       "sha256": "b86e51969931c3d62e88d0bdacd1cd8219105dc6d6b6a588a80011bf92e987cd"
     },
     {
-      "path": "apps/web/components.json",
-      "bytes": 516,
-      "sha256": "9928283696d86836422959a2c520df83a718d31ffbcab533a14ca8dca2c8d475"
-    },
-    {
       "path": "apps/web/hooks/use-mobile.ts",
       "bytes": 585,
       "sha256": "82bff42ff087bd5dc90a5d17609cc428b8688de92d1333073a839af5ad3c9cbd"
@@ -476,58 +477,73 @@
     },
     {
       "path": "grant-demo/PROVENANCE.md",
-      "bytes": 4278,
-      "sha256": "849ea9e7b5b0ecd5f2ddf761f3fcce6ceda043627a905ebc0c40ba744c286910"
+      "bytes": 5682,
+      "sha256": "b267f67e091fe4adfe741b7cfae95724e8aac192c40f333aa8cdf90e95929b2d"
     },
     {
       "path": "grant-demo/README.md",
-      "bytes": 1780,
-      "sha256": "007748498940442ea3ff8b6c603fc7e9df308dbdc7ad8c9bccb5f60c863fecec"
+      "bytes": 1964,
+      "sha256": "4ed19d7ecb54134fbbc2158b275232f9c0ff785d4779e849a04f4d05af2a9c7f"
     },
     {
       "path": "grant-demo/VERIFICATION.md",
-      "bytes": 3253,
-      "sha256": "3ed1bfc0842427a308efcef2d4940bffc51991b661b92277a8b02e4c01c437b7"
+      "bytes": 4518,
+      "sha256": "90e366efde9f542a7d7d505ed987a5d2129ccc2057b4e3bbb31e7e15bd3810a5"
     },
     {
       "path": "grant-demo/app.js",
-      "bytes": 7859,
-      "sha256": "e2b5b3dab4c402bbf31e0f1ba74e12521f24c30bf39fd5693b1358f87ec04461"
+      "bytes": 8200,
+      "sha256": "1e4dd2a76de91d5ff0c312aa18b105acb5d9cc3268767ce58528c0e2edd70a54"
     },
     {
       "path": "grant-demo/examples.js",
-      "bytes": 1496,
-      "sha256": "4d49a9b13ca5a84f1b6840ca63ab75ae1cd21319736dae337590e427b01de734"
+      "bytes": 1570,
+      "sha256": "0e6ac51a81d78a61999c9bad79691e82a98a4b6a5dfe9d1fa58eca930e905aad"
     },
     {
       "path": "grant-demo/index.html",
-      "bytes": 9235,
-      "sha256": "048b6118cb9c899a85c02b57aff5c6fe2ca0e730752428066da14373a8a69242"
+      "bytes": 7400,
+      "sha256": "37fb9e21a6a95d8cd8b5270f4014a0f8b1435653e32b48971076086d34de2b08"
+    },
+    {
+      "path": "grant-demo/media/example-1a.mp4",
+      "bytes": 818120,
+      "sha256": "b142e4df68b709475cc016c35b67d2a6999afc8c7644b91722093cd2e4355b5d"
+    },
+    {
+      "path": "grant-demo/media/example-2a.mp4",
+      "bytes": 890714,
+      "sha256": "dd57e8de24c28ce89977864af7689bbe4b0955d59e200d16747b1271bc5a0149"
     },
     {
       "path": "grant-demo/screenshots/main-desktop.png",
-      "bytes": 472469,
-      "sha256": "e025c6a12155c2e69761a0069ea9e3a0e7c510fa59d993ac0fe81dbc74883ad6"
+      "bytes": 505657,
+      "sha256": "d3a79ecd2a45b2528a64cdfcb2675341e5092de345a4af6ca8d0f910060838f9"
     },
     {
       "path": "grant-demo/screenshots/mobile-390.png",
-      "bytes": 372135,
-      "sha256": "e32e5283898a5a281b95c25f393e9c1c31535753ca78d7f92eb6c40d720058ef"
+      "bytes": 439935,
+      "sha256": "64a1f7bd75aa5c8d47a8ca5f570801e1dddb3a1561b860e758d9e7634dec5214"
     },
     {
       "path": "grant-demo/screenshots/timeline-2a.png",
-      "bytes": 475260,
-      "sha256": "54e64777e5bd394ff9d00d054c818d1f0f6e7f693687224ab0d5df7d451877bb"
+      "bytes": 522257,
+      "sha256": "7da0637a710611dcf63f4d9e0399bf0e22d5ef1505aa7d87c17ec115bb2860fc"
     },
     {
       "path": "grant-demo/serve.py",
-      "bytes": 691,
-      "sha256": "f1bd87af7ff159095db6148d7cd7eebac010e458821fb8a4220b74f0c1957ed8"
+      "bytes": 2469,
+      "sha256": "3335741b37c9dbf28f5d05ae308465521d2c8cb5104b261d2dd10d4c960201b5"
     },
     {
       "path": "grant-demo/style.css",
-      "bytes": 8180,
-      "sha256": "18df756ec9ed43e19ccf237abe5e95ec77680dfcd47981d773843f24c161014f"
+      "bytes": 9251,
+      "sha256": "ea1bfa31a24b36123734ba8c4412472d63d84bda5f66596957d4eca74c6ed83b"
+    },
+    {
+      "path": "grant-demo/test_serve.py",
+      "bytes": 2585,
+      "sha256": "5008ec281d1df506ae19634ba3b1edbb5d98515ff6d405b50c727858400a73f7"
     },
     {
       "path": "package.json",

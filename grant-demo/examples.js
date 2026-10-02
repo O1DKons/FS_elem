@@ -1,6 +1,7 @@
 window.FS_EXAMPLES = [
   {
     "id": "48",
+    "media": "media/example-1a.mp4",
     "label": "Сохранённый пример 1A",
     "nominal": "1A",
     "start": 1.8083333333333333,
@@ -19,6 +20,7 @@ window.FS_EXAMPLES = [
   },
   {
     "id": "16",
+    "media": "media/example-2a.mp4",
     "label": "Сохранённый пример 2A",
     "nominal": "2A",
     "start": 1.9266666666666667,
