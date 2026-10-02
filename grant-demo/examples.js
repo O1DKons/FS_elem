@@ -1,0 +1,38 @@
+window.FS_EXAMPLES = [
+  {
+    "id": "48",
+    "label": "Сохранённый пример 1A",
+    "nominal": "1A",
+    "start": 1.8083333333333333,
+    "end": 2.158333333333333,
+    "duration": 3.0,
+    "sourceSha256": "b142e4df68b709475cc016c35b67d2a6999afc8c7644b91722093cd2e4355b5d",
+    "receiptSha256": "b34964a34d1c70603258fe8aa12ad094b3300c1a72a65394184d30df2cd30937",
+    "receiptPath": "work/axel-single-recipe-runtime-v1/runs-v4/personal-48-cold.json",
+    "recipeSha256": "7b3d029ec114b010ac578340a4d92428dd4f64e48b34d5a49c2a90c328e23a76",
+    "underrotation": null,
+    "physicalAirborneTurns": null,
+    "trainingOverlap": true,
+    "globalAthleteIndependenceVerified": false,
+    "coldSeconds": 38.902,
+    "warmSeconds": 2.099
+  },
+  {
+    "id": "16",
+    "label": "Сохранённый пример 2A",
+    "nominal": "2A",
+    "start": 1.9266666666666667,
+    "end": 2.3933333333333335,
+    "duration": 3.686666666666667,
+    "sourceSha256": "dd57e8de24c28ce89977864af7689bbe4b0955d59e200d16747b1271bc5a0149",
+    "receiptSha256": "b9100fe666ffbf53f93004def76254886369d43c61285d1351d0f3b26529e5c7",
+    "receiptPath": "work/axel-single-recipe-runtime-v1/runs-v4/personal-16-cold.json",
+    "recipeSha256": "7b3d029ec114b010ac578340a4d92428dd4f64e48b34d5a49c2a90c328e23a76",
+    "underrotation": null,
+    "physicalAirborneTurns": null,
+    "trainingOverlap": true,
+    "globalAthleteIndependenceVerified": false,
+    "coldSeconds": 41.654,
+    "warmSeconds": 1.842
+  }
+];

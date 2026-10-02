@@ -1,0 +1,11 @@
+# Публичный snapshot
+
+Исходный Git: один commit de3592a от 15.09.2026 17:58:00+05:00. Его максимальный blob 221486 байт, лимит GitHub100MiB не затронут. История содержит исключённые archive inventories с приватными путями; поэтому выбрана новая clean история публичной копии. Исходный checkout, index и история не менялись. Git timestamp является локальным свидетельством, не юридическим доказательством состава команды или даты всей текущей разработки.
+
+Включено: apps/web, server, services/analysis, shared, contracts, scripts и tests (source-only), root package/config example, config v4 как reference, схема и screenshots grant-demo, schema-v2 и phase proposals. Исследовательские source-only helpers: worker.py, events.py, selection.py, extract_full_program.py, temporal.py, windows.py в исходных относительных путях work/. Из docs/grant включены только architecture.md и development-state.json после сигнала координатора. Reporting и проекты актов исключены по последнему прямому указанию пользователя.
+
+Исключено: .git исходника, archive inventory, raw media/кадры/фамилии спортсменов, dataset/экспертный реестр, модели, тяжёлые work, кеши, env, node_modules, credentials/config.local, внутренние research receipts, qa pages. Полный локальный tracked/untracked inventory хранится у владельца; публичный manifest перечисляет только опубликованные пути.
+
+Абсолютные private paths в текстовой копии заменены на /path/to/…; перечисленные в manifest original SHA и published SHA различаются. Поэтому исходные v4 input pins автоматически не валидируют изменённую копию. Для inference необходимы права на исходники/модели, доступ к исключённым весам, исходная среда, миграция путей и новый проверенный конфиг. Эта публикация не обещает автономного inference. Демонстрация работает автономно.
+
+Код лицензии проекта не содержит. LICENSE не придуман. Python/model third-party лицензии и условия dataset перед реальным распространением моделей/данных проверяются отдельно; эти assets не включены. npm dependency лицензии определены их package metadata, список в THIRD_PARTY_DEPENDENCIES.json; node_modules не распространяются.

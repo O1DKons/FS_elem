@@ -1,0 +1,212 @@
+[
+  {
+    "name": "react",
+    "version": "19.2.6",
+    "license": "MIT",
+    "declared": "19.2.6"
+  },
+  {
+    "name": "react-dom",
+    "version": "19.2.6",
+    "license": "MIT",
+    "declared": "19.2.6"
+  },
+  {
+    "name": "react-server-dom-webpack",
+    "version": "19.2.6",
+    "license": "MIT",
+    "declared": "19.2.6"
+  },
+  {
+    "name": "vinext",
+    "version": "1.0.0-beta.5",
+    "license": "MIT",
+    "declared": "1.0.0-beta.5"
+  },
+  {
+    "name": "@base-ui/react",
+    "version": "1.7.0",
+    "license": "MIT",
+    "declared": "1.7.0"
+  },
+  {
+    "name": "@shadcn/react",
+    "version": "0.3.0",
+    "license": "MIT",
+    "declared": "0.3.0"
+  },
+  {
+    "name": "class-variance-authority",
+    "version": "0.7.1",
+    "license": "Apache-2.0",
+    "declared": "0.7.1"
+  },
+  {
+    "name": "clsx",
+    "version": "2.1.1",
+    "license": "MIT",
+    "declared": "2.1.1"
+  },
+  {
+    "name": "cmdk",
+    "version": "1.1.1",
+    "license": "MIT",
+    "declared": "1.1.1"
+  },
+  {
+    "name": "date-fns",
+    "version": "4.1.0",
+    "license": "MIT",
+    "declared": "4.1.0"
+  },
+  {
+    "name": "embla-carousel-react",
+    "version": "8.5.2",
+    "license": "MIT",
+    "declared": "8.5.2"
+  },
+  {
+    "name": "input-otp",
+    "version": "1.4.2",
+    "license": "MIT",
+    "declared": "1.4.2"
+  },
+  {
+    "name": "lucide-react",
+    "version": "1.31.0",
+    "license": "ISC",
+    "declared": "1.31.0"
+  },
+  {
+    "name": "react-day-picker",
+    "version": "9.8.1",
+    "license": "MIT",
+    "declared": "9.8.1"
+  },
+  {
+    "name": "react-resizable-panels",
+    "version": "4.5.8",
+    "license": "MIT",
+    "declared": "4.5.8"
+  },
+  {
+    "name": "recharts",
+    "version": "3.8.0",
+    "license": "MIT",
+    "declared": "3.8.0"
+  },
+  {
+    "name": "shadcn",
+    "version": "4.18.0",
+    "license": "MIT",
+    "declared": "4.18.0"
+  },
+  {
+    "name": "tailwind-merge",
+    "version": "3.6.0",
+    "license": "MIT",
+    "declared": "3.6.0"
+  },
+  {
+    "name": "tw-animate-css",
+    "version": "1.4.0",
+    "license": "MIT",
+    "declared": "1.4.0"
+  },
+  {
+    "name": "@cloudflare/vite-plugin",
+    "version": "1.37.1",
+    "license": "MIT",
+    "declared": "1.37.1"
+  },
+  {
+    "name": "@cloudflare/workers-types",
+    "version": "4.20260515.1",
+    "license": "MIT OR Apache-2.0",
+    "declared": "4.20260515.1"
+  },
+  {
+    "name": "@openai/sites-vite-plugin",
+    "version": "0.2.0",
+    "license": "MIT",
+    "declared": "0.2.0"
+  },
+  {
+    "name": "@tailwindcss/postcss",
+    "version": "4.2.1",
+    "license": "MIT",
+    "declared": "4.2.1"
+  },
+  {
+    "name": "@types/node",
+    "version": "22.19.19",
+    "license": "MIT",
+    "declared": "22.19.19"
+  },
+  {
+    "name": "@types/react",
+    "version": "19.2.14",
+    "license": "MIT",
+    "declared": "19.2.14"
+  },
+  {
+    "name": "@types/react-dom",
+    "version": "19.2.3",
+    "license": "MIT",
+    "declared": "19.2.3"
+  },
+  {
+    "name": "@vitejs/plugin-react",
+    "version": "6.0.2",
+    "license": "MIT",
+    "declared": "6.0.2"
+  },
+  {
+    "name": "@vitejs/plugin-rsc",
+    "version": "0.5.26",
+    "license": "MIT",
+    "declared": "0.5.26"
+  },
+  {
+    "name": "oxfmt",
+    "version": "0.61.0",
+    "license": "MIT",
+    "declared": "0.61.0"
+  },
+  {
+    "name": "oxlint",
+    "version": "1.76.0",
+    "license": "MIT",
+    "declared": "1.76.0"
+  },
+  {
+    "name": "oxlint-tsgolint",
+    "version": "7.0.2001",
+    "license": "MIT",
+    "declared": "7.0.2001"
+  },
+  {
+    "name": "tailwindcss",
+    "version": "4.2.1",
+    "license": "MIT",
+    "declared": "4.2.1"
+  },
+  {
+    "name": "typescript",
+    "version": "5.9.3",
+    "license": "Apache-2.0",
+    "declared": "5.9.3"
+  },
+  {
+    "name": "vite",
+    "version": "8.0.13",
+    "license": "MIT",
+    "declared": "8.0.13"
+  },
+  {
+    "name": "wrangler",
+    "version": "4.92.0",
+    "license": "MIT OR Apache-2.0",
+    "declared": "4.92.0"
+  }
+]

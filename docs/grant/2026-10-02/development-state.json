@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "project": "FS_elem",
+  "collectedAtUtc": "2026-10-02T07:10:03.783274+00:00",
+  "purpose": "Technical identification of existing development artifacts for grant dossier",
+  "localGitHead": "de3592a9738e60486bf536faedb083accc32eb70",
+  "localCommitRecordedDate": "2026-09-15T17:58:00+05:00",
+  "hasUncommittedDevelopment": true,
+  "historicalDateIndependentlyTimestamped": false,
+  "organizationNameAsSupplied": "МОО «ФФККЛ»",
+  "developerRoleAsSupplied": "Ведущий ML-инженер (самозанятый)",
+  "organizationAuthorshipVerified": false,
+  "rightsTransferVerified": false,
+  "signedActsAvailable": false,
+  "grantStartDateConfirmed": false,
+  "currentDevelopmentEvaluation": {
+    "N": 8,
+    "D": 6,
+    "C": 5,
+    "FP": 0
+  },
+  "jointCorrectPercent": 62.5,
+  "independentAccuracyVerified": false,
+  "realtimeVerified": false,
+  "underrotationValidated": false,
+  "foundationServiceInferenceAvailable": false,
+  "researchCliAvailableOnExistingLocalStand": true,
+  "publicationCompleted": false,
+  "evidenceFiles": [
+    {
+      "path": "scripts/run_axel_research.py",
+      "bytes": 13053,
+      "sha256": "d7a36d0091407549fb14cb3d2c750905721bce252e2d8396fa40f93ac2fe0fd2"
+    },
+    {
+      "path": "configs/axel-research-runtime-v4.json",
+      "bytes": 12299,
+      "sha256": "7b3d029ec114b010ac578340a4d92428dd4f64e48b34d5a49c2a90c328e23a76"
+    },
+    {
+      "path": "scripts/evaluate_axel_pipeline.py",
+      "bytes": 14876,
+      "sha256": "b6ed3db016be3e4d150fe189a8f6fcf29faed018d81853671316639419b556ce"
+    },
+    {
+      "path": "server/api.mjs",
+      "bytes": 3394,
+      "sha256": "1e7f2c5c14adad47cdbde3565530bd0df5d5988173f580bf0a2f9b81fadb4e48"
+    },
+    {
+      "path": "server/store.mjs",
+      "bytes": 6405,
+      "sha256": "e99aa2976a735b846af3e7e44a2b260c455fe5e1ffee8d286daed466f09938c6"
+    },
+    {
+      "path": "server/validation.mjs",
+      "bytes": 3670,
+      "sha256": "03fee0b538740a69db7659f7b6513fddfffb06a5159888d33d199c55085f20cd"
+    },
+    {
+      "path": "services/analysis/server.py",
+      "bytes": 1430,
+      "sha256": "c1339b3fb9a5407d85ac359d37799fb576901629a864be2734864c3e506d6a37"
+    },
+    {
+      "path": "contracts/analysis-result.schema.json",
+      "bytes": 3167,
+      "sha256": "61b252517dae11883def227cea1cb7243a3a89747bf2864967dbb04a046602e4"
+    },
+    {
+      "path": "docs/research/axel-single-recipe-runtime-2026-10-01.md",
+      "bytes": 12328,
+      "sha256": "ffbcba4a3a23fafa772ee1d0f635a180ae33adf573b74af0528854ccdb3a7f3b"
+    },
+    {
+      "path": "docs/research/audit-evidence-2026-10-01/nominal81d-matched-fit-v3-actual-posthoc-coordinator-acceptance-2026-10-02.json",
+      "bytes": 1875,
+      "sha256": "4724041cdd97fa03f7d33607000865cea646f58b38a63f6ab6b322a037ee4212"
+    }
+  ],
+  "limits": [
+    "Hashes identify the bytes collected now, not the past creation date or organization ownership.",
+    "A new GitHub publication does not independently establish prior development.",
+    "The source has uncommitted research work; the foundation Git commit is not the current ML version.",
+    "Development evaluation uses familiar or reused footage; no independent accuracy claim.",
+    "No raw video, model values, private contracts or credentials were read to create this evidence record."
+  ]
+}

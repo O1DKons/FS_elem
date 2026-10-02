@@ -1,0 +1,14 @@
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+*.tsbuildinfo
+.next/
+.vinext/
+dist/
+data/
+work/
+config.local.json
+.DS_Store
+.runtime/
+phase-cache/
