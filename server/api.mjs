@@ -1,4 +1,5 @@
 import {statSync,createReadStream} from 'node:fs';
+import {request as httpRequest} from 'node:http';
 export function parseRange(header,size) {
   const m=/^bytes=(\d*)-(\d*)$/.exec(header||'');
   if(!m || (!m[1]&&!m[2])) throw Error('Invalid range');
@@ -15,11 +16,29 @@ export function createApi(store,{analysisPort}={}) {
       if(!path.startsWith('/api/')&&!path.startsWith('/media/')) return next();
       const port=req.socket.localPort;
       if(![`127.0.0.1:${port}`,`localhost:${port}`].includes(req.headers.host)) return send(403,{error:'Local access only'});
-      if(req.method==='GET' && path==='/api/health') return send(200,{app:'fs-elem',schemaVersion:2,status:'ready'});
-      if(req.method==='GET' && path==='/api/analysis/health') {
-        if(!analysisPort) return send(503,{error:'Analysis service unavailable'});
-        const r=await fetch(`http://127.0.0.1:${analysisPort}/health`,{signal:AbortSignal.timeout(2000)});return send(r.status,await r.json());
+      if(path.startsWith('/api/analysis/')) {
+        const fail=(status,code,message)=>send(status,{error:{code,message}});
+        if(!analysisPort)return fail(503,'SERVICE_UNAVAILABLE','Analysis service unavailable');
+        if(req.headers['sec-fetch-site']==='cross-site' || (req.headers.origin && req.headers.origin!==`http://${req.headers.host}`))return fail(403,'ORIGIN_REJECTED','Origin rejected');
+        const route=path==='/api/analysis/health'?'/health':path.slice('/api/analysis'.length);
+        if(route!=='/health' && !/^\/jobs(?:\/[a-z0-9-]+(?:\/(?:state|result|pose|media))?)?$/.test(route))return fail(404,'NOT_FOUND','Not found');
+        if(!['GET','HEAD','POST','DELETE'].includes(req.method))return fail(405,'METHOD_NOT_ALLOWED','Method not allowed');
+        const declared=req.headers['content-length'];
+        if(declared && (!/^\d+$/.test(declared) || Number(declared)>512*1024*1024))return fail(413,'TOO_LARGE','Maximum video size is 512 MiB');
+        const headers={};
+        for(const name of ['content-type','content-length','x-filename','range'])if(req.headers[name])headers[name]=req.headers[name];
+        // Stream raw bytes and ranged media; never buffer an entire video in Node.
+        const upstream=httpRequest({hostname:'127.0.0.1',port:analysisPort,path:route,method:req.method,headers},response=>{
+          const forwarded={};
+          for(const name of ['content-type','content-length','content-range','accept-ranges','cache-control'])if(response.headers[name])forwarded[name]=response.headers[name];
+          res.writeHead(response.statusCode||502,forwarded);response.on('error',()=>res.destroy());response.pipe(res);
+        });
+        upstream.setTimeout(120000,()=>upstream.destroy(Error('Analysis service timed out')));
+        upstream.on('error',()=>{if(res.headersSent)res.destroy();else fail(503,'SERVICE_UNAVAILABLE','Analysis service unavailable');});
+        req.on('aborted',()=>upstream.destroy());res.on('close',()=>{if(!res.writableFinished)upstream.destroy();});
+        req.pipe(upstream);return;
       }
+      if(req.method==='GET' && path==='/api/health') return send(200,{app:'fs-elem',schemaVersion:2,status:'ready'});
       if(req.method==='GET' && path==='/api/catalog') return send(200,store.catalog());
       if(req.method==='GET' && path==='/api/annotations') return send(200,store.read());
       if(req.method==='PUT' && path==='/api/annotations') {

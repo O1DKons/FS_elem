@@ -10,7 +10,7 @@ async function stop(code=0) {
   await Promise.all(children.map(async child=>{
     if(!child.pid || child.exitCode!==null || child.signalCode!==null)return;
     const ended=once(child,'exit');child.kill('SIGTERM');
-    const timer=setTimeout(()=>child.kill('SIGKILL'),3000);
+    const timer=setTimeout(()=>child.kill('SIGKILL'),12000);
     await ended;clearTimeout(timer);
   }));
   process.exit(code);

@@ -1,0 +1,230 @@
+{
+  "fixtureKind": "synthetic-consumer-only",
+  "apiContract": "runtime/API.md",
+  "notInferenceEvidence": true,
+  "pose": {
+    "schemaVersion": 1,
+    "jobId": "00000000-0000-4000-8000-000000000001",
+    "source": {
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "width": 1920,
+      "height": 1080,
+      "fps": 50,
+      "frameCount": 100,
+      "durationSeconds": 1.98,
+      "rotationDegrees": 0
+    },
+    "layout": "coco-wholebody-first23",
+    "coordinateSpace": "displayed-source-pixels",
+    "scoreKind": "raw-heatmap-peak",
+    "maxNearestSeconds": {
+      "sparse": 0.065,
+      "dense": 0.025
+    },
+    "keypointNames": [
+      "nose",
+      "left_eye",
+      "right_eye",
+      "left_ear",
+      "right_ear",
+      "left_shoulder",
+      "right_shoulder",
+      "left_elbow",
+      "right_elbow",
+      "left_wrist",
+      "right_wrist",
+      "left_hip",
+      "right_hip",
+      "left_knee",
+      "right_knee",
+      "left_ankle",
+      "right_ankle",
+      "left_big_toe",
+      "left_small_toe",
+      "left_heel",
+      "right_big_toe",
+      "right_small_toe",
+      "right_heel"
+    ],
+    "edges": [
+      [
+        5,
+        7
+      ],
+      [
+        7,
+        9
+      ]
+    ],
+    "frames": [
+      {
+        "frameIndex": 25,
+        "timeSeconds": 0.50007,
+        "density": "dense",
+        "candidateId": "synthetic-axel",
+        "points": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          {
+            "x": 500,
+            "y": 200,
+            "confidence": 0.8
+          },
+          null,
+          {
+            "x": 600,
+            "y": 300,
+            "confidence": 0.29
+          },
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "frameIndex": 50,
+        "timeSeconds": 1.011,
+        "density": "sparse",
+        "candidateId": null,
+        "points": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      }
+    ]
+  },
+  "handDerivedCases": [
+    {
+      "label": "contain-1920x1080-in-400-square",
+      "canvas": {
+        "width": 400,
+        "height": 400
+      },
+      "seekTimeSeconds": 0.524,
+      "expectedFrameIndex": 25,
+      "expectedImageRect": {
+        "x": 0,
+        "y": 87.5,
+        "width": 400,
+        "height": 225
+      },
+      "expectedLeftShoulderCanvas": {
+        "x": 104.16666666666667,
+        "y": 129.16666666666666
+      },
+      "hiddenPointIndices": [
+        7
+      ],
+      "expectedDrawnEdges": 0
+    },
+    {
+      "label": "dense-sample-gap-hides",
+      "seekTimeSeconds": 0.526,
+      "expectedFrameIndex": null
+    },
+    {
+      "label": "sparse-all-null-keeps-missing",
+      "seekTimeSeconds": 1.02,
+      "expectedFrameIndex": 50,
+      "expectedVisiblePoints": 0
+    },
+    {
+      "label": "source-binding-rejects-another-video",
+      "displayedSourceSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "expectedAccepted": false
+    },
+    {
+      "label": "displayed-pixels-do-not-rotate-again",
+      "sourcePatch": {
+        "width": 1080,
+        "height": 1920,
+        "rotationDegrees": 90
+      },
+      "canvas": {
+        "width": 400,
+        "height": 400
+      },
+      "point": {
+        "x": 270,
+        "y": 480,
+        "confidence": 0.8
+      },
+      "expectedImageRect": {
+        "x": 87.5,
+        "y": 0,
+        "width": 225,
+        "height": 400
+      },
+      "expectedCanvasPoint": {
+        "x": 143.75,
+        "y": 100
+      }
+    }
+  ],
+  "nominalDefinitionCases": [
+    {
+      "nominal": "1A",
+      "nominalRevolutions": 1.5,
+      "physicalAirborneTurns": null,
+      "underrotation": null
+    },
+    {
+      "nominal": "2A",
+      "nominalRevolutions": 2.5,
+      "physicalAirborneTurns": null,
+      "underrotation": null
+    },
+    {
+      "nominal": null,
+      "nominalRevolutions": null,
+      "physicalAirborneTurns": null,
+      "underrotation": null
+    }
+  ],
+  "lifecycleCases": [
+    "empty successful events",
+    "failed with structured reason",
+    "queued cancel",
+    "running cancel pending cleanup",
+    "restart marks interrupted jobs failed",
+    "next job after terminal cleanup"
+  ],
+  "lifecycleExecutionStatus": "5 real JobManager/Handler tests passed with an inert owned child process; no NN or video decoding",
+  "geometryExecutionStatus": "5 actual UI consumer tests passed against hand-derived fixtures; no actual video overlay acceptance"
+}

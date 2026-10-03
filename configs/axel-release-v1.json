@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 1,
+  "mode": "fixed_release_recipe",
+  "groupId": "group-00",
+  "recipeSelection": "Historical fixed group-00 development model; mixed prior training origin, not an unseen-athlete accuracy claim",
+  "sampleFps": 8.333333,
+  "flightThreshold": 0.3,
+  "poseSha256": "bd033156e5104c4f5d2edfe0453e02661e30a2f3da453ec93c8764d561b83054",
+  "detectorSha256": "3dea6513388889f0fff4b77bf7a26013600321b9eb9ceb0e9a400a82572f5f23",
+  "models": {
+    "flight": {
+      "groupId": "group-00",
+      "path": "../assets/models/flight.joblib",
+      "sha256": "9d6ca74b3de38dab1366c55f55b8de0bca6052ce1aa0c7dedd45ae17cf0140e7",
+      "protocolSha256": "c52bbf929e3a914b2501ef736b0e97cd41435d5838149837f4532ac65d46071e",
+      "trainingSourceHashes": [
+        "00a77c78c9b50e8b22ba39d8c4cbdb307ccbbfceafd861d01e20ba172635652a",
+        "0801d451bff52e8a2f98a55afe0f8cc72e9afcf1e8fdd8ca9f29fdd51644b2d1",
+        "086f8f7846fee31a4bcf8eff772b2394759ae25215a9df589fcbff8cfa9957b0",
+        "0fd5f1be8e5b393d9f16c6400d34a818aa4cb9d39eed4b23b9bf46b0190c8207",
+        "24dea37c447b206fef3cb3d45d3a7e52429f4ff2f45b5d18071c2dacb93c92b1",
+        "461ab0644c84dd17c804f725e1f801e0c5dff5683c9c4b4dbecc335bdd6567fd",
+        "57d7a57fa100c1370082956e9f04c5badad26266e4e942fad73ed7afc2f4c932",
+        "660a16065739d741e73d22ad87c3eb1b74485f29a472089a27fb0938b60f5b65",
+        "7d1863159f7e15e94843e270a34923fdbd306294ad05dbbf8da664c28178ea0c",
+        "7e39008c53087f30a51823ba8bc81df827aa8178d97b8fc75f735f579c6d9322",
+        "7e8b46d408d62f66eab6adfd6d2511c2b5cc1a5b3d53bc6382bfaebe38269ec8",
+        "7ee94ac28f6d505a412723fa9ccc0827930778f7c3af62a528422cf911f95f92",
+        "83ef199462422172f4a45dbb949c64c6ef1a526077c5b3de6ec13e2aa37dab37",
+        "86704065734263bad5285fa0af9992af057ba744eaf98f996e704d409a473423",
+        "87d92e7056951653f1641fd3b27aa09de6f728cb89662b38fb1b4d0b26643001",
+        "a25d904a84ab648cd6a5c145956c1561a82770cdd60f2835c3766f2cfd9ff16f",
+        "ae0512a45d6363d032352eabe846136ccf9e37ac1345a460c667ee047eb61e60",
+        "b142e4df68b709475cc016c35b67d2a6999afc8c7644b91722093cd2e4355b5d",
+        "b41d9b64f008e5bb313f910f8534717d13f6455635e369526bd9efda95785f2b",
+        "c3c379666172ba88aca76b71a81d27fc24ca477f348ad0a835d18328e61cac2b",
+        "c7db0f5dad80d788c57d1c1ebb55ae992d898bdb9bfa449e33effccc2653c8b6",
+        "cbb1e6fbfa5ed794680657050fe89e61af579f33675c490b1938e376c6672eee",
+        "dd57e8de24c28ce89977864af7689bbe4b0955d59e200d16747b1271bc5a0149",
+        "f03cb77bb246bed47e662d711ee8b58103517fddab9ae55786d37bd58e39497b",
+        "fd4f7d68107d5e90fa69458759e6bf4b09b89c29c667920ddc13bbef1f1fd9ee",
+        "ffb727f9689724aacc9ffca92a535672b54855d5010c5f72b0f46eab3a00acfd"
+      ],
+      "originalSha256": "f30ed99b4548a3f55bfa9a0066a4e8fff1191f61da0f27504800a0fb609b9e1e"
+    },
+    "family": {
+      "groupId": "group-00",
+      "path": "../assets/models/family.joblib",
+      "sha256": "1f696a6ab8a300320b7cdff5875ec22a6206ff32bd731c81db00f905529d5f72",
+      "classCounts": {
+        "axel": 33,
+        "other": 276
+      },
+      "protocolSha256": "bc265d805de691ac301613dbacefa5026ecb9b1fc3ad446bc1d7375ae2bae828",
+      "trainingSourceHashes": [
+        "00a77c78c9b50e8b22ba39d8c4cbdb307ccbbfceafd861d01e20ba172635652a",
+        "0801d451bff52e8a2f98a55afe0f8cc72e9afcf1e8fdd8ca9f29fdd51644b2d1",
+        "086f8f7846fee31a4bcf8eff772b2394759ae25215a9df589fcbff8cfa9957b0",
+        "0fd5f1be8e5b393d9f16c6400d34a818aa4cb9d39eed4b23b9bf46b0190c8207",
+        "24dea37c447b206fef3cb3d45d3a7e52429f4ff2f45b5d18071c2dacb93c92b1",
+        "461ab0644c84dd17c804f725e1f801e0c5dff5683c9c4b4dbecc335bdd6567fd",
+        "57d7a57fa100c1370082956e9f04c5badad26266e4e942fad73ed7afc2f4c932",
+        "660a16065739d741e73d22ad87c3eb1b74485f29a472089a27fb0938b60f5b65",
+        "7d1863159f7e15e94843e270a34923fdbd306294ad05dbbf8da664c28178ea0c",
+        "7e39008c53087f30a51823ba8bc81df827aa8178d97b8fc75f735f579c6d9322",
+        "7e8b46d408d62f66eab6adfd6d2511c2b5cc1a5b3d53bc6382bfaebe38269ec8",
+        "7ee94ac28f6d505a412723fa9ccc0827930778f7c3af62a528422cf911f95f92",
+        "83ef199462422172f4a45dbb949c64c6ef1a526077c5b3de6ec13e2aa37dab37",
+        "86704065734263bad5285fa0af9992af057ba744eaf98f996e704d409a473423",
+        "87d92e7056951653f1641fd3b27aa09de6f728cb89662b38fb1b4d0b26643001",
+        "a25d904a84ab648cd6a5c145956c1561a82770cdd60f2835c3766f2cfd9ff16f",
+        "ae0512a45d6363d032352eabe846136ccf9e37ac1345a460c667ee047eb61e60",
+        "b142e4df68b709475cc016c35b67d2a6999afc8c7644b91722093cd2e4355b5d",
+        "b41d9b64f008e5bb313f910f8534717d13f6455635e369526bd9efda95785f2b",
+        "c3c379666172ba88aca76b71a81d27fc24ca477f348ad0a835d18328e61cac2b",
+        "c7db0f5dad80d788c57d1c1ebb55ae992d898bdb9bfa449e33effccc2653c8b6",
+        "cbb1e6fbfa5ed794680657050fe89e61af579f33675c490b1938e376c6672eee",
+        "dd57e8de24c28ce89977864af7689bbe4b0955d59e200d16747b1271bc5a0149",
+        "f03cb77bb246bed47e662d711ee8b58103517fddab9ae55786d37bd58e39497b",
+        "fd4f7d68107d5e90fa69458759e6bf4b09b89c29c667920ddc13bbef1f1fd9ee",
+        "ffb727f9689724aacc9ffca92a535672b54855d5010c5f72b0f46eab3a00acfd"
+      ],
+      "originalSha256": "8607504b1afaf0f0b7d0b111d253b4b465017f2fb21ebee312512e1c2cedc008"
+    },
+    "nominal": {
+      "path": "../assets/models/nominal.joblib",
+      "sha256": "f4c2e2b70400bd161a3c9bed62e5e892d6712134719a647a0dd53877bce792f1",
+      "protocolSha256": "bc265d805de691ac301613dbacefa5026ecb9b1fc3ad446bc1d7375ae2bae828",
+      "trainingSourceHashes": [
+        "00a77c78c9b50e8b22ba39d8c4cbdb307ccbbfceafd861d01e20ba172635652a",
+        "0801d451bff52e8a2f98a55afe0f8cc72e9afcf1e8fdd8ca9f29fdd51644b2d1",
+        "086f8f7846fee31a4bcf8eff772b2394759ae25215a9df589fcbff8cfa9957b0",
+        "0fd5f1be8e5b393d9f16c6400d34a818aa4cb9d39eed4b23b9bf46b0190c8207",
+        "24dea37c447b206fef3cb3d45d3a7e52429f4ff2f45b5d18071c2dacb93c92b1",
+        "57d7a57fa100c1370082956e9f04c5badad26266e4e942fad73ed7afc2f4c932",
+        "660a16065739d741e73d22ad87c3eb1b74485f29a472089a27fb0938b60f5b65",
+        "7d1863159f7e15e94843e270a34923fdbd306294ad05dbbf8da664c28178ea0c",
+        "7e39008c53087f30a51823ba8bc81df827aa8178d97b8fc75f735f579c6d9322",
+        "7e8b46d408d62f66eab6adfd6d2511c2b5cc1a5b3d53bc6382bfaebe38269ec8",
+        "83ef199462422172f4a45dbb949c64c6ef1a526077c5b3de6ec13e2aa37dab37",
+        "ae0512a45d6363d032352eabe846136ccf9e37ac1345a460c667ee047eb61e60",
+        "b41d9b64f008e5bb313f910f8534717d13f6455635e369526bd9efda95785f2b",
+        "c3c379666172ba88aca76b71a81d27fc24ca477f348ad0a835d18328e61cac2b",
+        "fd4f7d68107d5e90fa69458759e6bf4b09b89c29c667920ddc13bbef1f1fd9ee",
+        "ffb727f9689724aacc9ffca92a535672b54855d5010c5f72b0f46eab3a00acfd"
+      ],
+      "originalSha256": "f4c2e2b70400bd161a3c9bed62e5e892d6712134719a647a0dd53877bce792f1"
+    }
+  },
+  "worker": "../runtime/pipeline/worker.py",
+  "sparseExtractor": "../runtime/pipeline/sparse.py",
+  "helpers": {
+    "temporal": "../runtime/pipeline/temporal.py",
+    "decoder": "../runtime/pipeline/selection.py",
+    "windows": "../runtime/pipeline/windows.py"
+  },
+  "ffmpeg": {
+    "path": "../.runtime/bin/ffmpeg",
+    "sha256": "6d175a4743ca50256e89a8cdd731100f9cee33bd79aeea46894d209410dc6617"
+  },
+  "scienceVersions": {
+    "numpy": "2.5.3",
+    "scikit-learn": "1.9.0",
+    "joblib": "1.6.0"
+  },
+  "poseVersions": {
+    "numpy": "2.0.2",
+    "rtmlib": "0.0.15",
+    "onnxruntime": "1.19.2",
+    "opencv-python": "5.0.0.93"
+  },
+  "inputSha256": {
+    "../runtime/pipeline/events.py": "8d591a7286e9a8ce1717c67d1390fab954932406560def8748dceb4472325f35",
+    "../runtime/pipeline/pose_models.py": "b9e8834d8b730ddafbd6750d353bc85446d05d6342277ab2a8ecf5adb49fe946",
+    "../runtime/pipeline/run.py": "3e2c89b28f6646cd8133f55b387ac0b8afef6b964042710826c3fad0a539cc42",
+    "../runtime/pipeline/selection.py": "05f849f1ed27b454671c752ee63ed2923eb78b9299cdfcbfc166a3b7fc667ca9",
+    "../runtime/pipeline/sparse.py": "2e6f9d0c39e8645c786357371d572324d8b97feae9ef580e614133996dac56d5",
+    "../runtime/pipeline/support.py": "598d21fd251792235a8802d4e9067959fb67dfc054d1ea2dff2a447418ae3f30",
+    "../runtime/pipeline/temporal.py": "71e20d9bbf3df07bee7c4e964afea696d0bca905b132bc58c94903ee169692d4",
+    "../runtime/pipeline/windows.py": "d6dcf81a59b1870a2ce06b2f8a514128f7b143cdf8b9e3b1858473c8b1187752",
+    "../runtime/pipeline/worker.py": "b0fbbb508158bbf6ea5f538a1f44c2ecbd367eea1758501244d4f4018a7a7a66",
+    "../scripts/axel_family.py": "4cbdc5067a37cd7d48b1b01dad1dc47a9e0f6cf3955881e4d9cfc59abade138c",
+    "../scripts/axel_features.py": "57137956fcd3422f66608128faecc0f22d0eccc6449e50eaa4b8245c2cd3f439",
+    "../scripts/axel_rtmw_windows.py": "e4468e72d28b11da98e39f279f48ff5be53ab3b3c90e3d2470309604b3aa7fc2",
+    "../scripts/full_context_contact.py": "1be041b89614bda4cd43aca078c091d21e223b5045d875f0b7087e93f8c70293",
+    "../scripts/phase_contact_pilot.py": "16458d28ea69b52bd7846331c891ae580427527e407afb183215aa2a76bb8375",
+    "../scripts/pose_cache_contract.py": "336d584c1777d369ade2c20d0bf14184a5584f6436c8d93e4ce9c239120da711",
+    "../scripts/rtmpose_adapter.py": "db7e931a9a80d72f16631300ff4b257e341b19a8cf9c653424225259e43cabdd",
+    "../scripts/run_rotation_proxy_baseline.py": "b989ca53a9479d10bacfbbed3ddaef90b2c4a54dac1f2d37531cca3c626493b2",
+    "../scripts/sparse_pose_timestamps.py": "8610eee27dcb55805b381d9d7cc43253ebf4e67143e4d4129585d8b97ca96b24",
+    "../scripts/video_native_type.py": "4f929b99a8238b361a6509898edd66628bd54b75b173229bb1631c4cf2ad467b",
+    "../scripts/video_pose_type.py": "d0471ecbcc11d0ce70d7ef7de159decea529ca22e758b164668cade43a33ae9d",
+    "../scripts/video_type_model.py": "d5c6a7e4f8a67bdd6d142fc1bb623aff118d79b1c11ceca12d12488c0d67e784"
+  },
+  "globalAthleteIndependenceVerified": false,
+  "nominalGuard": "usableTorsoFrames>=3 and finiteSpectralFeatures>0",
+  "underrotation": null,
+  "goal70Verified": false,
+  "denseGeometry": {
+    "keypointLayout": "coco-wholebody-first23",
+    "coordinateSpace": "original-source-pixels",
+    "frameAxis": "original-decoded-frame-index",
+    "timeAxis": "original-source-presentation-seconds",
+    "scoreKind": "raw-heatmap-peak"
+  },
+  "revisionNote": "Portable release adapter of fixed v4; unchanged classifiers, features, thresholds and guards; metadata-only model sanitation and raw pose/progress export",
+  "sciencePython": "../.runtime/venv-science/bin/python",
+  "posePython": "../.runtime/venv-pose/bin/python",
+  "checkpoints": {
+    "detector": {
+      "path": "../assets/models/yolox.onnx",
+      "sha256": "3dea6513388889f0fff4b77bf7a26013600321b9eb9ceb0e9a400a82572f5f23"
+    },
+    "pose": {
+      "path": "../assets/models/rtmw.onnx",
+      "sha256": "bd033156e5104c4f5d2edfe0453e02661e30a2f3da453ec93c8764d561b83054"
+    }
+  },
+  "researchProvenance": {
+    "originalRecipeSha256": "7b3d029ec114b010ac578340a4d92428dd4f64e48b34d5a49c2a90c328e23a76",
+    "originalRecipeRevision": "v4",
+    "priorTrainingOrigin": "historical mixed competition and personal data",
+    "newTrainingPerformed": false,
+    "packagingChange": "Training metadata removed; fitted model and preprocessing state retained. Asset admission requires sanitation receipt."
+  }
+}

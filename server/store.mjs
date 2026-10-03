@@ -1,6 +1,6 @@
 import {isDeepStrictEqual} from 'node:util';
 import {DatabaseSync} from 'node:sqlite';
-import {existsSync} from 'node:fs';
+import {existsSync,mkdirSync} from 'node:fs';
 import {join,resolve,sep} from 'node:path';
 import {validateDocument} from './validation.mjs';
 
@@ -36,7 +36,10 @@ export function initializeDatabase(path, {catalog,frames,annotations,expert,repo
 }
 export function openStore(dataDir) {
   const path=join(dataDir,'fs-elem.sqlite');
-  if(!existsSync(path)) throw Error('Данные не импортированы. Сначала выполните импорт.');
+  if(!existsSync(path)) {
+    mkdirSync(dataDir,{recursive:true});
+    initializeDatabase(path,{catalog:[],frames:{},annotations:{schemaVersion:2,revision:0,boundaryDefinition:'source presentation seconds',episodes:[]},expert:{labels:[],scope:'Empty local installation; no expert labels'},report:{mode:'empty_installation',createdAt:new Date().toISOString()}});
+  }
   const db=new DatabaseSync(path);
   try {
     db.exec('PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000;');

@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "release": "axel-release-v1",
+  "platform": {
+    "system": "macOS",
+    "architecture": "arm64",
+    "minVersion": "13"
+  },
+  "nodeMajor": 24,
+  "pnpmVersion": "11.19.0",
+  "models": [
+    {
+      "id": "flight",
+      "path": "assets/models/flight.joblib",
+      "sizeBytes": 1916697,
+      "sha256": "9d6ca74b3de38dab1366c55f55b8de0bca6052ce1aa0c7dedd45ae17cf0140e7",
+      "originalSha256": "f30ed99b4548a3f55bfa9a0066a4e8fff1191f61da0f27504800a0fb609b9e1e",
+      "protocolSha256": "c52bbf929e3a914b2501ef736b0e97cd41435d5838149837f4532ac65d46071e",
+      "url": null,
+      "format": "raw",
+      "distribution": "bundled sanitized research artifact",
+      "removedMetadataKeys": [
+        "fold"
+      ],
+      "licenseEvidence": "docs/release/model-card.md"
+    },
+    {
+      "id": "family",
+      "path": "assets/models/family.joblib",
+      "sizeBytes": 18228,
+      "sha256": "1f696a6ab8a300320b7cdff5875ec22a6206ff32bd731c81db00f905529d5f72",
+      "originalSha256": "8607504b1afaf0f0b7d0b111d253b4b465017f2fb21ebee312512e1c2cedc008",
+      "protocolSha256": "bc265d805de691ac301613dbacefa5026ecb9b1fc3ad446bc1d7375ae2bae828",
+      "url": null,
+      "format": "raw",
+      "distribution": "bundled sanitized research artifact",
+      "removedMetadataKeys": [
+        "fold"
+      ],
+      "licenseEvidence": "docs/release/model-card.md"
+    },
+    {
+      "id": "nominal",
+      "path": "assets/models/nominal.joblib",
+      "sizeBytes": 3097,
+      "sha256": "f4c2e2b70400bd161a3c9bed62e5e892d6712134719a647a0dd53877bce792f1",
+      "originalSha256": "f4c2e2b70400bd161a3c9bed62e5e892d6712134719a647a0dd53877bce792f1",
+      "protocolSha256": "bc265d805de691ac301613dbacefa5026ecb9b1fc3ad446bc1d7375ae2bae828",
+      "url": null,
+      "format": "raw",
+      "distribution": "bundled sanitized research artifact",
+      "removedMetadataKeys": [],
+      "licenseEvidence": "docs/release/model-card.md"
+    },
+    {
+      "id": "yolox",
+      "path": "assets/models/yolox.onnx",
+      "sizeBytes": 101400344,
+      "sha256": "3dea6513388889f0fff4b77bf7a26013600321b9eb9ceb0e9a400a82572f5f23",
+      "downloadSizeBytes": 94223081,
+      "downloadSha256": null,
+      "url": "https://download.openmmlab.com/mmpose/v1/projects/rtmposev1/onnx_sdk/yolox_m_8xb8-300e_humanart-c2c7a14a.zip",
+      "format": "zip",
+      "archiveSelection": "exactly one ONNX member, never extract other paths",
+      "licenseEvidence": "docs/release/third-party.md",
+      "checkpointLicenseStatus": "not explicitly verified; upstream code license is not weight clearance"
+    },
+    {
+      "id": "rtmw",
+      "path": "assets/models/rtmw.onnx",
+      "sizeBytes": 229320930,
+      "sha256": "bd033156e5104c4f5d2edfe0453e02661e30a2f3da453ec93c8764d561b83054",
+      "downloadSizeBytes": 213433855,
+      "downloadSha256": null,
+      "url": "https://download.openmmlab.com/mmpose/v1/projects/rtmw/onnx_sdk/rtmw-dw-x-l_simcc-cocktail14_270e-384x288_20231122.zip",
+      "format": "zip",
+      "archiveSelection": "exactly one ONNX member, never extract other paths",
+      "licenseEvidence": "docs/release/third-party.md",
+      "checkpointLicenseStatus": "not explicitly verified; upstream code license is not weight clearance"
+    }
+  ],
+  "sanitizationReceipt": {
+    "path": "assets/models/sanitization-release-v1.json",
+    "sha256": "dccb9e5b09c41f2c321e689a31032f3e144820d1ff3a4dae3c2620fac506f064"
+  },
+  "environments": {
+    "science": {
+      "pythonMinor": "3.12",
+      "lock": "services/analysis/requirements-science-macos-arm64.lock",
+      "lockSha256": "1e40e7635b80402059c3be3b5e514fcd7812001640b5e426ee2e5c703f98a821",
+      "packages": {
+        "cloudpickle": "3.1.2",
+        "imageio-ffmpeg": "0.6.0",
+        "joblib": "1.6.0",
+        "narwhals": "2.26.0",
+        "numpy": "2.5.3",
+        "scikit-learn": "1.9.0",
+        "scipy": "1.18.1",
+        "threadpoolctl": "3.6.0"
+      }
+    },
+    "pose": {
+      "pythonMinor": "3.9",
+      "lock": "services/analysis/requirements-pose-macos-arm64.lock",
+      "lockSha256": "4be74d2d4efcd57c700f3e81a4f96e1848338959c1f7f4ada9e33d6a8c7a17dd",
+      "packages": {
+        "coloredlogs": "15.0.1",
+        "flatbuffers": "25.12.19",
+        "humanfriendly": "10.0",
+        "mpmath": "1.3.0",
+        "numpy": "2.0.2",
+        "onnxruntime": "1.19.2",
+        "opencv-contrib-python": "5.0.0.93",
+        "opencv-python": "5.0.0.93",
+        "packaging": "26.3",
+        "protobuf": "6.33.6",
+        "rtmlib": "0.0.15",
+        "sympy": "1.14.0",
+        "tqdm": "4.70.1"
+      }
+    }
+  },
+  "ffmpeg": {
+    "id": "ffmpeg",
+    "path": ".runtime/bin/ffmpeg",
+    "sizeBytes": 49368728,
+    "sha256": "6d175a4743ca50256e89a8cdd731100f9cee33bd79aeea46894d209410dc6617",
+    "distribution": "imageio-ffmpeg==0.6.0 macOS arm64 wheel; local installation only",
+    "version": "7.1",
+    "binaryLicense": "GPL-2.0-or-later (verified local executable -L)",
+    "wrapperLicense": "BSD-2-Clause"
+  },
+  "requiredRuntimeFiles": [
+    "configs/axel-release-v1.json",
+    "runtime/API.md",
+    "runtime/pipeline/run.py",
+    "runtime/pipeline/worker.py",
+    "runtime/pipeline/sparse.py",
+    "runtime/pipeline/input-sha256.json",
+    "services/analysis/server.py",
+    "scripts/web-worker.mjs",
+    "scripts/config.mjs",
+    "services/analysis/jobs.py",
+    "runtime/analyze_job.py",
+    "runtime/pose_export.py",
+    "shared/phase-events.mjs",
+    "shared/event-editing.mjs",
+    "shared/axel-review.mjs"
+  ],
+  "limitations": [
+    "Research models, no validated new-video accuracy target",
+    "1.5/2.5 are nominal definitions, not measured physical turns",
+    "Raw FFmpeg and upstream ONNX are not bundled in GitHub",
+    "Checkpoint-specific upstream licensing remains unverified; see third-party.md"
+  ]
+}

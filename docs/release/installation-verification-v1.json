@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "status": "installed-built-offline-checked-start-stop-verified; full-video inference pending",
+  "firstSetupExitCode": 1,
+  "firstFailure": "allowlist omitted three shared UI modules; logs preserved",
+  "correctiveResumeExitCode": 0,
+  "checkExitCode": 0,
+  "startStopExitCode": 0,
+  "all16AfterRaceUiPinsMatch": true,
+  "actualEnvironment": {
+    "system": "Darwin",
+    "macOS": "27.0",
+    "architecture": "arm64",
+    "node": "24.19.0",
+    "sciencePython": "3.12.12",
+    "posePython": "3.9.25",
+    "pythonPatchDiffersFromHistorical": true,
+    "pnpm": "11.19.0"
+  },
+  "environmentsFromPublicPinnedDownloads": true,
+  "oldEnvironmentsOrCachesReused": false,
+  "sciencePipCheckPassed": true,
+  "posePipCheckPassed": true,
+  "effectiveCv2BinaryEqualsHistorical": true,
+  "modelManifestSha256": "02bac9b56af5fa012dafa27d89b809caa9ae00e007f647e2781d49756b2a855f",
+  "sanitizationReceiptSha256": "dccb9e5b09c41f2c321e689a31032f3e144820d1ff3a4dae3c2620fac506f064",
+  "requests": [
+    {
+      "path": "/api/analysis/health",
+      "status": 200,
+      "body": {
+        "service": "fs-elem-analysis",
+        "status": "ready",
+        "inferenceAvailable": true,
+        "issues": [],
+        "activeJobId": null,
+        "python": "3.12.12"
+      }
+    },
+    {
+      "path": "/analysis",
+      "status": 200,
+      "bodySizeBytes": 39192,
+      "hasAnalysisText": true
+    },
+    {
+      "path": "/api/analysis/jobs",
+      "case": "unsupported inert text bytes",
+      "status": 415,
+      "body": {
+        "error": {
+          "code": "UNSUPPORTED_FORMAT",
+          "message": "Use MP4, MOV, M4V or WebM"
+        }
+      }
+    }
+  ],
+  "fitCalls": 0,
+  "predictionCalls": 0,
+  "NN": 0,
+  "videoDecodeJobs": 0,
+  "mediaBodiesRead": 0,
+  "upstreamCheckpointSpecificLicenseVerified": false,
+  "postReviewCorrection": "Public launcher now runs full Node24/frontend lock receipt plus Python/model check before spawning services",
+  "bootstrapFixtureTestsPassed": 15,
+  "modelStateSyntheticGuardTestsPassed": 6,
+  "latestStartupRequests": [
+    {
+      "path": "/api/analysis/health",
+      "status": 200,
+      "body": {
+        "service": "fs-elem-analysis",
+        "status": "ready",
+        "inferenceAvailable": true,
+        "issues": [],
+        "activeJobId": null,
+        "python": "3.12.12"
+      }
+    },
+    {
+      "path": "/analysis",
+      "status": 200,
+      "bodySizeBytes": 39171
+    }
+  ],
+  "latestLauncherSha256": "109e183f1488bc64818d8beae8d54d626e60920c0780faf9925a179fd8aad9fa",
+  "postReviewStartupExitCode": 0,
+  "fullFrontendAndPythonStartupCheck": true,
+  "previousFinalReceiptSha256": "adb5155304b5e6ada1be87d87d1a1f0bc25cf11d9eb44c950a6372eaa3d31cd3"
+}

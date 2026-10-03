@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 2,
+  "recordedUtc": "2026-10-03T07:07:56.793883+00:00",
+  "scope": "One actual whole-program cold upload/API inference after clean Apple Silicon setup; familiar TRAIN-overlapping source, not independent accuracy",
+  "priorCodeLifecycleReceiptSha256": "79d9f3ab08a5815538733ec623c0d5212b3b382be2d1c8cb7d8d7bd3c8fb0a77",
+  "posthocReceiptSha256": "724f3d94666d7485bcb164e56bdc6b959a3d298dd4ffb1be3d4569b2b5a7ddd2",
+  "status": "actual_inference_and_http_passed",
+  "completedRealJobs": 1,
+  "trainingFits": 0,
+  "inferenceRetries": 0,
+  "cacheHit": false,
+  "source": {
+    "sha256": "fd4f7d68107d5e90fa69458759e6bf4b09b89c29c667920ddc13bbef1f1fd9ee",
+    "width": 1280,
+    "height": 720,
+    "fps": 50.0,
+    "frameCount": 9957,
+    "durationSeconds": 199.12,
+    "rotationDegrees": 0.0
+  },
+  "timings": {
+    "fullSourceProbeSeconds": 15.468200417002663,
+    "sparseExtractionSeconds": 625.2082341669884,
+    "flightFamilySeconds": 1.5222732500114944,
+    "denseExtractionSeconds": 80.44733058399288,
+    "nominalInferenceSeconds": 0.006119333003880456,
+    "totalBeforeWriteSeconds": 722.7603649169905
+  },
+  "jobLifecycleSeconds": 723.43598,
+  "returnedNominals": [
+    "2A",
+    "2A",
+    "1A"
+  ],
+  "nominalDefinition": "1A/2A are nominal 1.5/2.5 revolutions by element name; physical airborne turns are not measured",
+  "familiarSourceRegression": {
+    "historicalN": 3,
+    "reproducedD": 3,
+    "reproducedC": 3,
+    "reproducedFP": 0,
+    "basis": "All 9 event intervals/family/nominal reproduce the previously reviewed frozen comp44 result; no new expert annotation or independent evaluation"
+  },
+  "eventParity": {
+    "candidates": 9,
+    "tolerance": 1e-12,
+    "maxNumericDifference": 2.220446049250313e-16
+  },
+  "pose": {
+    "frameCount": 1824,
+    "densityCounts": {
+      "sparse": 1626,
+      "dense": 198
+    },
+    "denseWindowFrameCounts": [
+      64,
+      70,
+      64
+    ],
+    "pointsExactlyJoinedToRawObservations": 41205,
+    "nullPointsPreserved": 747,
+    "inventedOrInterpolatedFrames": 0,
+    "coordinateSpace": "displayed-source-pixels",
+    "scoreKind": "raw-heatmap-peak"
+  },
+  "http": {
+    "jobResultPose": 200,
+    "sourceRange": 206,
+    "rangeBodyBytes": 64,
+    "headSourceSizeBytes": 78192638,
+    "inferenceAvailable": true,
+    "activeJobIdAfterCompletion": null
+  },
+  "ownedInferenceProcessGroupReleased": true,
+  "localWebAndApiRetained": true,
+  "modelBindings": {
+    "flight": {
+      "sha256": "9d6ca74b3de38dab1366c55f55b8de0bca6052ce1aa0c7dedd45ae17cf0140e7",
+      "originalSha256": "f30ed99b4548a3f55bfa9a0066a4e8fff1191f61da0f27504800a0fb609b9e1e",
+      "protocolSha256": "c52bbf929e3a914b2501ef736b0e97cd41435d5838149837f4532ac65d46071e"
+    },
+    "family": {
+      "sha256": "1f696a6ab8a300320b7cdff5875ec22a6206ff32bd731c81db00f905529d5f72",
+      "originalSha256": "8607504b1afaf0f0b7d0b111d253b4b465017f2fb21ebee312512e1c2cedc008",
+      "protocolSha256": "bc265d805de691ac301613dbacefa5026ecb9b1fc3ad446bc1d7375ae2bae828"
+    },
+    "nominal": {
+      "sha256": "f4c2e2b70400bd161a3c9bed62e5e892d6712134719a647a0dd53877bce792f1",
+      "originalSha256": "f4c2e2b70400bd161a3c9bed62e5e892d6712134719a647a0dd53877bce792f1",
+      "protocolSha256": "bc265d805de691ac301613dbacefa5026ecb9b1fc3ad446bc1d7375ae2bae828"
+    }
+  },
+  "independentAccuracyClaim": false,
+  "goal70Verified": false,
+  "underrotation": null,
+  "physicalAirborneTurns": null,
+  "browserAcceptance": "Separate UI and independent peer receipts; this backend receipt does not certify visual anatomical accuracy",
+  "privateSourceVideoPublished": false,
+  "knownLimitations": [
+    "One familiar program cannot establish independent accuracy",
+    "Historical v4 mixed training provenance is retained; no new personal training",
+    "Known comp20 1A to 2A error has not been repaired by packaging",
+    "Sparse pose outside dense Axel windows; absent/out-of-image points stay null",
+    "Actual run on Mac M2 8 GB; M5 Air 16 GB not yet tested",
+    "Public release and independent browser acceptance are separate final checks"
+  ],
+  "pending": [
+    "independent_browser_acceptance",
+    "curated_public_release"
+  ]
+}

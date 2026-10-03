@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "operation": "metadata-only export of trusted existing artifacts; no model fit or scoring",
+  "models": [
+    {
+      "id": "flight",
+      "path": "assets/models/flight.joblib",
+      "sizeBytes": 1916697,
+      "sha256": "9d6ca74b3de38dab1366c55f55b8de0bca6052ce1aa0c7dedd45ae17cf0140e7",
+      "originalSha256": "f30ed99b4548a3f55bfa9a0066a4e8fff1191f61da0f27504800a0fb609b9e1e",
+      "protocolSha256": "c52bbf929e3a914b2501ef736b0e97cd41435d5838149837f4532ac65d46071e",
+      "removedMetadataKeys": [
+        "fold"
+      ],
+      "serializationRoundTripStructuralNumericParity": true,
+      "comparisonCounts": {
+        "arrays": 2404,
+        "trees": 200,
+        "objects": 203,
+        "scalars": 4862
+      },
+      "joblibHashes": {
+        "model": {
+          "original": "56f88288d4dd8f01e29009f27dce9a25",
+          "release": "56f88288d4dd8f01e29009f27dce9a25"
+        },
+        "state": {
+          "original": "8ccca4a9941ef2d1137c8e57dfda565d",
+          "release": "8ccca4a9941ef2d1137c8e57dfda565d"
+        }
+      },
+      "canonicalSemanticHashes": {
+        "model": {
+          "original": "ca4269cc1cec15bb1eed4bc5535fca01cbbf5f97",
+          "release": "ca4269cc1cec15bb1eed4bc5535fca01cbbf5f97"
+        },
+        "state": {
+          "original": "4765aefed091198e03a9df190615e26008d803af",
+          "release": "4765aefed091198e03a9df190615e26008d803af"
+        }
+      },
+      "canonicalHashesStableAcrossTwoLoads": true,
+      "admittedForRelease": true,
+      "rawJoblibModelHashStable": false,
+      "rawJoblibModelHashIsAdmissionGate": false
+    },
+    {
+      "id": "family",
+      "path": "assets/models/family.joblib",
+      "sizeBytes": 18228,
+      "sha256": "1f696a6ab8a300320b7cdff5875ec22a6206ff32bd731c81db00f905529d5f72",
+      "originalSha256": "8607504b1afaf0f0b7d0b111d253b4b465017f2fb21ebee312512e1c2cedc008",
+      "protocolSha256": "bc265d805de691ac301613dbacefa5026ecb9b1fc3ad446bc1d7375ae2bae828",
+      "removedMetadataKeys": [
+        "fold"
+      ],
+      "serializationRoundTripStructuralNumericParity": true,
+      "comparisonCounts": {
+        "arrays": 7,
+        "trees": 0,
+        "objects": 0,
+        "scalars": 1
+      },
+      "joblibHashes": {
+        "model": {
+          "original": "c265b364de5e8610ceb880f69c99c4f0",
+          "release": "c265b364de5e8610ceb880f69c99c4f0"
+        },
+        "state": {
+          "original": "0a0016d178625404321d71b549203396",
+          "release": "0a0016d178625404321d71b549203396"
+        }
+      },
+      "canonicalSemanticHashes": {
+        "model": {
+          "original": "e5ffcbcff5a90ef6fb0a1aa19c7fe9384c93981a",
+          "release": "e5ffcbcff5a90ef6fb0a1aa19c7fe9384c93981a"
+        },
+        "state": {
+          "original": "03372185d064b7ece333a6d09676b17124c1094a",
+          "release": "03372185d064b7ece333a6d09676b17124c1094a"
+        }
+      },
+      "canonicalHashesStableAcrossTwoLoads": true,
+      "admittedForRelease": true,
+      "rawJoblibModelHashStable": true
+    },
+    {
+      "id": "nominal",
+      "path": "assets/models/nominal.joblib",
+      "sizeBytes": 3097,
+      "sha256": "f4c2e2b70400bd161a3c9bed62e5e892d6712134719a647a0dd53877bce792f1",
+      "originalSha256": "f4c2e2b70400bd161a3c9bed62e5e892d6712134719a647a0dd53877bce792f1",
+      "protocolSha256": "bc265d805de691ac301613dbacefa5026ecb9b1fc3ad446bc1d7375ae2bae828",
+      "removedMetadataKeys": [],
+      "serializationRoundTripStructuralNumericParity": true,
+      "comparisonCounts": {
+        "arrays": 7,
+        "trees": 0,
+        "objects": 0,
+        "scalars": 1
+      },
+      "joblibHashes": {
+        "model": {
+          "original": "7ccb8a9dc97b535d0f7666079a5393e7",
+          "release": "7ccb8a9dc97b535d0f7666079a5393e7"
+        },
+        "state": {
+          "original": "573144c8b311ddea5fcf32d61c80302b",
+          "release": "573144c8b311ddea5fcf32d61c80302b"
+        }
+      },
+      "canonicalSemanticHashes": {
+        "model": {
+          "original": "33e777a65966b39899d00eaeb9582cffcc2a587b",
+          "release": "33e777a65966b39899d00eaeb9582cffcc2a587b"
+        },
+        "state": {
+          "original": "9ea1ec46cbbb4bf352794aedebb0b10d4675dbd9",
+          "release": "9ea1ec46cbbb4bf352794aedebb0b10d4675dbd9"
+        }
+      },
+      "canonicalHashesStableAcrossTwoLoads": true,
+      "admittedForRelease": true,
+      "rawJoblibModelHashStable": true
+    }
+  ],
+  "fitCalls": 0,
+  "predictionCalls": 0,
+  "modelInferenceRuns": 0,
+  "originalArtifactsModified": false,
+  "canonicalCode": {
+    "path": "scripts/release_model_state.py",
+    "sha256": "101a40627fc72ebf63721cdd24759f29ed852a930c1a249e31b78ddad1b30de4",
+    "algorithm": "joblib SHA1 hash of complete semantic traversal, arrays SHA256, all named structured fields; unnamed padding excluded only"
+  },
+  "environment": {
+    "python": "3.12.14",
+    "numpy": "2.5.3",
+    "scikit-learn": "1.9.0",
+    "joblib": "1.6.0",
+    "scipy": "1.18.1"
+  },
+  "flightRawHashDiagnosis": {
+    "repeatedLoads": 6,
+    "originalHashVariedAcrossLoads": true,
+    "differentNamedFieldBytes": 0,
+    "unnamedPaddingDifferentTreesPerLoad": [
+      84,
+      96,
+      68,
+      61,
+      60,
+      59
+    ]
+  },
+  "syntheticGuardTests": {
+    "passed": 6,
+    "testPath": "tests/test_release_model_state.py",
+    "testSha256": "1d472a96ec845a82d4bbd09f9c97537c3f2d28b21d9c1621b0a7e954ddfae758",
+    "namedNodeFieldMutationChangesHash": true,
+    "leafValueMutationChangesHash": true,
+    "paddingOnlyMutationPreservesHash": true,
+    "objectArrayValuesCovered": true,
+    "unsupportedTypesRejected": true
+  }
+}

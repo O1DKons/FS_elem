@@ -1,0 +1,45 @@
+# Release lock: public PyPI wheel hashes. Clean installation acceptance is recorded separately.
+# Target: CPython 3.9, macOS 13+ arm64. Historical exact pins preserved.
+# Both OpenCV distributions satisfy rtmlib0.0.15 metadata; shared-cv2 upstream warning remains.
+--index-url https://pypi.org/simple
+--only-binary=:all:
+--require-hashes
+
+# coloredlogs-15.0.1-py2.py3-none-any.whl
+coloredlogs==15.0.1 --hash=sha256:612ee75c546f53e92e70049c9dbfcc18c935a2b9a53b66085ce9ef6a6e5c0934
+
+# flatbuffers-25.12.19-py2.py3-none-any.whl
+flatbuffers==25.12.19 --hash=sha256:7634f50c427838bb021c2d66a3d1168e9d199b0607e6329399f04846d42e20b4
+
+# humanfriendly-10.0-py2.py3-none-any.whl
+humanfriendly==10.0 --hash=sha256:1697e1a8a8f550fd43c2865cd84542fc175a61dcb779b6fee18cf6b6ccba1477
+
+# mpmath-1.3.0-py3-none-any.whl
+mpmath==1.3.0 --hash=sha256:a0b2b9fe80bbcd81a6647ff13108738cfb482d481d826cc0e02f5b35e5c88d2c
+
+# numpy-2.0.2-cp39-cp39-macosx_11_0_arm64.whl
+numpy==2.0.2 --hash=sha256:423e89b23490805d2a5a96fe40ec507407b8ee786d66f7328be214f9679df6dd
+
+# onnxruntime-1.19.2-cp39-cp39-macosx_11_0_universal2.whl
+onnxruntime==1.19.2 --hash=sha256:006c8d326835c017a9e9f74c9c77ebb570a71174a1e89fe078b29a557d9c3848
+
+# opencv_contrib_python-5.0.0.93-cp37-abi3-macosx_13_0_arm64.whl
+opencv-contrib-python==5.0.0.93 --hash=sha256:3ebb8e0506573f36f54038116321a086c97aeda8ef154198931f3ea18b435cc7
+
+# opencv_python-5.0.0.93-cp37-abi3-macosx_13_0_arm64.whl
+opencv-python==5.0.0.93 --hash=sha256:198a75138241810206a17c829dbcc40a7cb1841cda538ca86cbbfc6c7d95f898
+
+# packaging-26.3-py3-none-any.whl
+packaging==26.3 --hash=sha256:d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c
+
+# protobuf-6.33.6-cp39-abi3-macosx_10_9_universal2.whl
+protobuf==6.33.6 --hash=sha256:9720e6961b251bde64edfdab7d500725a2af5280f3f4c87e57c0208376aa8c3a
+
+# rtmlib-0.0.15-py3-none-any.whl
+rtmlib==0.0.15 --hash=sha256:d336dd3bb2286ac9d07c7c14f918cbeca73e1d5e48f6a98929576f931dd0248c
+
+# sympy-1.14.0-py3-none-any.whl
+sympy==1.14.0 --hash=sha256:e091cc3e99d2141a0ba2847328f5479b05d94a6635cb96148ccb3f34671bd8f5
+
+# tqdm-4.70.1-py3-none-any.whl
+tqdm==4.70.1 --hash=sha256:c293e525e6fef9c20e8728fd4612df02a0aa31bb5fe91ecd93e123b1b7bffa73

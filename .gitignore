@@ -12,3 +12,4 @@ config.local.json
 .DS_Store
 .runtime/
 phase-cache/
+assets/models/*.onnx

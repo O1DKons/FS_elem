@@ -1,3 +1,4 @@
+# Direct and transitive release versions; install the accompanying ARM64 hash lock.
 coloredlogs==15.0.1
 flatbuffers==25.12.19
 humanfriendly==10.0
