@@ -14,6 +14,14 @@ import {
 } from 'lucide-react';
 import PoseOverlay from './PoseOverlay';
 import { createAnalysisClient } from '../../lib/analysis-client.mjs';
+import {
+  elapsedJobSeconds,
+  jobIdFromSearch,
+  jobLocation,
+  mediaPath,
+  readRememberedJob,
+  rememberJob,
+} from '../../lib/analysis-session.mjs';
 import type { AnalysisHealth } from '../../lib/analysis-client.mjs';
 import type {
   AnalysisJob,
@@ -66,6 +74,8 @@ export default function AnalysisWorkbench() {
     [poseError, setPoseError] = useState(''),
     [uploading, setUploading] = useState(false),
     [cancelPending, setCancelPending] = useState(false),
+    [restoring, setRestoring] = useState(false),
+    [lastJob, setLastJob] = useState<string | null>(null),
     [reconnect, setReconnect] = useState(0);
   const [duration, setDuration] = useState(0),
     [time, setTime] = useState(0),
@@ -73,6 +83,7 @@ export default function AnalysisWorkbench() {
     [showPose, setShowPose] = useState(true),
     [videoError, setVideoError] = useState(false);
   const uploadController = useRef<AbortController | null>(null),
+    restoreController = useRef<AbortController | null>(null),
     generation = useRef(0),
     cancelUploadRequested = useRef(false);
   const busy =
@@ -97,10 +108,7 @@ export default function AnalysisWorkbench() {
     return () => controller.abort();
   }, [healthRetry]);
   useEffect(() => {
-    if (!file) {
-      setUrl('');
-      return;
-    }
+    if (!file) return;
     const objectUrl = URL.createObjectURL(file);
     setUrl(objectUrl);
     return () => URL.revokeObjectURL(objectUrl);
@@ -109,9 +117,24 @@ export default function AnalysisWorkbench() {
     () => () => {
       generation.current++;
       uploadController.current?.abort();
+      restoreController.current?.abort();
     },
     [],
   );
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      setLastJob(readRememberedJob(window.localStorage));
+    } catch {
+      /* Storage is optional. */
+    }
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('job')) {
+      const id = jobIdFromSearch(window.location.search);
+      if (id) void restore(id);
+      else setError('Некорректная ссылка на сохранённый анализ.');
+    }
+  }, []);
   const jobId = job?.id,
     sourceSha = job?.sourceSha256;
   useEffect(() => {
@@ -160,6 +183,61 @@ export default function AnalysisWorkbench() {
       clearTimeout(timer);
     };
   }, [jobId, sourceSha, reconnect]);
+  function keepJob(id: string) {
+    setLastJob(id);
+    if (typeof window === 'undefined') return;
+    try {
+      rememberJob(id, window.localStorage);
+    } catch {
+      /* The link remains usable without storage. */
+    }
+    try {
+      window.history.replaceState(
+        null,
+        '',
+        jobLocation(window.location.href, id),
+      );
+    } catch {
+      /* Viewing does not depend on history access. */
+    }
+  }
+  async function restore(id: string) {
+    if (busy) return;
+    const own = ++generation.current,
+      controller = new AbortController();
+    restoreController.current?.abort();
+    restoreController.current = controller;
+    setRestoring(true);
+    setFile(null);
+    setUrl('');
+    setJob(null);
+    setResult(null);
+    setPose(null);
+    setError('');
+    setPoseError('');
+    setDuration(0);
+    setTime(0);
+    setPlaying(false);
+    setVideoError(false);
+    try {
+      const saved = await client.job(id, controller.signal);
+      if (controller.signal.aborted || own !== generation.current) return;
+      if (!saved.filename || saved.sizeBytes === null)
+        throw Error('В сохранённой задаче нет данных исходного видео.');
+      setUrl(mediaPath(saved.id));
+      setJob(saved);
+      keepJob(saved.id);
+    } catch (e) {
+      if (controller.signal.aborted || own !== generation.current) return;
+      setError(
+        e instanceof Error && 'status' in e && e.status === 404
+          ? 'Сохранённый анализ не найден на этом компьютере. Новый анализ автоматически не запускается.'
+          : message(e),
+      );
+    } finally {
+      if (own === generation.current) setRestoring(false);
+    }
+  }
   function choose(candidate: File | undefined) {
     if (!candidate || busy) return;
     if (!/\.(mp4|mov|m4v|webm)$/i.test(candidate.name)) {
@@ -171,6 +249,20 @@ export default function AnalysisWorkbench() {
       return;
     }
     generation.current++;
+    restoreController.current?.abort();
+    setRestoring(false);
+    if (typeof window !== 'undefined') {
+      try {
+        window.history.replaceState(
+          null,
+          '',
+          jobLocation(window.location.href, null),
+        );
+      } catch {
+        /* Selection remains available. */
+      }
+    }
+    setUrl('');
     setFile(candidate);
     setJob(null);
     setResult(null);
@@ -183,7 +275,7 @@ export default function AnalysisWorkbench() {
     setVideoError(false);
   }
   async function analyze() {
-    if (!file || busy) return;
+    if (!file || busy || restoring) return;
     const own = ++generation.current,
       controller = new AbortController();
     uploadController.current = controller;
@@ -198,6 +290,7 @@ export default function AnalysisWorkbench() {
     try {
       const created = await client.upload(file, controller.signal);
       if (own !== generation.current) return;
+      keepJob(created.id);
       // Keep the response so a cancelled upload cannot leave an unknown running job.
       if (cancelUploadRequested.current) {
         try {
@@ -248,13 +341,19 @@ export default function AnalysisWorkbench() {
     }
   }
   const progress = job?.progress;
-  const stageLabel = uploading
-    ? 'Передача видео'
-    : cancelPending
-      ? 'Остановка обработки'
-      : job
-        ? stages[job.stage] || 'Обработка видео'
-        : 'Готово к загрузке';
+  const elapsed = job ? elapsedJobSeconds(job) : null;
+  const metadata =
+    file ||
+    (job?.filename ? { name: job.filename, size: job.sizeBytes } : null);
+  const stageLabel = restoring
+    ? 'Открываем сохранённый анализ'
+    : uploading
+      ? 'Передача видео'
+      : cancelPending
+        ? 'Остановка обработки'
+        : job
+          ? stages[job.stage] || 'Обработка видео'
+          : 'Готово к загрузке';
   const geometryMismatch =
     (pose &&
       videoRef.current?.videoWidth &&
@@ -293,6 +392,22 @@ export default function AnalysisWorkbench() {
           <span className="analysis-live-dot" /> Обработка на вашем компьютере
         </div>
       </section>
+      {lastJob && (
+        <div className="analysis-session-actions">
+          <button
+            className="analysis-text-button"
+            disabled={busy || restoring}
+            onClick={() => void restore(lastJob)}
+          >
+            <RefreshCw size={14} /> Открыть последний анализ
+          </button>
+          {job && (
+            <a href={`/analysis?job=${encodeURIComponent(job.id)}`}>
+              Ссылка на этот анализ
+            </a>
+          )}
+        </div>
+      )}
       <input
         ref={inputRef}
         type="file"
@@ -311,7 +426,7 @@ export default function AnalysisWorkbench() {
             <span>
               <span className="analysis-step">01</span> Исходное видео
             </span>
-            {file && (
+            {(file || job) && (
               <button
                 className="analysis-text-button"
                 disabled={busy}
@@ -368,15 +483,23 @@ export default function AnalysisWorkbench() {
               </button>
             )}
           </div>
-          {file && (
+          {metadata && (
             <div className="analysis-file-meta">
               <FileVideo size={18} />
-              <span title={file.name}>{file.name}</span>
+              <span title={metadata.name}>{metadata.name}</span>
               <small>
-                {(file.size / 1024 / 1024).toFixed(1)} МБ
+                {metadata.size !== null
+                  ? `${(metadata.size / 1024 / 1024).toFixed(1)} МБ`
+                  : ''}
                 {duration > 0 ? ` · ${formatTime(duration)}` : ''}
               </small>
             </div>
+          )}
+          {job && !file && (
+            <p className="analysis-notice">
+              Открыт сохранённый анализ. Для нового анализа выберите видео
+              заново.
+            </p>
           )}
           {videoError && (
             <p className="analysis-notice">
@@ -482,7 +605,9 @@ export default function AnalysisWorkbench() {
             </p>
             <button
               className="analysis-primary-button"
-              disabled={!file || busy || !health?.inferenceAvailable}
+              disabled={
+                !file || busy || restoring || !health?.inferenceAvailable
+              }
               onClick={() => void analyze()}
             >
               {uploading ? (
@@ -523,10 +648,10 @@ export default function AnalysisWorkbench() {
               </div>
             )}
           </div>
-          {(job || uploading) && (
+          {(job || uploading || restoring) && (
             <div className="analysis-status" role="status" aria-live="polite">
               <div>
-                {busy ? (
+                {busy || restoring ? (
                   <LoaderCircle size={17} className="analysis-spin" />
                 ) : job?.status === 'completed' ? (
                   <Check size={17} />
@@ -535,6 +660,11 @@ export default function AnalysisWorkbench() {
                 )}
                 <strong>{stageLabel}</strong>
               </div>
+              {elapsed !== null && (
+                <small>
+                  Время задачи: {formatTime(elapsed)} · ожидание и обработка
+                </small>
+              )}
               {busy &&
                 progress !== null &&
                 progress !== undefined &&
@@ -600,6 +730,14 @@ export default function AnalysisWorkbench() {
                           : 'Предполагаемый аксель'}{' '}
                         · {formatTime(event.start)}–{formatTime(event.end)}
                       </small>
+                      {event.nominalRevolutions !== null &&
+                        event.nominalRevolutions !== undefined && (
+                          <small>
+                            Номинально{' '}
+                            {event.nominalRevolutions === 1.5 ? '1,5' : '2,5'}{' '}
+                            оборота
+                          </small>
+                        )}
                       {event.label === 'Axel' && (
                         <small>
                           Недостаточно данных для определения 1A / 2A

@@ -67,6 +67,7 @@ def export_result(job_id, raw):
             'candidateCount':len(raw['events']),'noEvents':not events,
             'provenance':{'recipeSha256':raw['recipeSha256'],'models':models,
                 'poseSha256':raw.get('poseSha256'),'detectorSha256':raw.get('detectorSha256'),
+                'ortThreads':raw.get('ortThreads'),'runtimeSessions':raw.get('runtimeSessions'),
                 'exactSourceTrainingOverlap':raw.get('exactSourceTrainingOverlap',{}),
                 'globalAthleteIndependenceVerified':False,'goal70Verified':False},
             'timings':raw.get('timings',{}),'limitations':raw.get('limitations',[])}

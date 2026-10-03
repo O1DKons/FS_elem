@@ -47,6 +47,20 @@ function normalizeJob(data) {
     currentFrame: data.progress.currentFrame ?? null,
     totalFrames: data.progress.totalFrames ?? null,
     sourceSha256: data.source.sha256,
+    filename:
+      typeof data.source.filename === 'string' ? data.source.filename : null,
+    sizeBytes:
+      Number.isSafeInteger(data.source.sizeBytes) && data.source.sizeBytes > 0
+        ? data.source.sizeBytes
+        : null,
+    createdAt: typeof data.createdAt === 'string' ? data.createdAt : null,
+    updatedAt: typeof data.updatedAt === 'string' ? data.updatedAt : null,
+    elapsedSeconds:
+      data.elapsedSeconds === undefined
+        ? undefined
+        : finite(data.elapsedSeconds) && data.elapsedSeconds >= 0
+          ? data.elapsedSeconds
+          : null,
     error: data.error?.message,
   };
 }
@@ -58,6 +72,9 @@ export function normalizeResult(data, id, sha) {
     sourceSha256: sha,
     warnings: data.limitations.filter((x) => typeof x === 'string'),
     events: data.events.map((event) => {
+      const nominalRevolutions = event.nominalRevolutions ?? null;
+      const expectedRevolutions =
+        event.nominal === '1A' ? 1.5 : event.nominal === '2A' ? 2.5 : null;
       if (
         typeof event.id !== 'string' ||
         event.family !== 'axel' ||
@@ -65,7 +82,9 @@ export function normalizeResult(data, id, sha) {
         !finite(event.startSeconds) ||
         !finite(event.endSeconds) ||
         event.startSeconds < 0 ||
-        event.endSeconds < event.startSeconds
+        event.endSeconds < event.startSeconds ||
+        (nominalRevolutions !== null &&
+          nominalRevolutions !== expectedRevolutions)
       )
         invalid();
       return {
@@ -74,6 +93,7 @@ export function normalizeResult(data, id, sha) {
         end: event.endSeconds,
         label: event.nominal ?? 'Axel',
         reason: event.nominalReason,
+        nominalRevolutions,
       };
     }),
   };

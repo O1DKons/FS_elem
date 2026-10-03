@@ -1,0 +1,35 @@
+name: Release payload and inert checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inert-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify declared source bytes and privacy boundary
+        run: node scripts/verify-release-payload.mjs .
+      - name: Install locked frontend dependencies
+        run: npx --yes pnpm@11.19.0 --dir apps/web install --frozen-lockfile
+      - name: Test frontend and public contracts without inference
+        run: |
+          npm run test:web
+          npm test
+          npm run typecheck
+      - name: Test synthetic service lifecycle and installer boundaries
+        run: |
+          python -B -m unittest discover -s services/analysis -p 'test_*.py' -v
+          python -B -m unittest discover -s tests -p 'test_release_bootstrap.py' -v
+      - name: Recheck declared source bytes
+        run: node scripts/verify-release-payload.mjs .

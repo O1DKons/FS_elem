@@ -6,7 +6,7 @@ import math
 import time
 from pathlib import Path
 from support import SCRIPTS, asset_path, progress
-from pose_models import track_box, normalize_wholebody
+from pose_models import track_box, normalize_wholebody, runtime_sessions
 
 
 def sha(path):
@@ -114,6 +114,7 @@ def extract(video, output, config, sample_fps=8.333333):
         raise ValueError("No source frames were sampled")
     result = {
         "schemaVersion": 1,
+        "runtimeSessions": runtime_sessions(detector,pose),
         "scope": "Sparse RTMW full-program landmark cache for flight-proposal research; no element prediction or rotation verdict.",
         "source": {"path": str(video), "sha256": sha(video), "fps": fps,
                    "frameCount": frame_count, "durationSeconds": (frame_count-1)/fps,

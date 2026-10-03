@@ -133,3 +133,87 @@ test('result and pose calls URL-encode opaque IDs; cancel uses DELETE', async ()
   assert.equal((await client.cancel('a/b')).status, 'cancelled');
   assert.deepEqual(calls, [['/api/analysis/jobs/a%2Fb', 'DELETE']]);
 });
+
+test('saved jobs retain source identity and server timestamps without upload', async () => {
+  const saved = {
+    ...job,
+    state: 'succeeded',
+    createdAt: '2026-10-03T06:47:44.996Z',
+    updatedAt: '2026-10-03T06:59:48.433Z',
+    source: { sha256: sha, filename: 'program.mp4', sizeBytes: 78192638 },
+  };
+  const client = createAnalysisClient(async (url, options) => {
+    assert.equal(
+      options.method ?? 'GET',
+      'GET',
+      'opening an existing job must not upload',
+    );
+    return Response.json(saved);
+  });
+  const value = await client.job('job-1');
+  assert.equal(value.filename, 'program.mp4');
+  assert.equal(value.sizeBytes, 78192638);
+  assert.equal(value.createdAt, saved.createdAt);
+  assert.equal(value.updatedAt, saved.updatedAt);
+});
+
+test('nominal turns remain definitions and contradictory values are rejected', () => {
+  const result = {
+    schemaVersion: 1,
+    jobId: 'job-1',
+    source,
+    limitations: [],
+    events: [
+      {
+        id: 'c1',
+        family: 'axel',
+        nominal: '1A',
+        nominalRevolutions: 1.5,
+        startSeconds: 1,
+        endSeconds: 1.4,
+      },
+      {
+        id: 'c2',
+        family: 'axel',
+        nominal: '2A',
+        nominalRevolutions: 2.5,
+        startSeconds: 2,
+        endSeconds: 2.4,
+      },
+      {
+        id: 'c3',
+        family: 'axel',
+        nominal: null,
+        nominalRevolutions: null,
+        startSeconds: 3,
+        endSeconds: 3.4,
+      },
+    ],
+  };
+  assert.deepEqual(
+    normalizeResult(result, 'job-1', sha).events.map(
+      (e) => e.nominalRevolutions,
+    ),
+    [1.5, 2.5, null],
+  );
+  assert.throws(() =>
+    normalizeResult(
+      { ...result, events: [{ ...result.events[0], nominalRevolutions: 2.5 }] },
+      'job-1',
+      sha,
+    ),
+  );
+});
+
+test('elapsed snapshot is optional and cannot become an invalid duration', async () => {
+  const read = async (elapsedSeconds) => {
+    const client = createAnalysisClient(async () =>
+      Response.json({ ...job, elapsedSeconds }),
+    );
+    return client.job('job-1');
+  };
+  assert.equal((await read(45)).elapsedSeconds, 45);
+  assert.equal((await read(undefined)).elapsedSeconds, undefined);
+  assert.equal((await read(null)).elapsedSeconds, null);
+  assert.equal((await read(-1)).elapsedSeconds, null);
+});

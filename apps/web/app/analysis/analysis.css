@@ -19,6 +19,17 @@
   cursor: default;
   opacity: 0.5;
 }
+.analysis-session-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin-bottom: 18px;
+  align-items: center;
+  font-size: 12px;
+}
+.analysis-session-actions a {
+  color: var(--analysis-muted);
+}
 .analysis-shell button:focus-visible,
 .analysis-shell a:focus-visible,
 .analysis-shell input:focus-visible,

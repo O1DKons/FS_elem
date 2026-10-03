@@ -123,7 +123,7 @@ class Handler(BaseHTTPRequestHandler):
 def main():
     if sys.version_info<(3,12):raise SystemExit('FS_elem requires Python 3.12 or later. Run setup first.')
     parser=argparse.ArgumentParser();parser.add_argument('--port',type=int,default=5175)
-    parser.add_argument('--config',type=Path,default=ROOT/'configs/axel-release-v1.json')
+    parser.add_argument('--config',type=Path,default=ROOT/'configs/axel-release-ort4-v2.json')
     parser.add_argument('--jobs',type=Path,default=ROOT/'.runtime/jobs')
     parser.add_argument('--max-wall-seconds',type=int,default=5400);args=parser.parse_args()
     manager=JobManager(args.jobs,args.config,max_wall_seconds=args.max_wall_seconds)

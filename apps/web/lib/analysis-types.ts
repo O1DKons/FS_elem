@@ -14,6 +14,7 @@ export type AnalysisEvent = {
   end: number;
   label: 'Axel' | '1A' | '2A' | 'unknown';
   reason?: string;
+  nominalRevolutions: 1.5 | 2.5 | null;
 };
 export type AnalysisJob = {
   id: string;
@@ -23,6 +24,11 @@ export type AnalysisJob = {
   currentFrame: number | null;
   totalFrames: number | null;
   sourceSha256: string;
+  filename: string | null;
+  sizeBytes: number | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  elapsedSeconds?: number | null;
   error?: string;
 };
 export type AnalysisResult = {

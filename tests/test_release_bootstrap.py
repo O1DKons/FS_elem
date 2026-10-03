@@ -165,7 +165,8 @@ class LauncherTests(unittest.TestCase):
         shutil.copy2(SCRIPT.with_name('config.mjs'), root / 'scripts/config.mjs')
         (root / '.runtime/venv-science/bin/python').symlink_to(sys.executable)
         (root / 'scripts/setup-release.py').write_text('raise SystemExit(0)\n')
-        (root / 'configs/axel-release-v1.json').write_text('{}\n')
+        (root / 'configs/axel-release-ort4-v2.json').write_text('{}\n')
+        (root / 'configs/axel-release-ort2-v2.json').write_text('{}\n')
         (root / 'services/analysis/server.py').write_text(
             "import json,sys,signal,time\nfrom pathlib import Path\n"
             "Path('api-args.json').write_text(json.dumps(sys.argv[1:]))\n"
@@ -186,10 +187,17 @@ class LauncherTests(unittest.TestCase):
         cli.write_text('// inert fixture')
 
     def test_launcher_starts_release_api_and_stops_both_children(self):
+        self.run_launcher_profile()
+
+    def test_explicit_ort2_fallback_selects_its_recipe_and_stops_children(self):
+        self.run_launcher_profile('ort2')
+
+    def run_launcher_profile(self, profile=None):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory).resolve()
             self.launch_fixture(root)
-            p = subprocess.Popen([self.node, str(root / 'scripts/start-release.mjs')], cwd=root,
+            args = [] if profile is None else ['--profile', profile]
+            p = subprocess.Popen([self.node, str(root / 'scripts/start-release.mjs'), *args], cwd=root,
                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             try:
                 lines = []
@@ -201,7 +209,8 @@ class LauncherTests(unittest.TestCase):
                 _, error = p.communicate(timeout=8)
                 self.assertEqual(p.returncode, 0, error)
                 argv = json.loads((root / 'api-args.json').read_text())
-                self.assertEqual(argv, ['--port', '5175', '--config', str(root / 'configs/axel-release-v1.json'),
+                expected_profile = profile or 'ort4'
+                self.assertEqual(argv, ['--port', '5175', '--config', str(root / f'configs/axel-release-{expected_profile}-v2.json'),
                                         '--jobs', str(root / '.runtime/jobs'), '--max-wall-seconds', '5400'])
                 self.assertTrue((root / 'api-stopped').exists())
                 self.assertEqual((root / 'apps/web/web-cwd').read_text(), str(root / 'apps/web'))
@@ -209,6 +218,16 @@ class LauncherTests(unittest.TestCase):
             finally:
                 if p.poll() is None:
                     p.kill();p.communicate()
+
+    def test_invalid_profile_is_rejected_before_children_spawn(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            self.launch_fixture(root)
+            p = subprocess.run([self.node, str(root / 'scripts/start-release.mjs'), '--profile', '../private'],
+                               cwd=root, capture_output=True, text=True, timeout=4)
+            self.assertEqual(p.returncode, 1)
+            self.assertIn('profile must be ort4 or ort2', p.stderr)
+            self.assertFalse((root / 'api-args.json').exists())
 
     def test_stale_frontend_lock_is_rejected_before_services_spawn(self):
         with tempfile.TemporaryDirectory() as directory:

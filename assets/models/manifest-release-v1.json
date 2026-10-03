@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "release": "axel-release-v1",
+  "release": "axel-release-ort-v2",
   "platform": {
     "system": "macOS",
     "architecture": "arm64",
@@ -131,12 +131,10 @@
     "wrapperLicense": "BSD-2-Clause"
   },
   "requiredRuntimeFiles": [
-    "configs/axel-release-v1.json",
     "runtime/API.md",
     "runtime/pipeline/run.py",
     "runtime/pipeline/worker.py",
     "runtime/pipeline/sparse.py",
-    "runtime/pipeline/input-sha256.json",
     "services/analysis/server.py",
     "scripts/web-worker.mjs",
     "scripts/config.mjs",
@@ -145,7 +143,9 @@
     "runtime/pose_export.py",
     "shared/phase-events.mjs",
     "shared/event-editing.mjs",
-    "shared/axel-review.mjs"
+    "shared/axel-review.mjs",
+    "configs/axel-release-ort4-v2.json",
+    "configs/axel-release-ort2-v2.json"
   ],
   "limitations": [
     "Research models, no validated new-video accuracy target",

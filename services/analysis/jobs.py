@@ -24,6 +24,18 @@ class ApiError(Exception):
 def now():return datetime.now(timezone.utc).isoformat()
 
 
+def job_elapsed_seconds(job):
+    """Queue plus processing since accepted upload; terminal end never advances."""
+    try:
+        state=job['state']
+        if state not in TERMINAL and state not in ('queued','running'):return None
+        start=datetime.fromisoformat(job['createdAt'])
+        end=datetime.fromisoformat(job['updatedAt'] if state in TERMINAL else now())
+        if start.tzinfo is None or end.tzinfo is None:return None
+        return max(0.0,(end-start).total_seconds())
+    except (KeyError,TypeError,ValueError):return None
+
+
 def write_atomic(path,value):
     temp=path.with_suffix('.tmp');temp.write_text(json.dumps(value,ensure_ascii=False,allow_nan=False));temp.replace(path)
 
@@ -87,7 +99,10 @@ class JobManager:
             self.jobs[jid].update(changes,updatedAt=now());write_atomic(self.directory/jid/'job.json',self.jobs[jid])
 
     def get(self,jid):
-        with self.lock:return json.loads(json.dumps(self.jobs[self._id(jid)]))
+        with self.lock:
+            job=json.loads(json.dumps(self.jobs[self._id(jid)]))
+            job['elapsedSeconds']=job_elapsed_seconds(job)
+            return job
 
     def upload(self,stream,length,filename,require_ready=True):
         if length is not None and (type(length) is not int or length<=0):raise ApiError(400,'EMPTY_UPLOAD','Video bytes are required')

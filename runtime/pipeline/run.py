@@ -21,6 +21,7 @@ from sparse_pose_timestamps import pose_arrays_pts,timestamps_sha256
 from axel_family import segment_features
 from run_rotation_proxy_baseline import transform
 from video_type_model import score_classifier
+from pose_models import ort_threads,validate_runtime_sessions
 
 
 
@@ -51,6 +52,7 @@ def nominal_usable(quality):
 
 
 def validate_dense(document,record,windows,recipe):
+    if 'ortThreads' in recipe:validate_runtime_sessions(document.get('runtimeSessions'),recipe,required=bool(windows))
     if (type(document.get('schemaVersion')) is not int or document['schemaVersion']!=1
             or document.get('extractorSha256')!=recipe['inputSha256'][recipe['worker']]
             or document.get('geometry')!=dict(recipe['denseGeometry'],width=record['width'],height=record['height'])):
@@ -86,6 +88,7 @@ def helper(path,name,config):
 
 
 def check_recipe(recipe,config):
+    ort_threads(recipe)
     if recipe.get('schemaVersion')!=1 or recipe.get('mode') not in ('fixed_single_development_recipe','fixed_release_recipe'):
         raise ValueError('Unsupported research recipe')
     for package,version in recipe['scienceVersions'].items():
@@ -131,7 +134,9 @@ def run(video,config,cache_root,pose_python):
     expected.update(poseSha256=recipe['poseSha256'],detectorSha256=recipe['detectorSha256'],
         requestedFps=recipe['sampleFps'],stepSourceFrames=max(1,round(record['fps']/recipe['sampleFps'])),
         timestampsSha256=timestamps_sha256(record['timestampsSeconds']))
-    raw,usable,indices,times=pose_arrays_pts(read(directory/'sparse.json'),record,expected)
+    sparse_document=read(directory/'sparse.json')
+    if 'ortThreads' in recipe:validate_runtime_sessions(sparse_document.get('runtimeSessions'),recipe)
+    raw,usable,indices,times=pose_arrays_pts(sparse_document,record,expected)
     context=helper(recipe['helpers']['temporal'],'research_temporal',config)
     decoder=helper(recipe['helpers']['decoder'],'research_decoder',config)
     windows_api=helper(recipe['helpers']['windows'],'research_windows',config)
@@ -199,6 +204,7 @@ def run(video,config,cache_root,pose_python):
         poseSha256=recipe['poseSha256'],detectorSha256=recipe['detectorSha256'],models=recipe['models'],
         events=rows,timings=timing,cacheHit=cache_hit,cacheDirectory=str(directory),
         cacheManifestSha256=sha(cache_receipt),exactSourceTrainingOverlap=overlap,
+        ortThreads=ort_threads(recipe),runtimeSessions=dict(sparse=sparse_document.get('runtimeSessions'),dense=read(directory/'dense.json').get('runtimeSessions')),
         globalAthleteIndependenceVerified=False,goal70Verified=False,underrotation=None,physicalAirborneTurns=None,
         limitations=['One fixed development bundle, not the source-specific grouped11-video control',
             'Training overlap is disclosed; no independent70% claim',
@@ -209,7 +215,7 @@ def run(video,config,cache_root,pose_python):
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('video',type=Path)
-    parser.add_argument('--config',type=Path,default=ROOT/'configs/axel-release-v1.json')
+    parser.add_argument('--config',type=Path,default=ROOT/'configs/axel-release-ort4-v2.json')
     parser.add_argument('--cache',type=Path,required=True)
     parser.add_argument('--pose-python',type=Path)
     parser.add_argument('--output',required=True,type=Path)

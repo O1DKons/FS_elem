@@ -12,9 +12,13 @@ Local-only API; no account, remote upload, training, or telemetry. The web serve
 
 Job:
 ```json
-{"schemaVersion":1,"jobId":"opaque-uuid","state":"queued","createdAt":"ISO UTC","updatedAt":"ISO UTC","source":{"filename":"clip.mp4","sizeBytes":100,"sha256":"64hex"},"progress":{"stage":"queued","currentFrame":null,"totalFrames":null,"percent":null},"error":null,"links":{"self":"/api/analysis/jobs/opaque-uuid","result":"/api/analysis/jobs/opaque-uuid/result","pose":"/api/analysis/jobs/opaque-uuid/pose","media":"/api/analysis/jobs/opaque-uuid/media"}}
+{"schemaVersion":1,"jobId":"opaque-uuid","state":"queued","createdAt":"ISO UTC","updatedAt":"ISO UTC","elapsedSeconds":0,"source":{"filename":"clip.mp4","sizeBytes":100,"sha256":"64hex"},"progress":{"stage":"queued","currentFrame":null,"totalFrames":null,"percent":null},"error":null,"links":{"self":"/api/analysis/jobs/opaque-uuid","result":"/api/analysis/jobs/opaque-uuid/result","pose":"/api/analysis/jobs/opaque-uuid/pose","media":"/api/analysis/jobs/opaque-uuid/media"}}
 ```
 States: `queued`, `running`, `succeeded`, `failed`, `cancelled`. Stages: `queued`, `probe`, `sparse`, `flight_family`, `dense`, `nominal`, `export`, `cancelling`, `completed`, `failed`, `cancelled`. Percent is stage-local, or null. It is not overall ETA. Error is null or `{code:string,message:string}`. Interrupted jobs become failed after service restart; no automatic repeat analysis.
+
+`elapsedSeconds` is an optional additive field, computed on GET without changing the saved job or its `updatedAt`. It measures queue plus processing time from `createdAt`, after the upload has been accepted. For queued/running jobs, the end is the server's current UTC time; for all terminal states, the end is saved `updatedAt`, so the value stops increasing. Invalid or timezone-naive timestamps and unknown states return null; a backwards clock yields zero. Display it as “Ожидание и обработка”; upload time is separate, and this is not an ETA. Older RC1 services omit this field. A client may derive terminal elapsed time from valid timestamps in that case, but should hide a running counter rather than substitute its own clock. The optional Result timing `totalBeforeWriteSeconds` separately measures pipeline calculation time and may be shown as “Время расчёта”.
+
+Accepted uploads, job records, results, pose and media persist in the service's jobs directory; there is no automatic expiry or completed-result deletion. Reopening a known job UUID uses GET only and may restore a saved result after a service restart. A missing job returns 404 and must not trigger automatic upload or repeat inference. Retention depends on preserving this directory; this is not a backup guarantee.
 
 Result:
 ```json
@@ -27,3 +31,8 @@ Pose:
 {"schemaVersion":1,"jobId":"opaque-uuid","source":{"sha256":"64hex","width":1920,"height":1080,"fps":50,"frameCount":100,"durationSeconds":1.98,"rotationDegrees":0},"layout":"coco-wholebody-first23","coordinateSpace":"displayed-source-pixels","scoreKind":"raw-heatmap-peak","maxNearestSeconds":{"sparse":0.065,"dense":0.025},"keypointNames":["nose"],"edges":[[5,7],[7,9]],"frames":[{"frameIndex":25,"timeSeconds":0.5,"density":"dense","candidateId":"candidate-id","points":[{"x":500,"y":200,"confidence":0.8}]}]}
 ```
 There are exactly 23 keypointNames and 23 point entries per frame. Entry is null when missing/invalid; whole missing pose is 23 nulls. Actual source PTS, no interpolation or filled gaps. Dense observation wins over sparse at the same source frame. Raw confidences are not calibrated probabilities. Threshold drawing at >=0.3; use contain/letterbox mapping from source width/height. Sparse nearest <=0.065 sec, dense <=0.025 sec, otherwise hide. RotationDegrees records source display metadata; exported pixels correspond to browser-displayed orientation/dimensions (unverified rotation is rejected). Pose endpoints become available after completion; progress is independent of skeleton streaming.
+# Stage2 additive runtime provenance
+
+New result provenance may contain `ortThreads` with `intraOpNumThreads`2 or4 and `interOpNumThreads`1, and `runtimeSessions` grouped by `sparse`/`dense`. Each executed detector/pose record contains the actual ORT session thread options and `providers:["CPUExecutionProvider"]`. An empty dense list means no dense windows executed. Historical results may omit these fields or contain null; this does not certify their runtime settings.
+
+The explicit profile is part of recipe identity and cache admission. It does not change the event/pose coordinate contract, nominal definitions, or null physical-turn/underrotation fields. Cached opening time remains separate from cold processing time.

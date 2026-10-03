@@ -131,14 +131,14 @@
   },
   "inputSha256": {
     "../runtime/pipeline/events.py": "8d591a7286e9a8ce1717c67d1390fab954932406560def8748dceb4472325f35",
-    "../runtime/pipeline/pose_models.py": "b9e8834d8b730ddafbd6750d353bc85446d05d6342277ab2a8ecf5adb49fe946",
-    "../runtime/pipeline/run.py": "3e2c89b28f6646cd8133f55b387ac0b8afef6b964042710826c3fad0a539cc42",
+    "../runtime/pipeline/pose_models.py": "47c5d792f0218212a5197732b1074ceedbdf6ed12b5f5dac3ba388bc940570f6",
+    "../runtime/pipeline/run.py": "6ba6bf5302abc19fe448c8a07ca9a2b5437a9c81c878127d36b94debfef965f6",
     "../runtime/pipeline/selection.py": "05f849f1ed27b454671c752ee63ed2923eb78b9299cdfcbfc166a3b7fc667ca9",
-    "../runtime/pipeline/sparse.py": "2e6f9d0c39e8645c786357371d572324d8b97feae9ef580e614133996dac56d5",
+    "../runtime/pipeline/sparse.py": "e664ebada2d5fca8c87e0d5953ad2876d0ae86a6205cb92b396e557e4730981d",
     "../runtime/pipeline/support.py": "598d21fd251792235a8802d4e9067959fb67dfc054d1ea2dff2a447418ae3f30",
     "../runtime/pipeline/temporal.py": "71e20d9bbf3df07bee7c4e964afea696d0bca905b132bc58c94903ee169692d4",
     "../runtime/pipeline/windows.py": "d6dcf81a59b1870a2ce06b2f8a514128f7b143cdf8b9e3b1858473c8b1187752",
-    "../runtime/pipeline/worker.py": "b0fbbb508158bbf6ea5f538a1f44c2ecbd367eea1758501244d4f4018a7a7a66",
+    "../runtime/pipeline/worker.py": "b7d4edce07c2a32718b0023276f3361cef78fdfbbd5eeb2804e45a1f02ad05e9",
     "../scripts/axel_family.py": "4cbdc5067a37cd7d48b1b01dad1dc47a9e0f6cf3955881e4d9cfc59abade138c",
     "../scripts/axel_features.py": "57137956fcd3422f66608128faecc0f22d0eccc6449e50eaa4b8245c2cd3f439",
     "../scripts/axel_rtmw_windows.py": "e4468e72d28b11da98e39f279f48ff5be53ab3b3c90e3d2470309604b3aa7fc2",
@@ -163,7 +163,7 @@
     "timeAxis": "original-source-presentation-seconds",
     "scoreKind": "raw-heatmap-peak"
   },
-  "revisionNote": "Portable release adapter of fixed v4; unchanged classifiers, features, thresholds and guards; metadata-only model sanitation and raw pose/progress export",
+  "revisionNote": "Stage2 explicit ORT CPU2/1; unchanged checkpoints/classifiers/sampling/thresholds; actual-session evidence and recipe-bound cache",
   "sciencePython": "../.runtime/venv-science/bin/python",
   "posePython": "../.runtime/venv-pose/bin/python",
   "checkpoints": {
@@ -181,6 +181,11 @@
     "originalRecipeRevision": "v4",
     "priorTrainingOrigin": "historical mixed competition and personal data",
     "newTrainingPerformed": false,
-    "packagingChange": "Training metadata removed; fitted model and preprocessing state retained. Asset admission requires sanitation receipt."
+    "packagingChange": "Training metadata removed; fitted model and preprocessing state retained. Asset admission requires sanitation receipt.",
+    "runtimeRevision": "ort-thread-profile-v2"
+  },
+  "ortThreads": {
+    "intraOpNumThreads": 2,
+    "interOpNumThreads": 1
   }
 }

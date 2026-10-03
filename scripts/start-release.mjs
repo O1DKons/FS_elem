@@ -49,13 +49,17 @@ try {
   const args = process.argv.slice(2);
   const options = {};
   for (let i = 0; i < args.length; i += 2) {
-    if (!['--config', '--max-wall-seconds'].includes(args[i]) || !args[i + 1] || args[i] in options)
-      throw Error('Usage: node scripts/start-release.mjs [--config web-config.json] [--max-wall-seconds 1..5400]');
+    if (!['--config', '--profile', '--max-wall-seconds'].includes(args[i]) || !args[i + 1] || args[i] in options)
+      throw Error('Usage: node scripts/start-release.mjs [--profile ort4|ort2] [--config web-config.json] [--max-wall-seconds 1..5400]');
     options[args[i]] = args[i + 1];
   }
   const maxWallSeconds = Number(options['--max-wall-seconds'] ?? 5400);
   if (!Number.isInteger(maxWallSeconds) || maxWallSeconds < 1 || maxWallSeconds > 5400)
     throw Error('Analysis deadline must be an integer from 1 to 5400 seconds');
+  const profile = options['--profile'] ?? 'ort4';
+  if (!['ort4', 'ort2'].includes(profile)) throw Error('Release profile must be ort4 or ort2');
+  const recipe = join(projectRoot, `configs/axel-release-${profile}-v2.json`);
+  if (!existsSync(recipe)) throw Error('Selected release profile is missing; obtain the complete RC2 package');
   const python = join(projectRoot, '.runtime/venv-science/bin/python');
   const checked = spawnSync(process.execPath, [join(projectRoot, 'scripts/setup-release.mjs'), '--check',
     '--science-python', python], {stdio: 'inherit'});
@@ -69,7 +73,7 @@ try {
   const configFile = options['--config'] ?? defaultConfig;
   const config = loadConfig(projectRoot, configFile);
   const analysis = spawn(python, [join(projectRoot, 'services/analysis/server.py'), '--port', String(config.analysisPort),
-    '--config', join(projectRoot, 'configs/axel-release-v1.json'), '--jobs', join(projectRoot, '.runtime/jobs'),
+    '--config', recipe, '--jobs', join(projectRoot, '.runtime/jobs'),
     '--max-wall-seconds', String(maxWallSeconds)],
     {cwd: projectRoot, stdio: ['ignore', 'pipe', 'inherit']});
   children.push(analysis);
@@ -82,6 +86,7 @@ try {
   await ready(web, listener => web.on('message', listener), message => message?.ready === true);
   watch(web);
   console.log(`FS_elem готов: http://${config.host}:${config.port}/analysis`);
+  console.log(`Профиль: ${profile} · ${recipe}`);
   console.log('Для остановки нажмите Ctrl+C.');
 } catch (error) {
   console.error(error.message);

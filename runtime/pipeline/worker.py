@@ -57,7 +57,7 @@ def probe(video,recipe,config):
 
 def dense(video,request,recipe,request_sha,config):
     import cv2
-    from pose_models import models,track_box
+    from pose_models import models,track_box,runtime_sessions
     DETECTOR=asset_path(config,recipe["checkpoints"]["detector"]["path"])
     POSE=asset_path(config,recipe["checkpoints"]["pose"]["path"])
     from axel_rtmw_windows import expanded_keypoint_box
@@ -96,7 +96,8 @@ def dense(video,request,recipe,request_sha,config):
     return dict(schemaVersion=1,geometry=dict(recipe['denseGeometry'],width=source['width'],height=source['height']),sourceSha256=source['sourceSha256'],fps=source['fps'],frameCount=source['frameCount'],
         poseSha256=recipe['poseSha256'],detectorSha256=recipe['detectorSha256'],
         requestSha256=request_sha,extractorSha256=sha(Path(__file__)),
-        geometryVerification=source['geometryVerification'],rotationDegrees=source['rotationDegrees'],items=items)
+        geometryVerification=source['geometryVerification'],rotationDegrees=source['rotationDegrees'],
+        runtimeSessions=runtime_sessions(detector,pose),items=items)
 
 
 def main():
