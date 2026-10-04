@@ -12,6 +12,7 @@ import sys
 os.environ['OMP_NUM_THREADS']='2';os.environ['OPENBLAS_NUM_THREADS']='2'
 from support import SCRIPTS, asset_path, progress, verify_display_geometry
 from pose_cache_contract import sha
+from source_diagnostics import require_source_timeline, SourceDiagnosticsError
 
 
 def probe(video,recipe,config):
@@ -32,8 +33,7 @@ def probe(video,recipe,config):
         times.append(capture.get(cv2.CAP_PROP_POS_MSEC)/1000)
         if len(times)%500==0:progress("probe",len(times),count)
     capture.release()
-    if len(times)!=count or times[0]!=0 or not all(math.isfinite(t) for t in times) or any(b<=a for a,b in zip(times,times[1:])):
-        raise ValueError('Complete source PTS/frame coverage invalid')
+    require_source_timeline(count,times)
     ffmpeg=asset_path(config,recipe['ffmpeg']['path'])
     if sha(ffmpeg)!=recipe['ffmpeg']['sha256']:raise ValueError('Pinned FFmpeg changed')
     command=[str(ffmpeg),'-hide_banner','-nostdin','-i',str(video),'-map','0:v:0',
@@ -118,4 +118,8 @@ def main():
     with args.output.open('x') as stream:json.dump(result,stream,allow_nan=False)
 
 
-if __name__=='__main__':main()
+if __name__=='__main__':
+    try:main()
+    except SourceDiagnosticsError as exc:
+        print(json.dumps({'kind':'analysis_diagnostics','diagnostics':exc.diagnostics},allow_nan=False),flush=True)
+        raise

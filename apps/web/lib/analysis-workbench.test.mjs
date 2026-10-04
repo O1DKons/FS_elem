@@ -5,6 +5,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import ts from 'typescript';
+import { createAnalysisClient } from './analysis-client.mjs';
+import errorFixture from './analysis-error-fixture.json' with { type: 'json' };
 
 // Execute the actual TSX component with deterministic hooks and transport.
 // This is a component logic regression, not browser/React DOM or inference evidence.
@@ -406,3 +408,58 @@ for (const response of ['completed', 'missing'])
       },
     );
   });
+
+
+test('restored failed job shows count explanation without predictions, pose or another upload', async () => {
+  const calls = [];
+  const client = createAnalysisClient(async (url, options) => {
+    calls.push([url, options.method ?? 'GET']);
+    if (url === '/api/analysis/health')
+      return Response.json({inferenceAvailable:true,issues:[],activeJobId:null});
+    if (url === '/api/analysis/jobs/' + savedJob.id)
+      return Response.json({
+        schemaVersion:1,jobId:savedJob.id,...errorFixture,
+        source:{sha256:savedJob.sourceSha256,filename:'synthetic-program.mp4',sizeBytes:1234},
+        progress:{stage:'failed',percent:null,currentFrame:null,totalFrames:null},
+        createdAt:savedJob.createdAt,updatedAt:savedJob.updatedAt,elapsedSeconds:1,
+      });
+    throw Error('Unexpected result/pose/upload request');
+  });
+  await savedComponent(client, async ({render}) => {
+    render(); await flush(); render(); await flush();
+    const tree=render();
+    assert.match(text(tree), /Количество прочитанных кадров.*337 вместо 357.*Анализ остановлен/);
+    assert.equal(nodes(tree,n=>n.props?.className==='analysis-event-card').length,0);
+    assert.ok(nodes(tree,n=>n.type==='pose-overlay').every(n=>n.props.pose===null));
+    assert.doesNotMatch(text(tree), /Аксели не обнаружены|Номинально|Traceback|Source frame/);
+    assert.ok(calls.length>0 && calls.every(([url,method])=>method==='GET' && !url.endsWith('/result') && !url.endsWith('/pose')));
+    assert.equal(nodes(tree,n=>n.type==='button' && n.props.className==='analysis-primary-button')[0].props.disabled,true);
+  });
+});
+
+
+test('malformed object diagnostic code restores the failed job with a safe reason', async () => {
+  const fixture = structuredClone(errorFixture);
+  fixture.error.diagnostics.code = {toString:null};
+  const client = createAnalysisClient(async url => {
+    if (url === '/api/analysis/health')
+      return Response.json({inferenceAvailable:true,issues:[],activeJobId:null});
+    if (url === '/api/analysis/jobs/' + savedJob.id)
+      return Response.json({
+        schemaVersion:1,jobId:savedJob.id,...fixture,
+        source:{sha256:savedJob.sourceSha256,filename:'synthetic-program.mp4',sizeBytes:1234},
+        progress:{stage:'failed',percent:null,currentFrame:null,totalFrames:null},
+        createdAt:savedJob.createdAt,updatedAt:savedJob.updatedAt,elapsedSeconds:1,
+      });
+    throw Error('Unexpected result/pose/upload request');
+  });
+  await savedComponent(client, async ({render,id}) => {
+    render(); await flush(); render(); await flush();
+    const tree=render();
+    assert.equal(nodes(tree,n=>n.type==='video')[0]?.props.src,'/api/analysis/jobs/'+id+'/media');
+    assert.match(text(tree), /Обработка остановлена из-за ошибки. Подробная причина недоступна/);
+    assert.doesNotMatch(text(tree), /primitive|TypeError|Traceback|337 вместо 357/);
+    assert.equal(nodes(tree,n=>n.props?.className==='analysis-event-card').length,0);
+    assert.ok(nodes(tree,n=>n.type==='pose-overlay').every(n=>n.props.pose===null));
+  });
+});

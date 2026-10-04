@@ -5,6 +5,7 @@ import os
 import queue
 import signal
 import subprocess
+import sys
 import threading
 import time
 import uuid
@@ -12,6 +13,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[2]
+if str(ROOT/'scripts') not in sys.path:sys.path.insert(0,str(ROOT/'scripts'))
+from source_diagnostics import validate_diagnostics, public_source_error
 TERMINAL={'succeeded','failed','cancelled'}
 
 
@@ -181,7 +184,7 @@ class JobManager:
         elif process.poll() is None:process.kill()
         process.wait(timeout=3)
 
-    def _read_progress(self,process,directory,jid):
+    def _read_progress(self,process,directory,jid,diagnostics=None):
         size=0
         with (directory/'runtime.log').open('w') as log:
             for line in process.stdout:
@@ -189,6 +192,14 @@ class JobManager:
                 if size<=2*1024*1024:log.write(line);log.flush()
                 try:
                     data=json.loads(line)
+                    if isinstance(data,dict) and data.get('kind')=='analysis_diagnostics':
+                        value=validate_diagnostics(data.get('diagnostics'))
+                        if diagnostics is not None:
+                            if (value is None or diagnostics.get('invalid')
+                                    or ('value' in diagnostics and diagnostics['value']!=value)):
+                                diagnostics.clear();diagnostics['invalid']=True
+                            else:diagnostics['value']=value
+                        continue
                     stage=data.get('stage')
                     if stage not in ['probe','sparse','flight_family','dense','nominal','export']:continue
                     n,total=data.get('currentFrame'),data.get('totalFrames')
@@ -204,7 +215,7 @@ class JobManager:
         while not self.stop.is_set():
             try:jid=self.queue.get(timeout=.1)
             except queue.Empty:continue
-            process=None;reader=None;failure=None
+            process=None;reader=None;failure=None;diagnostics={}
             with self.lock:
                 if jid in self.cancelled:continue
                 self.active_job_id=jid
@@ -215,7 +226,7 @@ class JobManager:
                     stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,start_new_session=True,
                     env={**os.environ,'OMP_NUM_THREADS':'2','OPENBLAS_NUM_THREADS':'2','MKL_NUM_THREADS':'2','NUMEXPR_NUM_THREADS':'2'})
                 self.process=process
-                reader=threading.Thread(target=self._read_progress,args=(process,directory,jid),daemon=True);reader.start()
+                reader=threading.Thread(target=self._read_progress,args=(process,directory,jid,diagnostics),daemon=True);reader.start()
                 deadline=time.monotonic()+self.max_wall_seconds
                 while process.poll() is None:
                     if jid in self.cancelled or self.stop.is_set():break
@@ -228,7 +239,7 @@ class JobManager:
                 self._cleanup(process);reader.join(timeout=3)
                 if cancelled:self._update(jid,state='cancelled',progress={'stage':'cancelled','currentFrame':None,'totalFrames':None,'percent':None})
                 elif failure:self._fail(jid,*failure)
-                elif returncode!=0:self._fail(jid,'ANALYSIS_FAILED','Video could not be analysed; inspect the local runtime log')
+                elif returncode!=0:self._fail(jid,'ANALYSIS_FAILED','Video could not be analysed; inspect the local runtime log',diagnostics=diagnostics.get('value'))
                 elif not all((directory/n).is_file() for n in ['result.json','pose.json']):self._fail(jid,'MISSING_RESULT','Runtime did not produce result and pose')
                 else:self._update(jid,state='succeeded',progress={'stage':'completed','currentFrame':None,'totalFrames':None,'percent':100})
             except Exception:
@@ -240,8 +251,9 @@ class JobManager:
                 if process and process.stdout:process.stdout.close()
                 with self.lock:self.process=None;self.active_job_id=None
 
-    def _fail(self,jid,code,message):
-        self._update(jid,state='failed',error={'code':code,'message':message},progress={'stage':'failed','currentFrame':None,'totalFrames':None,'percent':None})
+    def _fail(self,jid,code,message,diagnostics=None):
+        error=public_source_error(diagnostics) or {'code':code,'message':message}
+        self._update(jid,state='failed',error=error,progress={'stage':'failed','currentFrame':None,'totalFrames':None,'percent':None})
 
     def close(self):
         self.stop.set()

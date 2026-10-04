@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import errorFixture from './analysis-error-fixture.json' with { type: 'json' };
 import {
   createAnalysisClient,
   AnalysisHttpError,
@@ -216,4 +217,104 @@ test('elapsed snapshot is optional and cannot become an invalid duration', async
   assert.equal((await read(undefined)).elapsedSeconds, undefined);
   assert.equal((await read(null)).elapsedSeconds, null);
   assert.equal((await read(-1)).elapsedSeconds, null);
+});
+
+const safeFailure = 'Обработка остановлена из-за ошибки. Подробная причина недоступна.';
+const timestampFailure = 'Временные метки кадров не прошли проверку. Анализ остановлен.';
+const countFailure = 'Количество прочитанных кадров расходится с данными файла (337 вместо 357). Анализ остановлен.';
+async function failedJob(error, state = 'failed') {
+  const client = createAnalysisClient(async () => Response.json({ ...job, state, error }));
+  return client.job(job.jobId);
+}
+test('failed source-count diagnostic becomes a local explanation without corruption claim', async () => {
+  const value = await failedJob(errorFixture.error);
+  assert.equal(value.status, 'failed');
+  assert.equal(value.error, countFailure);
+});
+test('a zero decoded count is valid evidence and not treated as missing', async () => {
+  const error = structuredClone(errorFixture.error);
+  error.diagnostics.decodedFrames = 0;
+  assert.equal((await failedJob(error)).error,
+    'Количество прочитанных кадров расходится с данными файла (0 вместо 357). Анализ остановлен.');
+});
+test('count mismatch keeps precedence when timestamp checks also fail', async () => {
+  const error = structuredClone(errorFixture.error);
+  error.diagnostics.failedTimestampConditions = ['first_timestamp_nonzero', 'nonincreasing_timestamp'];
+  assert.equal((await failedJob(error)).error, countFailure);
+});
+test('equal counts with a timestamp failure explain timing without raw tokens', async () => {
+  const error = structuredClone(errorFixture.error);
+  error.code = error.diagnostics.code = 'SOURCE_TIMESTAMP_INVALID';
+  error.message = 'Source frame timestamps are invalid; analysis stopped.';
+  error.diagnostics.decodedFrames = 357;
+  error.diagnostics.failedTimestampConditions = ['nonfinite_timestamp'];
+  assert.equal((await failedJob(error)).error, timestampFailure);
+});
+const invalidDiagnostics = [
+  ['unknown diagnostic field', e => { e.diagnostics.sourcePath = '/private/synthetic.mov'; }],
+  ['missing diagnostic field', e => { delete e.diagnostics.stage; }],
+  ['unknown version', e => { e.diagnostics.schemaVersion = 2; }],
+  ['boolean version', e => { e.diagnostics.schemaVersion = true; }],
+  ['wrong stage', e => { e.diagnostics.stage = 'dense'; }],
+  ['unknown code', e => { e.code = e.diagnostics.code = 'OTHER'; }],
+  ['conflicting outer code', e => { e.code = 'SOURCE_TIMESTAMP_INVALID'; }],
+  ['unsafe message', e => { e.message = 'Traceback /private/synthetic.mov'; }],
+  ['boolean count', e => { e.diagnostics.declaredFrames = true; }],
+  ['negative count', e => { e.diagnostics.decodedFrames = -1; }],
+  ['fractional count', e => { e.diagnostics.decodedFrames = 337.5; }],
+  ['string count', e => { e.diagnostics.decodedFrames = '337'; }],
+  ['unsafe integer', e => { e.diagnostics.declaredFrames = 9007199254740992; }],
+  ['equal counts for mismatch', e => { e.diagnostics.decodedFrames = 357; }],
+  ['unknown timestamp condition', e => { e.diagnostics.failedTimestampConditions = ['header']; }],
+  ['duplicate timestamp condition', e => { e.diagnostics.failedTimestampConditions = ['nonfinite_timestamp', 'nonfinite_timestamp']; }],
+  ['out-of-order timestamp conditions', e => { e.diagnostics.failedTimestampConditions = ['nonincreasing_timestamp', 'first_timestamp_nonzero']; }],
+  ['non-array conditions', e => { e.diagnostics.failedTimestampConditions = 'nonfinite_timestamp'; }],
+  ['missing diagnostics', e => { delete e.diagnostics; }],
+  ['array diagnostics', e => { e.diagnostics = []; }],
+];
+for (const [reason, mutate] of invalidDiagnostics)
+  test(`failed diagnostic falls back safely for ${reason}`, async () => {
+    const error = structuredClone(errorFixture.error);
+    mutate(error);
+    assert.equal((await failedJob(error)).error, safeFailure);
+  });
+test('timestamp code cannot override a count mismatch', async () => {
+  const error = structuredClone(errorFixture.error);
+  error.code = error.diagnostics.code = 'SOURCE_TIMESTAMP_INVALID';
+  error.message = 'Source frame timestamps are invalid; analysis stopped.';
+  error.diagnostics.failedTimestampConditions = ['nonfinite_timestamp'];
+  assert.equal((await failedJob(error)).error, safeFailure);
+});
+test('timestamp diagnostic with no failed checks cannot invent a failure', async () => {
+  const error = structuredClone(errorFixture.error);
+  error.code = error.diagnostics.code = 'SOURCE_TIMESTAMP_INVALID';
+  error.message = 'Source frame timestamps are invalid; analysis stopped.';
+  error.diagnostics.decodedFrames = 357;
+  assert.equal((await failedJob(error)).error, safeFailure);
+});
+test('unknown and legacy failures never forward private or arbitrary server text', async () => {
+  for (const error of [null, {code:'ANALYSIS_FAILED',message:'Runtime exited; /private/synthetic.log'}, {code:'OTHER',message:'File is corrupted'}])
+    assert.equal((await failedJob(error)).error, safeFailure);
+});
+for (const state of ['succeeded', 'cancelled', 'queued', 'running'])
+  test(`stale failure diagnostics are ignored for ${state}`, async () => {
+    assert.equal((await failedJob(errorFixture.error, state)).error, undefined);
+  });
+test('a time-limit error cannot reuse a stale source-count diagnostic', async () => {
+  const error = {...errorFixture.error,code:'TIME_LIMIT',message:'Time limit reached'};
+  assert.equal((await failedJob(error)).error, safeFailure);
+});
+
+
+test('parsed object diagnostic code never escapes the safe failed-job fallback', async () => {
+  const error = structuredClone(errorFixture.error);
+  error.diagnostics.code = {toString:null};
+  assert.equal((await failedJob(error)).error, safeFailure);
+});
+
+
+test('numeric diagnostic code also falls back without a coercion-based lookup', async () => {
+  const error = structuredClone(errorFixture.error);
+  error.diagnostics.code = 42;
+  assert.equal((await failedJob(error)).error, safeFailure);
 });

@@ -1,0 +1,1 @@
+import e from"./page-BJoXK0C-.js";import{jsx as t}from"react/jsx-runtime";function n(){return t(e,{axelOnly:!0})}export{n as default};

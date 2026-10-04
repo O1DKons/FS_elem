@@ -36,3 +36,12 @@ There are exactly 23 keypointNames and 23 point entries per frame. Entry is null
 New result provenance may contain `ortThreads` with `intraOpNumThreads`2 or4 and `interOpNumThreads`1, and `runtimeSessions` grouped by `sparse`/`dense`. Each executed detector/pose record contains the actual ORT session thread options and `providers:["CPUExecutionProvider"]`. An empty dense list means no dense windows executed. Historical results may omit these fields or contain null; this does not certify their runtime settings.
 
 The explicit profile is part of recipe identity and cache admission. It does not change the event/pose coordinate contract, nominal definitions, or null physical-turn/underrotation fields. Cached opening time remains separate from cold processing time.
+
+
+## Неуспешная проверка источника: безопасная диагностика
+
+У задачи со статусом `failed` поле `error` может содержать подтверждённую диагностику источника: `code`, `message`, `diagnostics`. В `diagnostics` ровно шесть полей: `schemaVersion=1`, `stage="probe"`, `code`, `declaredFrames`, `decodedFrames`, `failedTimestampConditions`. Значения counts — неотрицательные безопасные целые числа; логические, строковые и дробные значения не допускаются.
+
+`SOURCE_FRAME_COUNT_MISMATCH` используется при разных counts; `SOURCE_TIMESTAMP_INVALID` — при равных counts и нарушенной временной шкале. Допустимые conditions в каноническом порядке: `first_timestamp_unavailable`, `first_timestamp_nonzero`, `nonfinite_timestamp`, `nonincreasing_timestamp`. Неизвестные или дополнительные поля, противоречащие друг другу сообщения и некорректная диагностика не становятся публичным объяснением: сохраняется общая ошибка. Приватный путь, заголовок файла и traceback не входят в диагностику.
+
+Диагностика источника относится только к завершённой неуспешной задаче. Успех, отмена и ограничения времени/объёма сохраняют свой приоритет; запросы результата и позы неуспешной задачи по-прежнему возвращают 409. Восстановление такой задачи не запускает новый анализ. Эти сообщения не устанавливают повреждение файла или физический недокрут.

@@ -1,0 +1,15 @@
+{
+  "state": "failed",
+  "error": {
+    "code": "SOURCE_FRAME_COUNT_MISMATCH",
+    "message": "Source frame count differs from decoded frames; analysis stopped.",
+    "diagnostics": {
+      "schemaVersion": 1,
+      "stage": "probe",
+      "code": "SOURCE_FRAME_COUNT_MISMATCH",
+      "declaredFrames": 357,
+      "decodedFrames": 337,
+      "failedTimestampConditions": []
+    }
+  }
+}

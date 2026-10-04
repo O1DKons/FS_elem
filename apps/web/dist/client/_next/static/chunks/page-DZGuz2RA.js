@@ -1,0 +1,1 @@
+import{r as e}from"./framework-D_rUT4EX.js";import t from"./page-adO5l_8V.js";var n=e();function r(){return(0,n.jsx)(t,{axelOnly:!0})}export{r as default};

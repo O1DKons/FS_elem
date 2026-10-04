@@ -10,6 +10,8 @@ ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS = ROOT/'scripts'
 if str(SCRIPTS) not in sys.path:
     sys.path.insert(0,str(SCRIPTS))
+from source_diagnostics import validate_diagnostics
+
 STAGES = ('probe','sparse','flight_family','dense','nominal','export')
 
 
@@ -43,6 +45,10 @@ def run_child(argv, log_path):
                         row=json.loads(line)
                     except (ValueError,TypeError):
                         continue
+                    if isinstance(row,dict) and row.get('kind')=='analysis_diagnostics':
+                        diagnostic=validate_diagnostics(row.get('diagnostics'))
+                        # Preserve invalid state without forwarding any untrusted fields.
+                        print(json.dumps({'kind':'analysis_diagnostics','diagnostics':diagnostic},allow_nan=False),flush=True)
                     if isinstance(row,dict) and row.get('stage') in STAGES:
                         progress(row['stage'],row['currentFrame'],row['totalFrames'])
                 code=process.wait()

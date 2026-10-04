@@ -135,10 +135,10 @@
     "../runtime/pipeline/run.py": "6ba6bf5302abc19fe448c8a07ca9a2b5437a9c81c878127d36b94debfef965f6",
     "../runtime/pipeline/selection.py": "05f849f1ed27b454671c752ee63ed2923eb78b9299cdfcbfc166a3b7fc667ca9",
     "../runtime/pipeline/sparse.py": "e664ebada2d5fca8c87e0d5953ad2876d0ae86a6205cb92b396e557e4730981d",
-    "../runtime/pipeline/support.py": "598d21fd251792235a8802d4e9067959fb67dfc054d1ea2dff2a447418ae3f30",
+    "../runtime/pipeline/support.py": "ccffd3c9e66c1a7a45edfa7581859557f8c4965dd7e63d1786df15c045d8802d",
     "../runtime/pipeline/temporal.py": "71e20d9bbf3df07bee7c4e964afea696d0bca905b132bc58c94903ee169692d4",
     "../runtime/pipeline/windows.py": "d6dcf81a59b1870a2ce06b2f8a514128f7b143cdf8b9e3b1858473c8b1187752",
-    "../runtime/pipeline/worker.py": "b7d4edce07c2a32718b0023276f3361cef78fdfbbd5eeb2804e45a1f02ad05e9",
+    "../runtime/pipeline/worker.py": "5a6770d998ea56b01791e725ef9aa6ea6f477c36f1ef8b7666c0e15e194b6328",
     "../scripts/axel_family.py": "4cbdc5067a37cd7d48b1b01dad1dc47a9e0f6cf3955881e4d9cfc59abade138c",
     "../scripts/axel_features.py": "57137956fcd3422f66608128faecc0f22d0eccc6449e50eaa4b8245c2cd3f439",
     "../scripts/axel_rtmw_windows.py": "e4468e72d28b11da98e39f279f48ff5be53ab3b3c90e3d2470309604b3aa7fc2",
@@ -150,7 +150,8 @@
     "../scripts/sparse_pose_timestamps.py": "8610eee27dcb55805b381d9d7cc43253ebf4e67143e4d4129585d8b97ca96b24",
     "../scripts/video_native_type.py": "4f929b99a8238b361a6509898edd66628bd54b75b173229bb1631c4cf2ad467b",
     "../scripts/video_pose_type.py": "d0471ecbcc11d0ce70d7ef7de159decea529ca22e758b164668cade43a33ae9d",
-    "../scripts/video_type_model.py": "d5c6a7e4f8a67bdd6d142fc1bb623aff118d79b1c11ceca12d12488c0d67e784"
+    "../scripts/video_type_model.py": "d5c6a7e4f8a67bdd6d142fc1bb623aff118d79b1c11ceca12d12488c0d67e784",
+    "../scripts/source_diagnostics.py": "33cb1b1022f17abea07143da65088d825df85fb2fadd9d99edf2c947e3519319"
   },
   "globalAthleteIndependenceVerified": false,
   "nominalGuard": "usableTorsoFrames>=3 and finiteSpectralFeatures>0",

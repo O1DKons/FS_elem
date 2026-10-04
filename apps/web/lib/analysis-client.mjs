@@ -11,6 +11,50 @@ const invalid = () => {
 const finite = Number.isFinite;
 const shaValid = (sha) =>
   typeof sha === 'string' && /^[a-f0-9]{64}$/i.test(sha);
+const failureFallback =
+  'Обработка остановлена из-за ошибки. Подробная причина недоступна.';
+const diagnosticKeys = [
+  'schemaVersion', 'stage', 'code', 'declaredFrames', 'decodedFrames',
+  'failedTimestampConditions',
+];
+const timestampConditions = [
+  'first_timestamp_unavailable', 'first_timestamp_nonzero',
+  'nonfinite_timestamp', 'nonincreasing_timestamp',
+];
+const diagnosticMessages = {
+  SOURCE_FRAME_COUNT_MISMATCH:
+    'Source frame count differs from decoded frames; analysis stopped.',
+  SOURCE_TIMESTAMP_INVALID:
+    'Source frame timestamps are invalid; analysis stopped.',
+};
+function jobFailure(data) {
+  if (data.state !== 'failed') return undefined;
+  const error = data.error, d = error?.diagnostics;
+  if (
+    !d || typeof d !== 'object' || Array.isArray(d) ||
+    Object.keys(d).length !== diagnosticKeys.length ||
+    !diagnosticKeys.every((key) => Object.hasOwn(d, key)) ||
+    d.schemaVersion !== 1 || d.stage !== 'probe' ||
+    typeof d.code !== 'string' || !Object.hasOwn(diagnosticMessages, d.code) ||
+    error.code !== d.code || error.message !== diagnosticMessages[d.code] ||
+    !Number.isSafeInteger(d.declaredFrames) || d.declaredFrames < 0 ||
+    !Number.isSafeInteger(d.decodedFrames) || d.decodedFrames < 0 ||
+    !Array.isArray(d.failedTimestampConditions)
+  ) return failureFallback;
+  let previous = -1;
+  for (const condition of d.failedTimestampConditions) {
+    const index = timestampConditions.indexOf(condition);
+    if (index <= previous) return failureFallback;
+    previous = index;
+  }
+  if (d.code === 'SOURCE_FRAME_COUNT_MISMATCH') {
+    if (d.declaredFrames === d.decodedFrames) return failureFallback;
+    return `Количество прочитанных кадров расходится с данными файла (${d.decodedFrames} вместо ${d.declaredFrames}). Анализ остановлен.`;
+  }
+  if (d.declaredFrames !== d.decodedFrames || !d.failedTimestampConditions.length)
+    return failureFallback;
+  return 'Временные метки кадров не прошли проверку. Анализ остановлен.';
+}
 function binding(data, id, sha) {
   if (
     data?.schemaVersion !== 1 ||
@@ -61,7 +105,7 @@ function normalizeJob(data) {
         : finite(data.elapsedSeconds) && data.elapsedSeconds >= 0
           ? data.elapsedSeconds
           : null,
-    error: data.error?.message,
+    error: jobFailure(data),
   };
 }
 export function normalizeResult(data, id, sha) {
