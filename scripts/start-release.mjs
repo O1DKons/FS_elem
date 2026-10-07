@@ -46,12 +46,16 @@ function watch(child) {
 }
 
 try {
+  if (Number(process.versions.node.split('.')[0]) !== 24)
+    throw Error('FS_elem требует Node.js 24. См. docs/release/installation.md.');
   const args = process.argv.slice(2);
   const options = {};
-  for (let i = 0; i < args.length; i += 2) {
+  let openBrowser = false;
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--open' && !openBrowser) {openBrowser = true; continue;}
     if (!['--config', '--profile', '--max-wall-seconds'].includes(args[i]) || !args[i + 1] || args[i] in options)
-      throw Error('Usage: node scripts/start-release.mjs [--profile ort4|ort2] [--config web-config.json] [--max-wall-seconds 1..5400]');
-    options[args[i]] = args[i + 1];
+      throw Error('Usage: node scripts/start-release.mjs [--open] [--profile ort4|ort2] [--config web-config.json] [--max-wall-seconds 1..5400]');
+    options[args[i]] = args[++i];
   }
   const maxWallSeconds = Number(options['--max-wall-seconds'] ?? 5400);
   if (!Number.isInteger(maxWallSeconds) || maxWallSeconds < 1 || maxWallSeconds > 5400)
@@ -59,11 +63,16 @@ try {
   const profile = options['--profile'] ?? 'ort4';
   if (!['ort4', 'ort2'].includes(profile)) throw Error('Release profile must be ort4 or ort2');
   const recipe = join(projectRoot, `configs/axel-release-${profile}-v2.json`);
-  if (!existsSync(recipe)) throw Error('Selected release profile is missing; obtain the complete RC2 package');
+  if (!existsSync(recipe)) throw Error('В пакете отсутствует профиль анализа. Распакуйте полный пакет FS_elem.');
   const python = join(projectRoot, '.runtime/venv-science/bin/python');
+  if (!existsSync(python))
+    throw Error('Первоначальная настройка FS_elem ещё не выполнена. Запустите npm run setup:release с Python 3.12 и 3.9; команды в docs/release/installation.md.');
+  if (!existsSync(join(projectRoot, 'apps/web/dist/server/index.js')) ||
+      !existsSync(join(projectRoot, 'apps/web/dist/client')))
+    throw Error('Готовый интерфейс отсутствует. Выполните первоначальную настройку: docs/release/installation.md.');
   const checked = spawnSync(process.execPath, [join(projectRoot, 'scripts/setup-release.mjs'), '--check',
     '--science-python', python], {stdio: 'inherit'});
-  if (checked.error || checked.status !== 0) throw Error('Run release setup first; see docs/release/installation.md.');
+  if (checked.error || checked.status !== 0) throw Error('Зависимости FS_elem не прошли проверку. Выполните настройку: docs/release/installation.md.');
   const defaultConfig = join(projectRoot, '.runtime/release-web.json');
   if (!options['--config'] && !existsSync(defaultConfig)) {
     mkdirSync(join(projectRoot, '.runtime'), {recursive: true});
@@ -80,7 +89,7 @@ try {
   const lines = createInterface({input: analysis.stdout});
   await ready(analysis, listener => lines.on('line', listener), line => JSON.parse(line).port === config.analysisPort);
   watch(analysis);
-  const web = spawn(process.execPath, [join(projectRoot, 'scripts/web-worker.mjs'), configFile],
+  const web = spawn(process.execPath, [join(projectRoot, 'scripts/release-web-worker.mjs'), configFile],
     {cwd: join(projectRoot, 'apps/web'), stdio: ['ignore', 'inherit', 'inherit', 'ipc']});
   children.push(web);
   await ready(web, listener => web.on('message', listener), message => message?.ready === true);
@@ -88,6 +97,11 @@ try {
   console.log(`FS_elem готов: http://${config.host}:${config.port}/analysis`);
   console.log(`Профиль: ${profile} · ${recipe}`);
   console.log('Для остановки нажмите Ctrl+C.');
+  if (openBrowser) {
+    const opened = spawnSync('/usr/bin/open', [`http://${config.host}:${config.port}/analysis`],
+      {stdio: 'ignore', timeout: 5000});
+    if (opened.error || opened.status !== 0) console.error('Откройте адрес выше в браузере.');
+  }
 } catch (error) {
   console.error(error.message);
   await stop(1);
