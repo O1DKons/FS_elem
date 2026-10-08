@@ -79,12 +79,39 @@ try{
  $iscc='C:\Program Files (x86)\Inno Setup 6\ISCC.exe'
  if(-not(Test-Path -LiteralPath $iscc)){throw 'Inno Setup build compiler missing'}
  $compiler=Get-Item -LiteralPath $iscc
- $compilerInfo=$compiler.VersionInfo
- $compilerVersion=[version]::new($compilerInfo.FileMajorPart,$compilerInfo.FileMinorPart,$compilerInfo.FileBuildPart,$compilerInfo.FilePrivatePart)
+ # Empty stdin prints the engine version then fails on the empty script (exit2).
+ # Output disabled: this query cannot create an installer. Help lacks minor version.
+ $probe=[Diagnostics.Process]::new()
+ $probe.StartInfo=[Diagnostics.ProcessStartInfo]::new($iscc,'/O- -')
+ $probe.StartInfo.UseShellExecute=$false
+ $probe.StartInfo.CreateNoWindow=$true
+ $probe.StartInfo.RedirectStandardInput=$true
+ $probe.StartInfo.RedirectStandardOutput=$true
+ $probe.StartInfo.RedirectStandardError=$true
+ try{
+  if(-not $probe.Start()){throw 'Cannot start official compiler version probe'}
+  $stdout=$probe.StandardOutput.ReadToEndAsync()
+  $stderr=$probe.StandardError.ReadToEndAsync()
+  $probe.StandardInput.Close()
+  if(-not $probe.WaitForExit(10000)){
+   $probe.Kill()
+   if(-not $probe.WaitForExit(3000)){throw 'Compiler version probe termination unresolved'}
+   throw 'Compiler version probe exceeded10s'
+  }
+  $probeExit=$probe.ExitCode
+  $banner=$stdout.GetAwaiter().GetResult()+[Environment]::NewLine+$stderr.GetAwaiter().GetResult()
+ }finally{$probe.Dispose()}
+ if([Text.Encoding]::UTF8.GetByteCount($banner) -gt 65536){throw 'Compiler version banner exceeds64KiB'}
+ [IO.File]::WriteAllText((Join-Path $logs 'compiler-version-banner.log'),$banner,[Text.UTF8Encoding]::new($false))
+ $engine=[regex]::Match($banner,'(?m)^Compiler engine version:\s+Inno Setup\s+(?<version>\d+\.\d+\.\d+(?:\.\d+)?)\s*$')
+ $versionText=if($engine.Success){$engine.Groups['version'].Value}else{$null}
  Write-Json (Join-Path $WorkRoot 'compiler-input.json') @{
-  publisher='JRSoftware';path=$iscc;fileVersion=$compilerInfo.FileVersion;resolvedVersion=$compilerVersion.ToString();
+  publisher='JRSoftware';path=$iscc;fileVersionResource=$compiler.VersionInfo.FileVersion;resolvedVersion=$versionText;
+  versionSource='actual CLI engine banner from /O- - with empty stdin';probeExitCode=$probeExit;expectedProbeExitCode=2;banner=$banner;
   bytes=$compiler.Length;sha256=(Get-FileHash -LiteralPath $iscc -Algorithm SHA256).Hash.ToLowerInvariant()
  }
+ if($probeExit -ne 2 -or -not $engine.Success){throw 'Compiler empty-script version probe has unexpected output or exit'}
+ $compilerVersion=[version]$versionText
  if($compilerVersion.Major -ne $inputs.innoSetup.major -or $compilerVersion -lt [version]$inputs.innoSetup.minimumVersion){throw "Incompatible Inno Setup compiler $compilerVersion"}
  $nodeVersion=(&$Node --version|Out-String).Trim().TrimStart('v')
  if($LASTEXITCODE -ne 0 -or -not $nodeVersion.StartsWith('24.')){throw 'Build requiresNode24'}

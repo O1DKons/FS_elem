@@ -36,10 +36,9 @@ jobs:
             if ($LASTEXITCODE -ne 0) { throw 'Inno compiler installation failed' }
           }
           if (-not (Test-Path -LiteralPath $iscc)) { throw 'Inno Setup compiler missing' }
-          $info = (Get-Item -LiteralPath $iscc).VersionInfo
-          $version = [version]::new($info.FileMajorPart, $info.FileMinorPart, $info.FileBuildPart, $info.FilePrivatePart)
-          if ($version.Major -ne 6 -or $version -lt [version]'6.3.0') { throw "Inno Setup 6.3+ required; found $version" }
-          Write-Host "Resolved Inno Setup $version SHA256=$((Get-FileHash -LiteralPath $iscc -Algorithm SHA256).Hash)"
+          # Compatibility/version comes from the bounded CLI engine probe in the builder.
+          # ISCC.exe may have no FileVersion resource; /? only reports its major version.
+          Write-Host "Resolved compiler path=$iscc SHA256=$((Get-FileHash -LiteralPath $iscc -Algorithm SHA256).Hash)"
       - name: Build self-contained installer and check native installation
         shell: pwsh
         run: |

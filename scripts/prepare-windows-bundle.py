@@ -97,7 +97,8 @@ def assemble_python(archive, site, dest, minor):
     copy_tree(site, dest / "Lib" / "site-packages")
     # Paths remain valid when the entire app is installed elsewhere.
     (scripts / (stem + "._pth")).write_text(
-        stem + ".zip\n.\n../Lib/site-packages\n../../..\n../../../scripts\nimport site\n",
+        stem + ".zip\n.\n../Lib/site-packages\n../../..\n../../../scripts\n"
+        "../../../services/analysis\n../../../runtime/pipeline\nimport site\n",
         encoding="utf-8")
 
 

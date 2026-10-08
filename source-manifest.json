@@ -21,8 +21,8 @@
     },
     {
       "path": ".github/workflows/windows-installer.yml",
-      "bytes": 2974,
-      "sha256": "baa77df0a8ee53a568ccea8a0bd86e332b8a3b98ed6555915c7ee4d8ae2d6d38"
+      "bytes": 2849,
+      "sha256": "39ca885be0c3dd0fa204c6771b49f19a5ed76fc5553875e5eee0b2916a99cb08"
     },
     {
       "path": ".github/workflows/windows-release-checks.yml",
@@ -103,6 +103,11 @@
       "path": "apps/web/app/page.tsx",
       "bytes": 12530,
       "sha256": "8599ae58d0908c174336e82b00272055292eb849aa8494f6efe40750e76a0f69"
+    },
+    {
+      "path": "apps/web/components.json",
+      "bytes": 516,
+      "sha256": "9928283696d86836422959a2c520df83a718d31ffbcab533a14ca8dca2c8d475"
     },
     {
       "path": "apps/web/components/analysis/AnalysisWorkbench.tsx",
@@ -428,11 +433,6 @@
       "path": "apps/web/components/ui/tooltip.tsx",
       "bytes": 2855,
       "sha256": "b86e51969931c3d62e88d0bdacd1cd8219105dc6d6b6a588a80011bf92e987cd"
-    },
-    {
-      "path": "apps/web/components.json",
-      "bytes": 516,
-      "sha256": "9928283696d86836422959a2c520df83a718d31ffbcab533a14ca8dca2c8d475"
     },
     {
       "path": "apps/web/dist/client/.vite/manifest.json",
@@ -1076,8 +1076,8 @@
     },
     {
       "path": "packaging/windows/runtime-inputs.json",
-      "bytes": 1264,
-      "sha256": "434da930da34bfadee7e5708d80663f4db8b0dc35f198d453eba443a45b8d461"
+      "bytes": 1325,
+      "sha256": "ae3f976dbb2c25344740acc2cd0411ab46beca238ea0c4a75ff8b3cacf9c22cb"
     },
     {
       "path": "runtime/API.md",
@@ -1176,8 +1176,8 @@
     },
     {
       "path": "scripts/build-windows-installer.ps1",
-      "bytes": 14267,
-      "sha256": "491335ce5a363104edb274c6f23ef47caf212a38426306132680138034f3ac82"
+      "bytes": 15857,
+      "sha256": "78f3bc9d68e906a6312fc7a3b1aca7cb42d1ede6470b0a66c16cd76f20246ea1"
     },
     {
       "path": "scripts/build.mjs",
@@ -1186,8 +1186,8 @@
     },
     {
       "path": "scripts/check-windows-installer.ps1",
-      "bytes": 10689,
-      "sha256": "09baf42fcab0b36bd027634bed400847e18f1a61580d675b0e20e4a56528c48f"
+      "bytes": 11246,
+      "sha256": "4c04561cd9d223939e48aa0e8432fb36203772a1fcb4af4c64a43ebaa64a0791"
     },
     {
       "path": "scripts/config.mjs",
@@ -1216,8 +1216,8 @@
     },
     {
       "path": "scripts/prepare-windows-bundle.py",
-      "bytes": 10038,
-      "sha256": "cbf8fbe9c385ef75c189bdf42e6a40221bd82d8337f9269a6e8eac2b166070e4"
+      "bytes": 10104,
+      "sha256": "91a1a53adbf24c2b3d8bd7193eb7c633fe844ccda435749cc163c44735a3cb28"
     },
     {
       "path": "scripts/release-control.mjs",
@@ -1415,6 +1415,41 @@
       "sha256": "ebfb0ca24932b4cb8bfd67621e4bde26dad8f6a6b7baefed52bc3be8d05fe944"
     },
     {
+      "path": "tests/release-api-contract.test.mjs",
+      "bytes": 5410,
+      "sha256": "81def2dbc9eb9720c456720a01607d63d0ee92392ec420c5b28a3a53ab9005c9"
+    },
+    {
+      "path": "tests/release-fixtures-v1.json",
+      "bytes": 4989,
+      "sha256": "07cb09214ec19f0f72293b88eb33bf8fb98e708df85b3080b724ace6e36142c2"
+    },
+    {
+      "path": "tests/release-inert-pipeline.py",
+      "bytes": 1641,
+      "sha256": "d39467d50b56a2c46db7c7ce9c2c709cc72ebcd71343198b786cf80a5fe953b8"
+    },
+    {
+      "path": "tests/release-lifecycle.test.py",
+      "bytes": 10286,
+      "sha256": "8e1cf611cb5f09e33527945bac2363bed70a4355114b0051fe5e0b098ffe756c"
+    },
+    {
+      "path": "tests/release-manifest.test.mjs",
+      "bytes": 3503,
+      "sha256": "2d6e555b97c87384e9474a938a2ebceceb426c4b6a298db796c5bf2e4080e914"
+    },
+    {
+      "path": "tests/release-package-imports.test.mjs",
+      "bytes": 2680,
+      "sha256": "b83e34f59bd48bdf0dafb7362c10ef4157df7ad4659bc039a6dec010edbbf299"
+    },
+    {
+      "path": "tests/release-pose-consumer.test.mjs",
+      "bytes": 3982,
+      "sha256": "afdfc40cf3282a66a74c54e25b1b3fe24bf0198440e2b74bb07beb45d5d0f063"
+    },
+    {
       "path": "tests/release/api-cooperative-grace.test.mjs",
       "bytes": 1444,
       "sha256": "c66981a210a2a7e286cbbd1bbd31a19a3cd908be99682a68bc7ea68c5e48e55f"
@@ -1451,8 +1486,8 @@
     },
     {
       "path": "tests/release/test_windows_bundle_assembly.py",
-      "bytes": 3368,
-      "sha256": "15dcd59ec0fa5c415d7e7c02ceedb662afa6f8299167db6c1af28a75177ef2ad"
+      "bytes": 4663,
+      "sha256": "e918fb7a0380c6ea8c5b618582720bd67bba9d50a4a82657d315fcf9aac698f8"
     },
     {
       "path": "tests/release/test_windows_first_run.py",
@@ -1463,41 +1498,6 @@
       "path": "tests/release/windows-desktop.test.mjs",
       "bytes": 7082,
       "sha256": "38a537977d9324f48497a871f326bdd3d0012e1b135c4da9cc426fa6c86084ac"
-    },
-    {
-      "path": "tests/release-api-contract.test.mjs",
-      "bytes": 5410,
-      "sha256": "81def2dbc9eb9720c456720a01607d63d0ee92392ec420c5b28a3a53ab9005c9"
-    },
-    {
-      "path": "tests/release-fixtures-v1.json",
-      "bytes": 4989,
-      "sha256": "07cb09214ec19f0f72293b88eb33bf8fb98e708df85b3080b724ace6e36142c2"
-    },
-    {
-      "path": "tests/release-inert-pipeline.py",
-      "bytes": 1641,
-      "sha256": "d39467d50b56a2c46db7c7ce9c2c709cc72ebcd71343198b786cf80a5fe953b8"
-    },
-    {
-      "path": "tests/release-lifecycle.test.py",
-      "bytes": 10286,
-      "sha256": "8e1cf611cb5f09e33527945bac2363bed70a4355114b0051fe5e0b098ffe756c"
-    },
-    {
-      "path": "tests/release-manifest.test.mjs",
-      "bytes": 3503,
-      "sha256": "2d6e555b97c87384e9474a938a2ebceceb426c4b6a298db796c5bf2e4080e914"
-    },
-    {
-      "path": "tests/release-package-imports.test.mjs",
-      "bytes": 2680,
-      "sha256": "b83e34f59bd48bdf0dafb7362c10ef4157df7ad4659bc039a6dec010edbbf299"
-    },
-    {
-      "path": "tests/release-pose-consumer.test.mjs",
-      "bytes": 3982,
-      "sha256": "afdfc40cf3282a66a74c54e25b1b3fe24bf0198440e2b74bb07beb45d5d0f063"
     },
     {
       "path": "tests/test_release_bootstrap.py",
@@ -1564,5 +1564,8 @@
       "bytes": 33709,
       "sha256": "545c3b65d1784ad68e6d25b189c0ff5531c3746c77075d35fa976cd94b0ca27a"
     }
-  ]
+  ],
+  "fileCount": 311,
+  "totalBytes": 8324561,
+  "recordedAtUTC": "2026-10-08T21:26:57.183218+00:00"
 }

@@ -116,6 +116,9 @@ print(json.dumps({"loadedVCRuntimePaths":loaded,"NN":0}))
 '@
  Run 'science-relocated-imports' $science @('-I','-c',('import numpy,sklearn,joblib;print(numpy.__version__)'+[Environment]::NewLine+$dllCheck))|Out-Null
  Run 'pose-relocated-imports' $pose @('-I','-c',('import cv2,onnxruntime,rtmlib;assert "CPUExecutionProvider" in onnxruntime.get_available_providers();print(onnxruntime.__version__)'+[Environment]::NewLine+$dllCheck))|Out-Null
+ $importProbe='import json,pathlib,runpy,sys;root=pathlib.Path(sys.argv[1]);results=[{"path":relative,"runName":runpy.run_path(str(root/relative),run_name="__installer_import_probe__")["__name__"]} for relative in sys.argv[2:]];print(json.dumps({"inertImports":results,"NN":0}))'
+ Run 'science-installed-entrypoint-imports' $science @('-I','-c',$importProbe,$installed,'services/analysis/server.py','runtime/pipeline/run.py')|Out-Null
+ Run 'pose-installed-entrypoint-imports' $pose @('-I','-c',$importProbe,$installed,'runtime/pipeline/worker.py')|Out-Null
  foreach($flag in '-version','-L','-buildconf'){Run ('ffmpeg-'+$flag.TrimStart('-')) (Join-Path $installed '.runtime\bin\ffmpeg.exe') @($flag)|Out-Null}
  $watch=[Diagnostics.Stopwatch]::StartNew()
  Run 'first-run-full-setup' $science @('-I',(Join-Path $installed 'scripts\windows-first-run.py'),'--root',$installed)|Out-Null
