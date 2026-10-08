@@ -1553,10 +1553,10 @@
       "sha256": "4be74d2d4efcd57c700f3e81a4f96e1848338959c1f7f4ada9e33d6a8c7a17dd"
     },
     {
-      "bytes": 1447,
+      "bytes": 1545,
       "mode": "0644",
       "path": "services/analysis/requirements-pose-windows-x64.lock",
-      "sha256": "fcd316f5c16dc76acf90bf344786bf553c50100d8efcbbcb86d9f1bbd539c963"
+      "sha256": "27ae2ae3054b6bfed04a8c93ebf5af57af21540d3df4217ddd4e33220cbca915"
     },
     {
       "bytes": 324,
@@ -1726,7 +1726,7 @@
     "baseListedFiles": 284,
     "baseSourceManifestSha256": "e4d94b1c70775240ad5033027b26e30035bac16f55db6a3b7bca4df7cf6ef403",
     "inheritedSourceProjectionSha256": "2287ddc6a153f7d9edb85136caf3397cbf0f1840a6a95b9e3aa48de7d465bac5",
-    "listedBytesExcludingManifest": 8084838,
+    "listedBytesExcludingManifest": 8084936,
     "listedFiles": 285,
     "payloadFilesIncludingManifest": 286,
     "policyPath": ".gitattributes",
@@ -1739,5 +1739,16 @@
   "scientificValidationUnchanged": true,
   "sourceProjectionSha256": "2287ddc6a153f7d9edb85136caf3397cbf0f1840a6a95b9e3aa48de7d465bac5",
   "status": "CANDIDATE_PENDING_NATIVE_VALIDATION",
-  "version": "0.2.1"
+  "version": "0.2.1",
+  "windowsPoseDependencyDelta": {
+    "baseCandidate3FreezeSha256": "b87fa628384680506d968b30545465acf5ab3b1e3c84f3f8632407afb543c1aa",
+    "deltaBytes": 98,
+    "dependency": "pyreadline3==3.5.6",
+    "nativeInstallPassed": false,
+    "path": "services/analysis/requirements-pose-windows-x64.lock",
+    "sourceFreezeSha256": "6eb898413ac394d98fdb346a636297245ec86214d270448662fde673eb5a5757",
+    "sourceOnly": true,
+    "wheelSha256": "8449b734232e42a5dcd74048e39b60db2839a4c38cf3ae2bf7707d58b5389c0d",
+    "wholePayloadFrozenSeparately": true
+  }
 }
