@@ -154,6 +154,7 @@ try{
  New-Item -ItemType Directory -Path $web|Out-Null
  Copy-Item -LiteralPath (Join-Path $PackageRoot 'apps\web\package.json') -Destination $web
  Copy-Item -LiteralPath (Join-Path $PackageRoot 'apps\web\pnpm-lock.yaml') -Destination $web
+ Copy-Item -LiteralPath (Join-Path $PackageRoot 'apps\web\pnpm-workspace.yaml') -Destination $web
  $npm=Join-Path (Split-Path $Node -Parent) 'node_modules\npm\bin\npm-cli.js'
  $bootstrap=Join-Path $WorkRoot 'pnpm-bootstrap'
  Invoke-Tool 'pinned-build-pnpm' $Node @($npm,'install','--prefix',$bootstrap,'--no-save','--package-lock=false','--ignore-scripts','--bin-links=false','--no-audit','--no-fund','pnpm@11.19.0')

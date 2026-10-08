@@ -1176,8 +1176,8 @@
     },
     {
       "path": "scripts/build-windows-installer.ps1",
-      "bytes": 15857,
-      "sha256": "78f3bc9d68e906a6312fc7a3b1aca7cb42d1ede6470b0a66c16cd76f20246ea1"
+      "bytes": 15955,
+      "sha256": "07038df2297f8083bc4aaa8631a4926dd44dde737fe688760e84ea1ac5cdc004"
     },
     {
       "path": "scripts/build.mjs",
@@ -1566,6 +1566,6 @@
     }
   ],
   "fileCount": 311,
-  "totalBytes": 8326783,
+  "totalBytes": 8326881,
   "recordedAtUTC": "2026-10-08T21:26:57.183218+00:00"
 }
