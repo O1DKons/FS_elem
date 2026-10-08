@@ -1,6 +1,6 @@
 {
-  "acceptedBaseAcceptanceSha256": "a986d1dea4a5e99813e4ea5229d49689db33d56bb17cb0b069cf6868ac7b4243",
-  "acceptedBaseFreezeSha256": "f0f4a42c4b2ecf66c3084f53fbf91ac871eadc84f001859c31d8da65eddbfd01",
+  "acceptedBaseAcceptanceSha256": "69f2deae7d0ef374ede81250c86342e958fe66cd2e37058c0eef2b01d2151795",
+  "acceptedBaseFreezeSha256": "8fa27679c082e7f688a4eb815568120c419c6e3f64ec637faa23abc5a7f9fc83",
   "correctionFreezeSha256": "d7d6ea39eb71ce92582552e57e545b929ab894ed50d6d4ef4b47a67d7953fce0",
   "diagnosticsExcluded": true,
   "files": [
@@ -1052,7 +1052,7 @@
       "bytes": 13368,
       "mode": "0644",
       "path": "configs/axel-release-ort4-windows-x64-v2.json",
-      "sha256": "57b4c92b50ab4c9abd65b147b0768e0180081a8be59e954cc5d23afc68268c42"
+      "sha256": "ae3ba2f68a6a039eae2ac434de708978f459df50790b49df0798946160445463"
     },
     {
       "bytes": 2225,
@@ -1726,12 +1726,12 @@
     "baseListedFiles": 284,
     "baseSourceManifestSha256": "e4d94b1c70775240ad5033027b26e30035bac16f55db6a3b7bca4df7cf6ef403",
     "inheritedSourceProjectionSha256": "2287ddc6a153f7d9edb85136caf3397cbf0f1840a6a95b9e3aa48de7d465bac5",
-    "listedBytesExcludingManifest": 8086618,
+    "listedBytesExcludingManifest": 8088578,
     "listedFiles": 285,
     "payloadFilesIncludingManifest": 286,
     "policyPath": ".gitattributes",
     "policySha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da",
-    "priorWindowsFailureCauseEstablished": false,
+    "priorWindowsFailureCauseEstablished": true,
     "sourceProjectionFieldScope": "inherited candidate2 accepted projection; separate raw checkout leaf delta"
   },
   "releaseAccepted": false,
@@ -1796,6 +1796,21 @@
     "oldLockSha256": "fcd316f5c16dc76acf90bf344786bf553c50100d8efcbbcb86d9f1bbd539c963",
     "onlyJsonPointer": "/platforms/windows-x64/environments/pose/lockSha256",
     "sourceFreezeSha256": "d7d6ea39eb71ce92582552e57e545b929ab894ed50d6d4ef4b47a67d7953fce0",
+    "sourceOnly": true
+  },
+  "windowsRecipePoseLockBindingDelta": {
+    "MacPathUnchanged": true,
+    "codeGuardsUnchanged": true,
+    "formalPeer": "pending first focused recipe binding Source disposition",
+    "nativeLifecyclePassed": false,
+    "newAcceptedNativeLockSha256": "e7031ebb2e7ad8bc5bdecdf3c57b07727c6f9df25bfbcda7121d92c0b3f8f294",
+    "newRecipeSha256": "ae3ba2f68a6a039eae2ac434de708978f459df50790b49df0798946160445463",
+    "oldLockSha256": "fcd316f5c16dc76acf90bf344786bf553c50100d8efcbbcb86d9f1bbd539c963",
+    "oldRecipeSha256": "57b4c92b50ab4c9abd65b147b0768e0180081a8be59e954cc5d23afc68268c42",
+    "onlyJsonPointer": "/platformProvenance/poseLockSha256",
+    "recipeBytes": 13368,
+    "rootSourceIntakeSha256": "e8777392d05f8c0edb5d7541352083a9799f18e67299fb75f69c8f335eef560c",
+    "sourceFreezeSha256": "5b8d0519acd04126f317f687a060ed359968d23800e9c15def8eb6ea6e7a51a0",
     "sourceOnly": true
   }
 }

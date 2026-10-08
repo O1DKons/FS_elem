@@ -197,7 +197,7 @@
     "id": "windows-x64",
     "status": "ready",
     "scienceLockSha256": "d6a35ee85c30403021db8e9a080657f18e52bd1006859f1d476505b493462300",
-    "poseLockSha256": "fcd316f5c16dc76acf90bf344786bf553c50100d8efcbbcb86d9f1bbd539c963",
+    "poseLockSha256": "e7031ebb2e7ad8bc5bdecdf3c57b07727c6f9df25bfbcda7121d92c0b3f8f294",
     "ffmpegSha256": "2ce797a0f88d7f067180338fb227f7b1928ea727bd9a4d7a1d022f7c52af71a3",
     "backendRuntimeHashes": {
       "../runtime/process_gate.py": "bdd10b07c12f34ef977a01cfc10e3d339671e91dbc1f1138041edb8b40bda1fd",
