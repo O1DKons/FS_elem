@@ -1,6 +1,6 @@
 {
-  "acceptedBaseAcceptanceSha256": "33d640dd3849d6aca0d7a10e52e631542187e459d226f89b8d793c9b5ef314a6",
-  "acceptedBaseFreezeSha256": "6b21b94ea42bd476278ff717f32e788a11f78617b3f889d3ec570425e71c5c35",
+  "acceptedBaseAcceptanceSha256": "a986d1dea4a5e99813e4ea5229d49689db33d56bb17cb0b069cf6868ac7b4243",
+  "acceptedBaseFreezeSha256": "f0f4a42c4b2ecf66c3084f53fbf91ac871eadc84f001859c31d8da65eddbfd01",
   "correctionFreezeSha256": "d7d6ea39eb71ce92582552e57e545b929ab894ed50d6d4ef4b47a67d7953fce0",
   "diagnosticsExcluded": true,
   "files": [
@@ -1019,10 +1019,10 @@
       "sha256": "704ff25b6a724f41d6af3b50d77a67f4dd0e37477d534dfa822a608ba32e631d"
     },
     {
-      "bytes": 10759,
+      "bytes": 12719,
       "mode": "0644",
       "path": "checks/native_package_check.py",
-      "sha256": "06a0bec6873139b6dfb1c75696e0f7ee66f2ffcaf3e8f98e9977b34f3bb24422"
+      "sha256": "208a07fef20af55408b0abeb685ea02b6e6eccbf828408788d9995d47efca03e"
     },
     {
       "bytes": 12770,
@@ -1764,6 +1764,19 @@
     "sourceFreezeSha256": "c3e073e25798f0ac35acaae457ca281eb5a119b3c6ac7079693aca19cc3e76f3",
     "sourceIntakeSha256": "8b75bc1249cacc4d6761c54b44a5a3e2d34d6b5351b14a64ca1923bc4d475c62",
     "sourceOnly": true
+  },
+  "windowsHttpDiagnosticDelta": {
+    "actualStartupCause": null,
+    "boundedWindowsFailureOnly": true,
+    "formalPeer": "pending first focused diagnostic Source disposition",
+    "nativeLifecycleSuccess": false,
+    "newBytes": 12719,
+    "newSha256": "208a07fef20af55408b0abeb685ea02b6e6eccbf828408788d9995d47efca03e",
+    "oldBytes": 10759,
+    "oldSha256": "208a07fef20af55408b0abeb685ea02b6e6eccbf828408788d9995d47efca03e",
+    "preserved45sWaitAndRetainedCleanup": true,
+    "rootIntakeSha256": "d41e04d63fdec6d3e84031e76cd9dcb70e6346efaec6670fff71a76385f26057",
+    "sourceFreezeSha256": "6255ed4686468efd4f61e8bd09979571291617bf513f2816ff504f0eb72d6820"
   },
   "windowsPoseDependencyDelta": {
     "baseCandidate3FreezeSha256": "b87fa628384680506d968b30545465acf5ab3b1e3c84f3f8632407afb543c1aa",

@@ -154,17 +154,32 @@ def wait_ready(owner, deadline, capture):
     last = None
     while time.monotonic() < deadline:
         capture.check()
+        attempted_path = '/api/analysis/health'
         try:
-            code, body = request('/api/analysis/health')
+            code, body = request(attempted_path)
             health = json.loads(body)
-            web_code, _ = request('/analysis')
+            attempted_path = '/analysis'
+            web_code, _ = request(attempted_path)
             if code == 200 and strict_idle(health) and web_code == 200:
                 capture.check()
                 return {'healthStatus': code, 'analysisStatus': web_code,
                         'inferenceAvailable': True, 'activeJobId': health['activeJobId']}
             last = 'health/compiled UI not ready'
+            if os.name == 'nt':
+                last += f' (healthStatus={code}, analysisStatus={web_code}, strictIdle={strict_idle(health)})'
         except (OSError, ValueError) as error:
             last = type(error).__name__
+            if os.name == 'nt':
+                # Diagnostic formatting must not replace the readiness failure.
+                try:
+                    reason = getattr(error, 'reason', error)
+                    last = json.dumps({'url': 'http://127.0.0.1:5174' + attempted_path,
+                        'exceptionType': type(error).__name__, 'message': str(error)[:512],
+                        'reasonType': type(reason).__name__, 'reason': str(reason)[:512],
+                        'errno': getattr(reason, 'errno', None), 'winerror': getattr(reason, 'winerror', None)},
+                        ensure_ascii=True)
+                except BaseException:
+                    pass
         time.sleep(.2)
     raise RuntimeError('bounded real package readiness failed: ' + str(last))
 
@@ -177,6 +192,23 @@ def require_unavailable():
             continue
         connection.close()
         raise RuntimeError('web/API port remains reachable outside owned tree')
+
+
+def emit_windows_lifecycle_failure(cycle, capture):
+    # Called only after the existing retained cleanup; never changes first_failure.
+    try:
+        with capture.lock:
+            value = {'diagnostic': 'windows native lifecycle startup capture', 'cycle': cycle + 1,
+                'outputBytes': capture.total, 'retainedBytes': capture.retained,
+                'outputLimitBytes': capture.limit, 'outputExceeded': capture.exceeded.is_set(),
+                'drainFailed': capture.failure is not None,
+                'startupStdoutIsBoundedPrefix': True,
+                'startupStdout': bytes(capture.buffers['stdout']).decode('utf-8', 'replace')}
+        # Existing capture is at most 8192 bytes; ASCII JSON is at most 6x that plus metadata.
+        print(json.dumps(value, ensure_ascii=True), file=sys.stderr, flush=True)
+    except BaseException:
+        # Secondary diagnostic/pipe failure cannot mask the original first cause.
+        pass
 
 
 def lifecycle_check():
@@ -233,6 +265,8 @@ def lifecycle_check():
                 if first_failure is None:
                     first_failure = error
         if first_failure:
+            if os.name == 'nt':
+                emit_windows_lifecycle_failure(cycle, capture)
             raise first_failure
         require_unavailable()
         record.update({'ownedTreeStopped': True, 'outputBytes': capture.total,
