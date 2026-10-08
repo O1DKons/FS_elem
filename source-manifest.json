@@ -35,24 +35,6 @@
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "bytes": 430,
-      "mode": "0644",
-      "path": "FS_elem.cmd",
-      "sha256": "6f5a7599be3590c672fea61849e0b27a9454319968e1056443e180958a4e372c"
-    },
-    {
-      "bytes": 1195,
-      "mode": "0755",
-      "path": "FS_elem.command",
-      "sha256": "abcad572bf872d6dc8b937ca05e38a5f9fba273fd799fd77f108e07ac8cec221"
-    },
-    {
-      "bytes": 5169,
-      "mode": "0644",
-      "path": "README.md",
-      "sha256": "c9a99121a1c4d4c34921ad4dd37b8652e3329cca725b2aca56ff2a0795ec2ace"
-    },
-    {
       "bytes": 1097,
       "mode": "0644",
       "path": "apps/web/.next/types/routes.d.ts",
@@ -503,12 +485,6 @@
       "sha256": "b86e51969931c3d62e88d0bdacd1cd8219105dc6d6b6a588a80011bf92e987cd"
     },
     {
-      "bytes": 4647,
-      "mode": "0644",
-      "path": "apps/web/dist/client/.vite/manifest.json",
-      "sha256": "a397690d8c39dfdd64eab587a0e3192d0d5231512737f1d9f9ae992e449752ad"
-    },
-    {
       "bytes": 159,
       "mode": "0644",
       "path": "apps/web/dist/client/_next/static/b5b1013e-429c-4f7b-952b-edfacbf2929d/_buildManifest.js",
@@ -551,16 +527,16 @@
       "sha256": "3d94a3e1ae6eba89613b36bd8db111e6982d910858eff6b48e3d7f67904bdd13"
     },
     {
-      "bytes": 155,
-      "mode": "0644",
-      "path": "apps/web/dist/client/_next/static/chunks/page-DZGuz2RA.js",
-      "sha256": "46896d721ee3fada0f732543fb50a963cca38e4aa4e4021133f04d475e4c2706"
-    },
-    {
       "bytes": 189680,
       "mode": "0644",
       "path": "apps/web/dist/client/_next/static/chunks/page-adO5l_8V.js",
       "sha256": "3261fffeea663b46aaed5ba939e664489534ceb9cb1739f8abb925a90b94b27a"
+    },
+    {
+      "bytes": 155,
+      "mode": "0644",
+      "path": "apps/web/dist/client/_next/static/chunks/page-DZGuz2RA.js",
+      "sha256": "46896d721ee3fada0f732543fb50a963cca38e4aa4e4021133f04d475e4c2706"
     },
     {
       "bytes": 1850,
@@ -593,6 +569,12 @@
       "sha256": "3cab3962c87f73f64e11a224c744c9203ee3bda7780d7dff68dd021ef8d69efd"
     },
     {
+      "bytes": 4647,
+      "mode": "0644",
+      "path": "apps/web/dist/client/.vite/manifest.json",
+      "sha256": "a397690d8c39dfdd64eab587a0e3192d0d5231512737f1d9f9ae992e449752ad"
+    },
+    {
       "bytes": 712,
       "mode": "0644",
       "path": "apps/web/dist/client/favicon.svg",
@@ -603,12 +585,6 @@
       "mode": "0644",
       "path": "apps/web/dist/client/vinext-client-entry-manifest.json",
       "sha256": "6d6065cb77e4a3114fe512d1d060c373b5a2b027daea968c0a3a9680137af04a"
-    },
-    {
-      "bytes": 36,
-      "mode": "0644",
-      "path": "apps/web/dist/server/BUILD_ID",
-      "sha256": "bd5a84491495bfb50b1a2f367c1c9669ad0b24405c8280855a12d00c556b0457"
     },
     {
       "bytes": 3247,
@@ -723,6 +699,12 @@
       "mode": "0644",
       "path": "apps/web/dist/server/_next/static/seed-cache-Zb5zLczT.js",
       "sha256": "978a40a89f44c97e821eb6d756040c09aca6e2d2635502ee3ab98e00097ef972"
+    },
+    {
+      "bytes": 36,
+      "mode": "0644",
+      "path": "apps/web/dist/server/BUILD_ID",
+      "sha256": "bd5a84491495bfb50b1a2f367c1c9669ad0b24405c8280855a12d00c556b0457"
     },
     {
       "bytes": 248176,
@@ -1016,7 +998,7 @@
       "bytes": 12142,
       "mode": "0644",
       "path": "assets/models/manifest-release-v1.json",
-      "sha256": "3d2910fc991e9c66f177876c0f7cc853b5336109c09c3d73eeadc5858d3986e8"
+      "sha256": "e243ca9844a6441cc860f4a7712bee8ccb6852190716c519fcb6e9a12c4a9186"
     },
     {
       "bytes": 3097,
@@ -1157,22 +1139,16 @@
       "sha256": "bb49228abfbe8f75d72eb0866cd8ac7f90f691d203726d7f15b0f2c047256c4c"
     },
     {
-      "bytes": 5682,
+      "bytes": 430,
       "mode": "0644",
-      "path": "grant-demo/PROVENANCE.md",
-      "sha256": "b267f67e091fe4adfe741b7cfae95724e8aac192c40f333aa8cdf90e95929b2d"
+      "path": "FS_elem.cmd",
+      "sha256": "6f5a7599be3590c672fea61849e0b27a9454319968e1056443e180958a4e372c"
     },
     {
-      "bytes": 1964,
-      "mode": "0644",
-      "path": "grant-demo/README.md",
-      "sha256": "4ed19d7ecb54134fbbc2158b275232f9c0ff785d4779e849a04f4d05af2a9c7f"
-    },
-    {
-      "bytes": 4518,
-      "mode": "0644",
-      "path": "grant-demo/VERIFICATION.md",
-      "sha256": "90e366efde9f542a7d7d505ed987a5d2129ccc2057b4e3bbb31e7e15bd3810a5"
+      "bytes": 1195,
+      "mode": "0755",
+      "path": "FS_elem.command",
+      "sha256": "abcad572bf872d6dc8b937ca05e38a5f9fba273fd799fd77f108e07ac8cec221"
     },
     {
       "bytes": 8200,
@@ -1203,6 +1179,18 @@
       "mode": "0644",
       "path": "grant-demo/media/example-2a.mp4",
       "sha256": "dd57e8de24c28ce89977864af7689bbe4b0955d59e200d16747b1271bc5a0149"
+    },
+    {
+      "bytes": 5682,
+      "mode": "0644",
+      "path": "grant-demo/PROVENANCE.md",
+      "sha256": "b267f67e091fe4adfe741b7cfae95724e8aac192c40f333aa8cdf90e95929b2d"
+    },
+    {
+      "bytes": 1964,
+      "mode": "0644",
+      "path": "grant-demo/README.md",
+      "sha256": "4ed19d7ecb54134fbbc2158b275232f9c0ff785d4779e849a04f4d05af2a9c7f"
     },
     {
       "bytes": 505657,
@@ -1241,22 +1229,34 @@
       "sha256": "5008ec281d1df506ae19634ba3b1edbb5d98515ff6d405b50c727858400a73f7"
     },
     {
+      "bytes": 4518,
+      "mode": "0644",
+      "path": "grant-demo/VERIFICATION.md",
+      "sha256": "90e366efde9f542a7d7d505ed987a5d2129ccc2057b4e3bbb31e7e15bd3810a5"
+    },
+    {
       "bytes": 797,
       "mode": "0644",
       "path": "package.json",
       "sha256": "18a9d75a4931b0f5009b2910236675b01c5f5e75b6a41504cbf281c37bf2ddb4"
     },
     {
-      "bytes": 9040,
+      "bytes": 5169,
       "mode": "0644",
-      "path": "runtime/API.md",
-      "sha256": "1d21c6ef3fd0ed29478f2254988fd7c88fc2a8d8a06b780bee0b4454b0c6b9d4"
+      "path": "README.md",
+      "sha256": "c9a99121a1c4d4c34921ad4dd37b8652e3329cca725b2aca56ff2a0795ec2ace"
     },
     {
       "bytes": 1259,
       "mode": "0644",
       "path": "runtime/analyze_job.py",
       "sha256": "1620ff5c41ac203725ad0d7fc87c410ca9dda6789430f151aacef97460d8ac15"
+    },
+    {
+      "bytes": 9040,
+      "mode": "0644",
+      "path": "runtime/API.md",
+      "sha256": "1d21c6ef3fd0ed29478f2254988fd7c88fc2a8d8a06b780bee0b4454b0c6b9d4"
     },
     {
       "bytes": 2668,
@@ -1397,6 +1397,18 @@
       "sha256": "336d584c1777d369ade2c20d0bf14184a5584f6436c8d93e4ce9c239120da711"
     },
     {
+      "bytes": 2361,
+      "mode": "0644",
+      "path": "scripts/release_model_state.py",
+      "sha256": "101a40627fc72ebf63721cdd24759f29ed852a930c1a249e31b78ddad1b30de4"
+    },
+    {
+      "bytes": 2546,
+      "mode": "0644",
+      "path": "scripts/release_platform.py",
+      "sha256": "341319858459672006f588538a3700ac202e4ecf5a348d60c4c043e922d5a6c1"
+    },
+    {
       "bytes": 1539,
       "mode": "0644",
       "path": "scripts/release-control.mjs",
@@ -1419,18 +1431,6 @@
       "mode": "0644",
       "path": "scripts/release-web-worker.mjs",
       "sha256": "522aea8914eed0133d7ed9e99c8961e1f4bfd43ab9d778c9c2650d3a6db3568c"
-    },
-    {
-      "bytes": 2361,
-      "mode": "0644",
-      "path": "scripts/release_model_state.py",
-      "sha256": "101a40627fc72ebf63721cdd24759f29ed852a930c1a249e31b78ddad1b30de4"
-    },
-    {
-      "bytes": 2546,
-      "mode": "0644",
-      "path": "scripts/release_platform.py",
-      "sha256": "341319858459672006f588538a3700ac202e4ecf5a348d60c4c043e922d5a6c1"
     },
     {
       "bytes": 5809,
@@ -1553,10 +1553,10 @@
       "sha256": "4be74d2d4efcd57c700f3e81a4f96e1848338959c1f7f4ada9e33d6a8c7a17dd"
     },
     {
-      "bytes": 1545,
+      "bytes": 1640,
       "mode": "0644",
       "path": "services/analysis/requirements-pose-windows-x64.lock",
-      "sha256": "27ae2ae3054b6bfed04a8c93ebf5af57af21540d3df4217ddd4e33220cbca915"
+      "sha256": "e7031ebb2e7ad8bc5bdecdf3c57b07727c6f9df25bfbcda7121d92c0b3f8f294"
     },
     {
       "bytes": 324,
@@ -1726,7 +1726,7 @@
     "baseListedFiles": 284,
     "baseSourceManifestSha256": "e4d94b1c70775240ad5033027b26e30035bac16f55db6a3b7bca4df7cf6ef403",
     "inheritedSourceProjectionSha256": "2287ddc6a153f7d9edb85136caf3397cbf0f1840a6a95b9e3aa48de7d465bac5",
-    "listedBytesExcludingManifest": 8084936,
+    "listedBytesExcludingManifest": 8085031,
     "listedFiles": 285,
     "payloadFilesIncludingManifest": 286,
     "policyPath": ".gitattributes",
@@ -1740,6 +1740,18 @@
   "sourceProjectionSha256": "2287ddc6a153f7d9edb85136caf3397cbf0f1840a6a95b9e3aa48de7d465bac5",
   "status": "CANDIDATE_PENDING_NATIVE_VALIDATION",
   "version": "0.2.1",
+  "windowsColoramaDependencyDelta": {
+    "changedMetadataSha256": "e243ca9844a6441cc860f4a7712bee8ccb6852190716c519fcb6e9a12c4a9186",
+    "nativeWindowsValidation": "pending",
+    "newLockSha256": "e7031ebb2e7ad8bc5bdecdf3c57b07727c6f9df25bfbcda7121d92c0b3f8f294",
+    "newPinnedRow": "colorama==0.4.6",
+    "oldLockSha256": "27ae2ae3054b6bfed04a8c93ebf5af57af21540d3df4217ddd4e33220cbca915",
+    "onlyMetadataPointer": "/platforms/windows-x64/environments/pose/lockSha256",
+    "sourceAcceptanceSha256": "1e94c4115630f86a403f4f1440ed1ffbb2282390ce82bb68d59990c58797cb46",
+    "sourceFreezeSha256": "6e79b084055c7827ff11fe4f132b8feef18517571fbe96d765c85edb358ad3d0",
+    "sourceOnly": true,
+    "wheelSha256": "4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"
+  },
   "windowsPoseDependencyDelta": {
     "baseCandidate3FreezeSha256": "b87fa628384680506d968b30545465acf5ab3b1e3c84f3f8632407afb543c1aa",
     "deltaBytes": 98,

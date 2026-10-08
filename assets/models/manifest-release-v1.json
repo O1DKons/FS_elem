@@ -248,7 +248,7 @@
         "pose": {
           "pythonMinor": "3.9",
           "lock": "services/analysis/requirements-pose-windows-x64.lock",
-          "lockSha256": "27ae2ae3054b6bfed04a8c93ebf5af57af21540d3df4217ddd4e33220cbca915",
+          "lockSha256": "e7031ebb2e7ad8bc5bdecdf3c57b07727c6f9df25bfbcda7121d92c0b3f8f294",
           "packages": {
             "coloredlogs": "15.0.1",
             "flatbuffers": "25.12.19",
