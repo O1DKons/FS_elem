@@ -215,7 +215,7 @@ try{
   (Join-Path $PackageRoot 'scripts\prepare-windows-bundle.py'),$payload)
  $out=Join-Path $WorkRoot 'artifacts'
  New-Item -ItemType Directory -Path $out|Out-Null
- Invoke-Tool 'compile-installer' $iscc @("/DPayloadDir=$payload","/DOutputDir=$out",(Join-Path $PackageRoot 'packaging\windows\FS_elem.iss'))
+ Invoke-Tool 'compile-installer' $iscc @('/Q',"/DPayloadDir=$payload","/DOutputDir=$out",(Join-Path $PackageRoot 'packaging\windows\FS_elem.iss'))
  $installer=Join-Path $out 'FS_elem-Setup-0.2.2-x64.exe'
  if(-not(Test-Path -LiteralPath $installer)){throw 'Installer artifact missing'}
  $hash=(Get-FileHash -LiteralPath $installer -Algorithm SHA256).Hash.ToLowerInvariant()
