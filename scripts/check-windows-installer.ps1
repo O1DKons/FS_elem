@@ -83,15 +83,7 @@ try{
  $summary.shortcutPath=$shortcut
  $summary.shortcutTarget=$link.TargetPath
  $summary.expectedLauncher=Join-Path $installed 'FS_elem.exe'
- $target=[IO.Path]::GetFullPath($link.TargetPath)
- $expected=[IO.Path]::GetFullPath($summary.expectedLauncher)
- $summary.shortcutTargetExists=Test-Path -LiteralPath $target -PathType Leaf
- $summary.expectedLauncherExists=Test-Path -LiteralPath $expected -PathType Leaf
- if(-not $summary.shortcutTargetExists -or -not $summary.expectedLauncherExists){
-  throw "Shortcut/app file missing: actual=$target expected=$expected actualExists=$($summary.shortcutTargetExists) expectedExists=$($summary.expectedLauncherExists)"
- }
- # Resolve both EXISTING files through Windows handles. This expands 8.3 names
- # and resolves reparse paths; a different actual target still fails the gate.
+ # WScript may expose an ANSI target. Read the actual .lnk via IShellLinkW.
  Add-Type -TypeDefinition @'
 using System;
 using System.IO;
@@ -99,6 +91,22 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Win32.SafeHandles;
 public static class InstallerFilePath {
+    [ComImport, Guid("000214F9-0000-0000-C000-000000000046"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    private interface IShellLinkW {
+        [PreserveSig]
+        int GetPath([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder path, int size, IntPtr findData, uint flags);
+    }
+    public static string ShortcutTarget(string path) {
+        object link = Activator.CreateInstance(Type.GetTypeFromCLSID(new Guid("00021401-0000-0000-C000-000000000046"), true));
+        try {
+            ((System.Runtime.InteropServices.ComTypes.IPersistFile)link).Load(path, 0);
+            var result = new StringBuilder(32768);
+            int status = ((IShellLinkW)link).GetPath(result, result.Capacity, IntPtr.Zero, 0);
+            if (status != 0) throw new IOException("IShellLinkW.GetPath failed: " + status);
+            if (result.Length == 0) throw new IOException("IShellLinkW returned an empty target");
+            return result.ToString();
+        } finally {Marshal.FinalReleaseComObject(link);}
+    }
     [DllImport("kernel32.dll", CharSet=CharSet.Unicode, SetLastError=true)]
     private static extern uint GetFinalPathNameByHandle(SafeFileHandle handle, StringBuilder path, uint size, uint flags);
     public static string Resolve(string path) {
@@ -112,6 +120,15 @@ public static class InstallerFilePath {
     }
 }
 '@
+ $summary.shortcutUnicodeTarget=[InstallerFilePath]::ShortcutTarget($shortcut)
+ $target=[IO.Path]::GetFullPath($summary.shortcutUnicodeTarget)
+ $expected=[IO.Path]::GetFullPath($summary.expectedLauncher)
+ $summary.shortcutTargetExists=Test-Path -LiteralPath $target -PathType Leaf
+ $summary.expectedLauncherExists=Test-Path -LiteralPath $expected -PathType Leaf
+ if(-not $summary.shortcutTargetExists -or -not $summary.expectedLauncherExists){
+  throw "Shortcut/app file missing: WScript=$($summary.shortcutTarget) unicode=$target expected=$expected actualExists=$($summary.shortcutTargetExists) expectedExists=$($summary.expectedLauncherExists)"
+ }
+ # Both existing files must still resolve to the same installed executable.
  $summary.shortcutCanonicalTarget=[InstallerFilePath]::Resolve($target)
  $summary.installedCanonicalLauncher=[InstallerFilePath]::Resolve($expected)
  if(-not [string]::Equals($summary.shortcutCanonicalTarget,$summary.installedCanonicalLauncher,[StringComparison]::OrdinalIgnoreCase)){
@@ -168,7 +185,12 @@ print(json.dumps({"loadedVCRuntimePaths":loaded,"NN":0}))
   ([Uri](Join-Path $installed 'scripts\windows-bundle.mjs')).AbsoluteUri,$installed)|Out-Null
 
  $watch.Restart()
- $launcher=Start-Process -FilePath (Join-Path $installed 'FS_elem.exe') -WorkingDirectory $installed -PassThru
+ $shortcutLaunch=[Diagnostics.ProcessStartInfo]::new($shortcut)
+ $shortcutLaunch.UseShellExecute=$true
+ $shortcutLaunch.WorkingDirectory=$installed
+ $launcher=[Diagnostics.Process]::Start($shortcutLaunch)
+ if($null -eq $launcher){throw 'Unicode Shell shortcut launch returned no process handle'}
+ $summary.shortcutLaunchedViaShell=$true
  Wait-Ready $launcher
  $summary.desktopReadySeconds=$watch.Elapsed.TotalSeconds
  $launcher.Refresh()
