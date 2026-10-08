@@ -80,8 +80,43 @@ try{
  $shortcut=Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs\FS_elem\FS_elem.lnk'
  if(-not(Test-Path -LiteralPath $shortcut)){throw 'Start Menu shortcut missing'}
  $link=(New-Object -ComObject WScript.Shell).CreateShortcut($shortcut)
- if([IO.Path]::GetFullPath($link.TargetPath) -ne [IO.Path]::GetFullPath((Join-Path $installed 'FS_elem.exe'))){throw 'Shortcut points outside installed app'}
+ $summary.shortcutPath=$shortcut
  $summary.shortcutTarget=$link.TargetPath
+ $summary.expectedLauncher=Join-Path $installed 'FS_elem.exe'
+ $target=[IO.Path]::GetFullPath($link.TargetPath)
+ $expected=[IO.Path]::GetFullPath($summary.expectedLauncher)
+ $summary.shortcutTargetExists=Test-Path -LiteralPath $target -PathType Leaf
+ $summary.expectedLauncherExists=Test-Path -LiteralPath $expected -PathType Leaf
+ if(-not $summary.shortcutTargetExists -or -not $summary.expectedLauncherExists){
+  throw "Shortcut/app file missing: actual=$target expected=$expected actualExists=$($summary.shortcutTargetExists) expectedExists=$($summary.expectedLauncherExists)"
+ }
+ # Resolve both EXISTING files through Windows handles. This expands 8.3 names
+ # and resolves reparse paths; a different actual target still fails the gate.
+ Add-Type -TypeDefinition @'
+using System;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Text;
+using Microsoft.Win32.SafeHandles;
+public static class InstallerFilePath {
+    [DllImport("kernel32.dll", CharSet=CharSet.Unicode, SetLastError=true)]
+    private static extern uint GetFinalPathNameByHandle(SafeFileHandle handle, StringBuilder path, uint size, uint flags);
+    public static string Resolve(string path) {
+        using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete)) {
+            var result = new StringBuilder(32768);
+            uint length = GetFinalPathNameByHandle(stream.SafeFileHandle, result, (uint)result.Capacity, 0);
+            if (length == 0 || length >= result.Capacity)
+                throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error(), "Cannot resolve installed file path");
+            return result.ToString();
+        }
+    }
+}
+'@
+ $summary.shortcutCanonicalTarget=[InstallerFilePath]::Resolve($target)
+ $summary.installedCanonicalLauncher=[InstallerFilePath]::Resolve($expected)
+ if(-not [string]::Equals($summary.shortcutCanonicalTarget,$summary.installedCanonicalLauncher,[StringComparison]::OrdinalIgnoreCase)){
+  throw "Shortcut points outside installed app: actual=$target expected=$expected actualCanonical=$($summary.shortcutCanonicalTarget) expectedCanonical=$($summary.installedCanonicalLauncher)"
+ }
  $env:PATH=(Join-Path $installed '.runtime\node')+';'+$env:SystemRoot+'\System32;'+$env:SystemRoot
  foreach($key in 'PYTHONHOME','PYTHONPATH','VIRTUAL_ENV','NODE_OPTIONS'){[Environment]::SetEnvironmentVariable($key,$null,'Process')}
  $env:PYTHONDONTWRITEBYTECODE='1'

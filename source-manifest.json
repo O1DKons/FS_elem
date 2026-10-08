@@ -1186,8 +1186,8 @@
     },
     {
       "path": "scripts/check-windows-installer.ps1",
-      "bytes": 11246,
-      "sha256": "4c04561cd9d223939e48aa0e8432fb36203772a1fcb4af4c64a43ebaa64a0791"
+      "bytes": 13313,
+      "sha256": "07eb9f59d5628f4f9ad0bc902d4480086e2287e4f5fde9fb5cf382f9f9cad9bd"
     },
     {
       "path": "scripts/config.mjs",
@@ -1566,6 +1566,6 @@
     }
   ],
   "fileCount": 311,
-  "totalBytes": 8327079,
+  "totalBytes": 8329146,
   "recordedAtUTC": "2026-10-08T21:26:57.183218+00:00"
 }
