@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "status": "FROZEN_PEER_CORRECTED_EXECUTABLE_SOURCE_DELTA_CLOSURE_PENDING",
+  "sourceOnly": true,
+  "actualGranted": false,
+  "ownerRelative": "work/v0.2.1-native-windows-smoke-remote-preparation-v1/peer-corrected-v1",
+  "authority": {
+    "name": "coordinator-v0.2.1-windows-smoke-source-intake-v2.json",
+    "bytes": 2950,
+    "sha256": "adf8b0b1366990bac2d3b723ff7adc116ab65c750fa180ba0c04cef6e44e540f"
+  },
+  "initialFreeze": {
+    "name": "source-freeze.json",
+    "bytes": 2586,
+    "sha256": "1303b7c6a45d21e6474234cf382d70edb2ffe59fa58bacef359fc181a0cc8423"
+  },
+  "files": [
+    {
+      "name": "source-plan.json",
+      "bytes": 11667,
+      "sha256": "3b2cf606af4399f749274070c1f50659d577739bd40e12a7a03438a169b90924"
+    },
+    {
+      "name": "windows_nn_operator.py",
+      "bytes": 33709,
+      "sha256": "545c3b65d1784ad68e6d25b189c0ff5531c3746c77075d35fa976cd94b0ca27a"
+    },
+    {
+      "name": "remote_support.py",
+      "bytes": 8789,
+      "sha256": "2d8c383ca5d49ceecde4cc04742e131985b949909ec3655ff45b64f0d2844ee4"
+    },
+    {
+      "name": "remote_entry.py",
+      "bytes": 13445,
+      "sha256": "c370c73d0e54ddd1844061e13d8a2d54bd6a991178205eb15b5dee12ebe89975"
+    },
+    {
+      "name": "remote_outer.py",
+      "bytes": 4433,
+      "sha256": "c084d74ce2e808c38662c6b82433df5ddba1f597ccc0fe72dc8b8f0ea340ab9f"
+    },
+    {
+      "name": "remote_witness.py",
+      "bytes": 3548,
+      "sha256": "b0052b1947e8a49407b45e42993c06ec3317cde24300b9d0190497c100d051b9"
+    },
+    {
+      "name": "remote-contract.json",
+      "bytes": 7198,
+      "sha256": "a87f9047f47fb126d93b666b4283137fedb01a038844a94cd80d7e26220c5d3d"
+    },
+    {
+      "name": "readiness.json",
+      "bytes": 3806,
+      "sha256": "ca0a3ee01a208056142f04dc2e99048529aead8cafcab9936e1cee04f9cc9e3c"
+    },
+    {
+      "name": "proposal.md",
+      "bytes": 3180,
+      "sha256": "44f68a7b6b94a2a852c4f87bb13bc2df87681f0340e6b6065b3fbf02675e2132"
+    },
+    {
+      "name": "combined-peer-initial-findings.json",
+      "bytes": 1248,
+      "sha256": "bd935642994d0306b6751a5ed9bad99aaa006f87d014e473ec3bfa0d4dab71dc"
+    }
+  ],
+  "peerCorrections": [
+    "-I/-S preserved: explicit same-directory absolute importlib specs; no script-directory sys.path insertion.",
+    "Outer live and final guards sum outer TMP plus controller TMP; one32MiB declared OWN subset, unknown or overshoot fails closed."
+  ],
+  "reuse": "controller cached accepted V2; only new plan hash binding, defaultOwner byref; no whole oldSource re-review",
+  "caps": {
+    "ownSeconds": 30,
+    "ownRssBytes": 536870912,
+    "newRegularBytes": 2097152,
+    "retry": 0
+  },
+  "operatorImportsASTTestsRuntimeQueries": 0,
+  "oldFSBodyReads": 0,
+  "peer": "same ONE focused combined review; delta closure pending",
+  "actualBoundary": "No actual Windows/CI/NN admission inferred."
+}

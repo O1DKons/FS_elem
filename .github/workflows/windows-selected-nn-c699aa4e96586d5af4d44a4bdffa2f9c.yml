@@ -1,0 +1,109 @@
+name: Windows v0.2.1 selected NN c699aa4e96586d5af4d44a4bdffa2f9c
+on:
+  push:
+    branches: [release/v0.2.1]
+permissions:
+  contents: read
+jobs:
+  selected-public-nn:
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/release/v0.2.1' &&
+      github.event.head_commit.message == 'FS_elem v0.2.1 Windows NN once: c699aa4e96586d5af4d44a4bdffa2f9c' &&
+      github.run_number == '1' &&
+      github.run_attempt == '1'
+    runs-on: windows-2022
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: pwsh
+        working-directory: '${{ github.workspace }}'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require private external one-event binding before fresh setup
+        env:
+          FS_ELEM_V021_WINDOWS_SMOKE_BINDING: ${{ secrets.FS_ELEM_V021_WINDOWS_SMOKE_BINDING }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:FS_ELEM_V021_WINDOWS_SMOKE_BINDING)) { throw 'External Root selected-push binding missing' }
+          $binding = $env:FS_ELEM_V021_WINDOWS_SMOKE_BINDING | ConvertFrom-Json
+          if ($binding.authorizedSelectedPush -ne $true -or $binding.allowedCommit -cne $env:GITHUB_SHA -or $binding.triggerNonce -cne 'c699aa4e96586d5af4d44a4bdffa2f9c' -or [string]$binding.allowedRunNumber -cne $env:GITHUB_RUN_NUMBER -or $env:GITHUB_RUN_ATTEMPT -cne '1') { throw 'Selected event is not externally authorized' }
+          if ($binding.firstNoNNWindowsCIAccepted -ne $true -or $binding.macPublicNNClosed -ne $true -or $binding.oneHeavySlotReserved -ne $true -or $binding.bridgeSourcesBound -ne $true) { throw 'Mandatory Root admission unresolved' }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          architecture: x64
+      - uses: actions/setup-python@v5
+        id: science
+        with:
+          python-version: '3.12'
+          architecture: x64
+      - uses: actions/setup-python@v5
+        id: pose
+        with:
+          python-version: '3.9'
+          architecture: x64
+      - name: Verify curated source and public asset boundary
+        run: node scripts/verify-release-payload.mjs .
+      - name: Install pinned public runtime and reuse compiled UI
+        env:
+          SCIENCE_PYTHON: ${{ steps.science.outputs.python-path }}
+          POSE_PYTHON: ${{ steps.pose.outputs.python-path }}
+        run: |
+          npm.cmd run setup:release -- --science-python "$env:SCIENCE_PYTHON" --pose-python "$env:POSE_PYTHON"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm.cmd run check:release -- --science-python "$env:SCIENCE_PYTHON"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Observe native FFmpeg version and license output
+        run: |
+          & ./.runtime/venv-science/Scripts/python.exe -B checks/native_package_check.py ffmpeg
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Run current ten native backend ownership cases
+        env:
+          FS_ELEM_RUN_PROCESS_TESTS: '1'
+          FS_ELEM_TEST_PACKAGE_ROOT: '${{ github.workspace }}'
+        run: |
+          & ./.runtime/venv-science/Scripts/python.exe -B -m unittest discover -s checks -p test_owned_process.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Run current launcher entry and cooperative shutdown cases
+        run: node --test --test-concurrency=1 --test-reporter=tap tests/release/owned-web-worker.test.mjs tests/release/api-cooperative-grace.test.mjs
+      - name: Start real compiled UI, cancel its owned tree and restart
+        run: |
+          & ./.runtime/venv-science/Scripts/python.exe -B checks/native_package_check.py lifecycle
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Record completed fresh-host prerequisites before NN boundary
+        run: |
+          $prereq = @{
+            phase = 'PRE_NN_FRESH_NATIVE_PREREQUISITES'
+            numericExitCode = 0
+            exactCommit = $env:GITHUB_SHA
+            runId = $env:GITHUB_RUN_ID
+            runAttempt = $env:GITHUB_RUN_ATTEMPT
+            compiledUiReused = $true
+          }
+          $path = Join-Path $env:RUNNER_TEMP 'fs-elem-v021-prerequisites.json'
+          if (Test-Path -LiteralPath $path) { throw 'Prerequisite receipt must be fresh' }
+          $prereq | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $path -Encoding utf8NoBOM
+      - name: Run separately authorized E300 with retained external CI parent
+        env:
+          FS_ELEM_V021_WINDOWS_SMOKE_BINDING: ${{ secrets.FS_ELEM_V021_WINDOWS_SMOKE_BINDING }}
+        run: |
+          & '${{ steps.science.outputs.python-path }}' -I -S -B tools/release/windows-smoke/ci_host_bridge.py --template tools/release/windows-smoke/admission-template.json --template-sha256 fc1203e55cd3bf3b84f4a08761f793a0aab59c04cf676b35524f73810e0d85a9 --prerequisites (Join-Path $env:RUNNER_TEMP 'fs-elem-v021-prerequisites.json')
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Save explicit public-sample diagnostic witness only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-public3s-${{ github.run_id }}-${{ github.run_attempt }}
+          if-no-files-found: ignore
+          path: |
+            ${{ runner.temp }}/fs-elem-v021-host-${{ github.run_id }}-${{ github.run_attempt }}/ci-host-result.json
+            ${{ runner.temp }}/fs-elem-v021-host-${{ github.run_id }}-${{ github.run_attempt }}/e-numeric-exit.json
+            ${{ runner.temp }}/fs-elem-v021-host-${{ github.run_id }}-${{ github.run_attempt }}/e-raw-transcript.bin
+            ${{ runner.temp }}/fs-elem-v021-host-${{ github.run_id }}-${{ github.run_attempt }}/nn-own/root-physical-result.json
+            ${{ runner.temp }}/fs-elem-v021-host-${{ github.run_id }}-${{ github.run_attempt }}/nn-own/controller/receipt.json
+            ${{ runner.temp }}/fs-elem-v021-host-${{ github.run_id }}-${{ github.run_attempt }}/nn-own/controller/job/research-result.json
+            ${{ runner.temp }}/fs-elem-v021-host-${{ github.run_id }}-${{ github.run_attempt }}/nn-own/controller/job/result.json
+            ${{ runner.temp }}/fs-elem-v021-host-${{ github.run_id }}-${{ github.run_attempt }}/nn-own/controller/job/pose.json
+      # Ordinary/final pushes have a different message and skip this job.
+      # Public selector/template is not Root authority. Private/raw runtime gates
+      # and private source paths are not uploaded or committed.

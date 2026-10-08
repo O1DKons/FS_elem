@@ -1,0 +1,254 @@
+{
+  "schemaVersion": 3,
+  "status": "PEER_CORRECTED_EXECUTABLE_REMOTE_SOURCE_UNRUN",
+  "sourceOnly": true,
+  "actualGranted": false,
+  "correctionAuthority": {
+    "name": "coordinator-v0.2.1-windows-smoke-source-correction-v2.json",
+    "bytes": 2798,
+    "sha256": "e1aa2e8f707389f0757437f0ecc74f53d9307927cc21a8ee69b447668046a188"
+  },
+  "rootDisposition": {
+    "name": "coordinator-v0.2.1-windows-smoke-source-disposition-v1.json",
+    "bytes": 2652,
+    "sha256": "06218da2ac44bc506c60e5e1e0642bd2aaae1def5e1e2879fd9694d99936dbd2"
+  },
+  "priorFreeze": {
+    "name": "source-freeze.json",
+    "bytes": 2983,
+    "sha256": "4ad9344f375810ee0b846936d6fae4eb6e1312c9379e91749e2e461c003d72fe"
+  },
+  "cachedV1ReusedWithoutOldFSBodyReads": true,
+  "acceptedOwnerSource": {
+    "packagePath": "services/analysis/process_owner.py",
+    "bytes": 9015,
+    "sha256": "6b2d4d771b01e420203863f6d0bc1cc7ea26915b8b287c0db3262bd6bbe73876",
+    "defaultInterfaceOnly": true
+  },
+  "canonicalCommand": {
+    "executable": ".runtime/venv-science/Scripts/python.exe",
+    "argv": [
+      "-B",
+      "runtime/analyze_job.py",
+      "--job",
+      "<fresh OWN>/job",
+      "--video",
+      "grant-demo/media/example-1a.mp4",
+      "--config",
+      "configs/axel-release-ort4-windows-x64-v2.json"
+    ],
+    "cwd": "exact GITHUB_WORKSPACE"
+  },
+  "publicSample": {
+    "sha256": "b142e4df68b709475cc016c35b67d2a6999afc8c7644b91722093cd2e4355b5d",
+    "bytes": 818120,
+    "wholeSeconds": 3,
+    "wholeClipOnly": true,
+    "approvedPublic": true
+  },
+  "jobSeedFilename": "job/job.json",
+  "jobSeed": {
+    "source": {
+      "sha256": "b142e4df68b709475cc016c35b67d2a6999afc8c7644b91722093cd2e4355b5d"
+    }
+  },
+  "outputs": [
+    "research-result.json",
+    "result.json",
+    "pose.json"
+  ],
+  "resultPoseSourceContract": "Identical source metadata with admitted sha256; research output required to be JSON object, no guessed research schema.",
+  "cpu": {
+    "canonicalOrInferenceThreads": 4,
+    "preparationWorkers": 1,
+    "alteration": false
+  },
+  "modelAndCaches": "Keep accepted preinstalled models/cache environment; require ready/read-only identity from noNN Windows evidence. No install/download/parameter alteration here.",
+  "prospectiveCaps": {
+    "wholeSeconds": 300,
+    "workSeconds": 270,
+    "cleanupSeconds": 30,
+    "ownRssBytes": 2147483648,
+    "newRegularBytes": 1073741824,
+    "tmpSubsetBytes": 33554432,
+    "combinedLogsBytes": 262144,
+    "retry": 0
+  },
+  "controllerInvocation": [
+    "<admitted stdlib-controller-python.exe>",
+    "-I",
+    "-S",
+    "-B",
+    "windows_nn_operator.py",
+    "--root-grant",
+    "<private RUNNER_TEMP remote grant projection>",
+    "--root-grant-sha256",
+    "<exact SHA256>",
+    "--package",
+    "<GITHUB_WORKSPACE>",
+    "--owner",
+    "<fresh outer OWN/controller OWN>",
+    "--origin-qpc-ticks",
+    "<external original native QPC exact decimal integer>",
+    "--qpc-frequency",
+    "<same native QPC frequency exact decimal integer>"
+  ],
+  "envOverrides": {
+    "TEMP": "<OWN>/tmp",
+    "TMP": "<OWN>/tmp",
+    "TMPDIR": "<OWN>/tmp",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTHONUNBUFFERED": "1",
+    "PYTHONIOENCODING": "utf-8"
+  },
+  "metadataRead": {
+    "expectedLength": "pinned size, or stable fd/path size bounded by maximum",
+    "bound": "one os.read(fd, expected+1), require exactlen and supplied SHA",
+    "noFollow": "CreateFileW OPEN_REPARSE_POINT; reject reparse/nonregular; share READ only; fd owns transferred handle",
+    "stableSixFields": "native volume/file index, fd mode, size, native LastWriteTime/ChangeTime; compare retained fd before/after and noFollow path handles; separate lstat six fields also stable",
+    "handleClosure": "failed fd transfer closes raw handle; each transferred or path-probe fd closes exactly once in finally",
+    "nativeRuntimeVerified": false
+  },
+  "sourcePinFilenames": {
+    "operator": "windows_nn_operator.py",
+    "plan": "source-plan.json",
+    "sourceFreeze": "source-freeze.json",
+    "remoteContract": "remote-contract.json"
+  },
+  "clock": {
+    "origin": "E original native QPC before W/G/R/C/science startup; all descendants inherit exact origin/frequency.",
+    "values": "native QPC ticks and frequency as canonical exact decimal integer strings",
+    "workDeadline": "origin + 270 * frequency",
+    "wholeDeadline": "origin + 300 * frequency",
+    "frequency": "checked against native QueryPerformanceFrequency inside prospective actual only",
+    "renewed": false,
+    "fallback": false,
+    "queriesExecutedHere": false
+  },
+  "liveGuards": {
+    "innerResident": "current controller + listed inner Job resident working-set sample; unknown/list inconsistency or observed overshoot fails closed",
+    "completeOwnResident": "E samples E plus outer Job current members once and separately retained W working set; startup ack requires complete known current sample before C launch.",
+    "storage": "Root complete regular snapshot plus combined current outer TMP/controller TMP <=32MiB; outer live and final guards; unsampled high-water unknown.",
+    "logs": "science raw <=240KiB; shared E/W/R/C diagnostics <=16KiB. Counters and current file sizes qualified, no continuous high-water claim.",
+    "peaks": "sampled maximum aggregate and observed sums of per-process peaks reported separately; no aggregate physical maximum invented",
+    "lifetimeCoverage": "historical census or postexit peak unavailable => explicit unknown; no claimed continuity/high-water coverage",
+    "partialResident": "W and C readings explicitly exclude outer ancestor processes; E is the complete declared OWN union provider."
+  },
+  "teardown": {
+    "implementation": "Accepted default OwnedProcess.stop only; no windows_job_factory, unowned fallback, replacement kill sequence or product Source modifications.",
+    "retainedWait": "R retains/directly waits C Popen; W waits accepted G; E retains/directly waits W plus independent native named member handles.",
+    "jobDrainAndClose": "Pass-through audits original active()/close() calls; final cumulative accounting is read before backend closure. Native teardown remains default accepted stop; audited backend returns are not independent Root CloseHandle observation.",
+    "independentRootParentWaitClaimed": false,
+    "cleanupOnFailures": "Attempt bounded stop, retained wait, raw reader join, stdout close when joined, retained original handle close and all readout handle closure; preserve first cause and one shared whole deadline.",
+    "observationVsFailure": "Unavailable postexit memory/population observation does not change successful target into failure; earlier live unknown/overshoot and wait/drain/close failures remain first cause.",
+    "remainingOriginalBudget": "accepted stop needs its existing six-second budget available; every wait/join/receipt shares external original whole deadline",
+    "externalOuterImplementationProvided": true,
+    "rootDuplicate": "E duplicates W outer Job handle before controller launch ack; after W retained wait, queries Job/accounting independently then closes only its duplicated handle. Default W stop/drain remains the normal teardown.",
+    "failurePath": "Every error requests W default stop; bounded direct W/C retained Popen termination may be necessary on failure, with inherited containment and default Job kill-on-close. No guessed PID, taskkill, replacement job factory or product teardown."
+  },
+  "remoteContractFilename": "remote-contract.json",
+  "remoteIntegrationStatus": "EXECUTABLE_SOURCE_PROVIDED_UNIMPORTED_UNRUN",
+  "requiredPriorAcceptance": [
+    "firstNoNNWindowsCIaccepted",
+    "MacpublicNNclosed",
+    "onefocusedSourcePeer",
+    "exactSource/operator/remoteouter/caps/tree/localcommit binding",
+    "distinctoneheavyRootactualscope before push/NN",
+    "concreteexternalcompletion/retainedwait/cleanup/savedresults/freshRoot-controlledremote physical readout"
+  ],
+  "actualGateFields": [
+    "actualGranted",
+    "firstNoNNWindowsCIAccepted",
+    "macPublicNNClosed",
+    "oneHeavySlotReserved",
+    "focusedSourcePeerAccepted",
+    "remoteOuterContractBound",
+    "externalWaitAndFreshPhysicalRequired",
+    "canonicalCPU4_1AndModelsPreserved",
+    "remoteOuterExecutableSourceBound",
+    "runtimeProjectionAllowed"
+  ],
+  "removedUnassignedStudyPrerequisites": [
+    "nativeReadoutProfileAccepted",
+    "remoteStorageHighWaterGuardReady",
+    "remoteResidentPhysicalEnvelopeReady",
+    "separate scalar/profile/high-water proof studies"
+  ],
+  "remainingUnknowns": [
+    "unsampled aggregate resident/storage high-water",
+    "complete lifetime process population",
+    "postexit process peak counters when unavailable",
+    "independent final outer parent peak/reap until Root fresh physical readout",
+    "target role mapping beyond captured native identities"
+  ],
+  "macPrerequisite": {
+    "rootAccepted": true,
+    "acceptanceSha256Prefix": "dd4b65ce",
+    "acceptanceBytes": 7696,
+    "physicalSha256Prefix": "c7b6a3a2",
+    "scopeSha256Prefix": "446b",
+    "scopeConsumedAndReleased": true,
+    "oldBodiesRead": false
+  },
+  "noNNWindowsPrerequisite": {
+    "accepted": false,
+    "status": "Root reports payload mismatch before dependencies; Main raw-checkout packaging Source fix active."
+  },
+  "preparationExecution": {
+    "rootIntakeBodyReads": 1,
+    "oldFSBodyReads": 0,
+    "cachedV2OperatorReused": true,
+    "defaultOwnerInterfaceReusedByRef": true,
+    "operatorImports": 0,
+    "operatorASTParses": 0,
+    "operatorTests": 0,
+    "runtimeNativeQueries": 0,
+    "clockProbes": 0,
+    "network": 0,
+    "git": 0,
+    "ci": 0,
+    "nn": 0,
+    "mediaModelBodyHashes": 0,
+    "productSharedWrites": 0
+  },
+  "sourceConclusion": "Executable inert Source with both concrete P1 corrections. Same ONE combined Source Peer delta closure pending; no runtime or actual readiness inferred.",
+  "remoteSourceAuthority": {
+    "name": "coordinator-v0.2.1-windows-smoke-source-intake-v2.json",
+    "bytes": 2950,
+    "sha256": "adf8b0b1366990bac2d3b723ff7adc116ab65c750fa180ba0c04cef6e44e540f"
+  },
+  "remoteExecutableSources": {
+    "externalEntry": "remote_entry.py",
+    "jobWitness": "remote_witness.py",
+    "containedControllerParent": "remote_outer.py",
+    "shared": "remote_support.py",
+    "controller": "windows_nn_operator.py"
+  },
+  "externalInvocation": [
+    "<admitted stdlib-controller-python.exe>",
+    "-I",
+    "-S",
+    "-B",
+    "remote_entry.py",
+    "--root-grant",
+    "<private distinct Root future grant>",
+    "--root-grant-sha256",
+    "<exact SHA256>",
+    "--package",
+    "<GITHUB_WORKSPACE>",
+    "--owner",
+    "<fresh RUNNER_TEMP outer OWN>"
+  ],
+  "processRoles": [
+    "E: Root-controlled external entry retains direct W Popen and independently duplicated outer Job handle.",
+    "W: separate witness uses admitted default OwnedProcess to contain G/R/C/science in outer Job.",
+    "G: accepted OwnedProcess.process startup gate; retained Popen PID differs from R/C.",
+    "R: contained parent directly retains C Popen; waits for E Job-handle retention ack before C startup.",
+    "C: reused V2 controller owns accepted inner science Job and canonical command."
+  ],
+  "remoteParentBoundary": "E captures fresh saved output/postSTAT and independent named W/member waits plus duplicated Job after W exit. E's own final peak/reap still requires its retained CI/host parent; not inferred here.",
+  "peerCorrections": [
+    "-I/-S preserved: explicit same-directory absolute importlib specs; no script-directory sys.path insertion.",
+    "Outer live and final guards sum outer TMP plus controller TMP; one32MiB declared OWN subset, unknown or overshoot fails closed."
+  ]
+}
