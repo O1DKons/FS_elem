@@ -1,7 +1,7 @@
 {
   "acceptedBaseAcceptanceSha256": "33d640dd3849d6aca0d7a10e52e631542187e459d226f89b8d793c9b5ef314a6",
   "acceptedBaseFreezeSha256": "6b21b94ea42bd476278ff717f32e788a11f78617b3f889d3ec570425e71c5c35",
-  "correctionFreezeSha256": "2485cd5ea346debcc875a90dd2cdbe608c07fe2c27ae5c8e0771a56f0e65f38c",
+  "correctionFreezeSha256": "d7d6ea39eb71ce92582552e57e545b929ab894ed50d6d4ef4b47a67d7953fce0",
   "diagnosticsExcluded": true,
   "files": [
     {
@@ -1016,7 +1016,7 @@
       "bytes": 12142,
       "mode": "0644",
       "path": "assets/models/manifest-release-v1.json",
-      "sha256": "16c8ffe54a9d4366e133719c88ac7ab31bf6ea529e24684660fb6e4ffb7ca1b1"
+      "sha256": "3d2910fc991e9c66f177876c0f7cc853b5336109c09c3d73eeadc5858d3986e8"
     },
     {
       "bytes": 3097,
@@ -1750,5 +1750,14 @@
     "sourceOnly": true,
     "wheelSha256": "8449b734232e42a5dcd74048e39b60db2839a4c38cf3ae2bf7707d58b5389c0d",
     "wholePayloadFrozenSeparately": true
+  },
+  "windowsPoseLockBindingDelta": {
+    "changedMetadataSha256": "3d2910fc991e9c66f177876c0f7cc853b5336109c09c3d73eeadc5858d3986e8",
+    "nativeWindowsValidation": "pending",
+    "newLockSha256": "27ae2ae3054b6bfed04a8c93ebf5af57af21540d3df4217ddd4e33220cbca915",
+    "oldLockSha256": "fcd316f5c16dc76acf90bf344786bf553c50100d8efcbbcb86d9f1bbd539c963",
+    "onlyJsonPointer": "/platforms/windows-x64/environments/pose/lockSha256",
+    "sourceFreezeSha256": "d7d6ea39eb71ce92582552e57e545b929ab894ed50d6d4ef4b47a67d7953fce0",
+    "sourceOnly": true
   }
 }
