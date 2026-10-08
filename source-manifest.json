@@ -5,6 +5,12 @@
   "diagnosticsExcluded": true,
   "files": [
     {
+      "bytes": 8,
+      "mode": "0644",
+      "path": ".gitattributes",
+      "sha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da"
+    },
+    {
       "bytes": 606,
       "mode": "0644",
       "path": ".github/workflows/release-checks.yml",
@@ -1716,6 +1722,18 @@
     "native Mac+Windows workflow run",
     "release/publication acceptance"
   ],
+  "rawCheckoutDelta": {
+    "baseListedFiles": 284,
+    "baseSourceManifestSha256": "e4d94b1c70775240ad5033027b26e30035bac16f55db6a3b7bca4df7cf6ef403",
+    "inheritedSourceProjectionSha256": "2287ddc6a153f7d9edb85136caf3397cbf0f1840a6a95b9e3aa48de7d465bac5",
+    "listedBytesExcludingManifest": 8084838,
+    "listedFiles": 285,
+    "payloadFilesIncludingManifest": 286,
+    "policyPath": ".gitattributes",
+    "policySha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da",
+    "priorWindowsFailureCauseEstablished": false,
+    "sourceProjectionFieldScope": "inherited candidate2 accepted projection; separate raw checkout leaf delta"
+  },
   "releaseAccepted": false,
   "schemaVersion": 2,
   "scientificValidationUnchanged": true,
