@@ -2,6 +2,8 @@
 import argparse
 import json
 import mimetypes
+import os
+import threading
 import re
 import signal
 import sys
@@ -120,6 +122,24 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self,*args):pass
 
 
+CONTROL_LINE_BYTES=256
+
+
+def read_control_stdin(stream,shutdown):
+    """Private launcher pipe only; EOF or invalid bounded input closes safely."""
+    reason='invalid'
+    try:
+        line=stream.readline(CONTROL_LINE_BYTES+1)
+        if not line:
+            reason='eof'
+        elif len(line)<=CONTROL_LINE_BYTES and line.endswith(b'\n'):
+            value=json.loads(line.decode('utf-8'))
+            if type(value) is dict and value=={'type':'shutdown'}:reason='shutdown'
+    except (OSError,ValueError,UnicodeError):pass
+    shutdown()
+    return reason
+
+
 def main():
     if sys.version_info<(3,12):raise SystemExit('FS_elem requires Python 3.12 or later. Run setup first.')
     parser=argparse.ArgumentParser();parser.add_argument('--port',type=int,default=5175)
@@ -131,7 +151,12 @@ def main():
         server.daemon_threads=True;server.manager=manager
         signal.signal(signal.SIGTERM,lambda *_:sys.exit(0))
         print(json.dumps({'port':server.server_port}),flush=True)
-        try:server.serve_forever()
+        try:
+            if os.environ.get('FS_ELEM_CONTROL_STDIN')=='1':
+                if sys.stdin.isatty():raise RuntimeError('Launcher control requires private pipe stdin')
+                threading.Thread(target=read_control_stdin,args=(sys.stdin.buffer,server.shutdown),
+                    name='private-launcher-control',daemon=True).start()
+            server.serve_forever()
         except KeyboardInterrupt:pass
         finally:manager.close()
 

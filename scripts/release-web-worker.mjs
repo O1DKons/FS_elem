@@ -9,7 +9,7 @@ export function installReleaseAdapter(server, api) {
   server.on('request', (req, res) => api(req, res, () => listeners[0].call(server, req, res)));
 }
 
-async function main() {
+export async function main() {
   const {loadConfig, projectRoot} = await import('./config.mjs');
   const {openStore} = await import('../server/store.mjs');
   const {createApi} = await import('../server/api.mjs');

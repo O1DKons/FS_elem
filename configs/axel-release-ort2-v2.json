@@ -151,7 +151,11 @@
     "../scripts/video_native_type.py": "4f929b99a8238b361a6509898edd66628bd54b75b173229bb1631c4cf2ad467b",
     "../scripts/video_pose_type.py": "d0471ecbcc11d0ce70d7ef7de159decea529ca22e758b164668cade43a33ae9d",
     "../scripts/video_type_model.py": "d5c6a7e4f8a67bdd6d142fc1bb623aff118d79b1c11ceca12d12488c0d67e784",
-    "../scripts/source_diagnostics.py": "33cb1b1022f17abea07143da65088d825df85fb2fadd9d99edf2c947e3519319"
+    "../scripts/source_diagnostics.py": "33cb1b1022f17abea07143da65088d825df85fb2fadd9d99edf2c947e3519319",
+    "../runtime/process_gate.py": "bdd10b07c12f34ef977a01cfc10e3d339671e91dbc1f1138041edb8b40bda1fd",
+    "../services/analysis/jobs.py": "7e7d6d3fd6b5c2325872bd2011d03365cd06bf3a223d5539c1ee7903070f257c",
+    "../services/analysis/process_owner.py": "6b2d4d771b01e420203863f6d0bc1cc7ea26915b8b287c0db3262bd6bbe73876",
+    "../services/analysis/server.py": "2536291b06ead6f80106d4aa2f7abdde3fa590aba8eeeb383f3718225a229fd9"
   },
   "globalAthleteIndependenceVerified": false,
   "nominalGuard": "usableTorsoFrames>=3 and finiteSpectralFeatures>0",
@@ -188,5 +192,21 @@
   "ortThreads": {
     "intraOpNumThreads": 2,
     "interOpNumThreads": 1
+  },
+  "backendSourceProvenance": {
+    "acceptanceSha256": "db126eae5e1261c4c8d779bcbc04206ed1eb2fd53af2d60dce93e0d27acd2a0b",
+    "runtimeHashes": {
+      "../runtime/process_gate.py": "bdd10b07c12f34ef977a01cfc10e3d339671e91dbc1f1138041edb8b40bda1fd",
+      "../services/analysis/jobs.py": "7e7d6d3fd6b5c2325872bd2011d03365cd06bf3a223d5539c1ee7903070f257c",
+      "../services/analysis/process_owner.py": "6b2d4d771b01e420203863f6d0bc1cc7ea26915b8b287c0db3262bd6bbe73876",
+      "../services/analysis/server.py": "2536291b06ead6f80106d4aa2f7abdde3fa590aba8eeeb383f3718225a229fd9"
+    },
+    "runtimeBytes": {
+      "../runtime/process_gate.py": 906,
+      "../services/analysis/jobs.py": 15049,
+      "../services/analysis/process_owner.py": 9015,
+      "../services/analysis/server.py": 8374
+    },
+    "status": "source-reviewed-native-runtime-not-validated"
   }
 }

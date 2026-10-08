@@ -1,0 +1,65 @@
+name: Native Windows v0.2.1 candidate
+on:
+  push:
+    branches: [release/v0.2.1]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-release:
+    runs-on: windows-2022
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: pwsh
+        working-directory: '${{ github.workspace }}/FS elem & проверка'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: 'FS elem & проверка'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          architecture: x64
+      - uses: actions/setup-python@v5
+        id: science
+        with:
+          python-version: '3.12'
+          architecture: x64
+      - uses: actions/setup-python@v5
+        id: pose
+        with:
+          python-version: '3.9'
+          architecture: x64
+      - name: Verify curated source and public asset boundary
+        run: node scripts/verify-release-payload.mjs .
+      - name: Install pinned public runtime and reuse compiled UI
+        env:
+          SCIENCE_PYTHON: ${{ steps.science.outputs.python-path }}
+          POSE_PYTHON: ${{ steps.pose.outputs.python-path }}
+        run: |
+          npm.cmd run setup:release -- --science-python "$env:SCIENCE_PYTHON" --pose-python "$env:POSE_PYTHON"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm.cmd run check:release -- --science-python "$env:SCIENCE_PYTHON"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Observe native FFmpeg version and license output
+        run: |
+          & ./.runtime/venv-science/Scripts/python.exe -B checks/native_package_check.py ffmpeg
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Run current ten native backend ownership cases
+        env:
+          FS_ELEM_RUN_PROCESS_TESTS: '1'
+          FS_ELEM_TEST_PACKAGE_ROOT: '${{ github.workspace }}/FS elem & проверка'
+        run: |
+          & ./.runtime/venv-science/Scripts/python.exe -B -m unittest discover -s checks -p test_owned_process.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Run current launcher entry and cooperative shutdown cases
+        run: node --test --test-concurrency=1 --test-reporter=tap tests/release/owned-web-worker.test.mjs tests/release/api-cooperative-grace.test.mjs
+      - name: Start real compiled UI and cancel its owned tree, then restart
+        run: |
+          & ./.runtime/venv-science/Scripts/python.exe -B checks/native_package_check.py lifecycle
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      # No NN/FIT/model probes, accepted-video POST, private uploads or artifact upload.
+      # A real public-demo analysis upload queues inference and needs a distinct
+      # Root scope after native setup/lifecycle acceptance. Win10/11 Explorer UX
+      # and an analysis-page cancel button require separate desktop acceptance.

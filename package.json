@@ -1,6 +1,6 @@
 {
   "name": "fs-elem",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "type": "module",
   "engines": {
@@ -15,7 +15,8 @@
     "setup:release": "node scripts/setup-release.mjs --install",
     "check:release": "node scripts/setup-release.mjs --check",
     "start:release": "node scripts/start-release.mjs",
-    "test:web": "node --test apps/web/lib/*.test.mjs"
+    "test:web": "node --test apps/web/lib/*.test.mjs",
+    "test:release-platform": "node --test --test-concurrency=1 tests/release/*.test.mjs"
   },
   "packageManager": "pnpm@11.19.0"
 }

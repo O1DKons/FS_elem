@@ -115,8 +115,8 @@
     "windows": "../runtime/pipeline/windows.py"
   },
   "ffmpeg": {
-    "path": "../.runtime/bin/ffmpeg",
-    "sha256": "6d175a4743ca50256e89a8cdd731100f9cee33bd79aeea46894d209410dc6617"
+    "path": "../.runtime/bin/ffmpeg.exe",
+    "sha256": "2ce797a0f88d7f067180338fb227f7b1928ea727bd9a4d7a1d022f7c52af71a3"
   },
   "scienceVersions": {
     "numpy": "2.5.3",
@@ -168,9 +168,9 @@
     "timeAxis": "original-source-presentation-seconds",
     "scoreKind": "raw-heatmap-peak"
   },
-  "revisionNote": "Stage2 explicit ORT CPU4/1; unchanged checkpoints/classifiers/sampling/thresholds; actual-session evidence and recipe-bound cache",
-  "sciencePython": "../.runtime/venv-science/bin/python",
-  "posePython": "../.runtime/venv-pose/bin/python",
+  "revisionNote": "Native Windows CPU4/1 paths prepared; unchanged checkpoints/classifiers/sampling/thresholds; metadata and backend binding pending, no native execution evidence",
+  "sciencePython": "../.runtime/venv-science/Scripts/python.exe",
+  "posePython": "../.runtime/venv-pose/Scripts/python.exe",
   "checkpoints": {
     "detector": {
       "path": "../assets/models/yolox.onnx",
@@ -193,20 +193,27 @@
     "intraOpNumThreads": 4,
     "interOpNumThreads": 1
   },
-  "backendSourceProvenance": {
-    "acceptanceSha256": "db126eae5e1261c4c8d779bcbc04206ed1eb2fd53af2d60dce93e0d27acd2a0b",
-    "runtimeHashes": {
+  "platformProvenance": {
+    "id": "windows-x64",
+    "status": "ready",
+    "scienceLockSha256": "d6a35ee85c30403021db8e9a080657f18e52bd1006859f1d476505b493462300",
+    "poseLockSha256": "fcd316f5c16dc76acf90bf344786bf553c50100d8efcbbcb86d9f1bbd539c963",
+    "ffmpegSha256": "2ce797a0f88d7f067180338fb227f7b1928ea727bd9a4d7a1d022f7c52af71a3",
+    "backendRuntimeHashes": {
       "../runtime/process_gate.py": "bdd10b07c12f34ef977a01cfc10e3d339671e91dbc1f1138041edb8b40bda1fd",
       "../services/analysis/jobs.py": "7e7d6d3fd6b5c2325872bd2011d03365cd06bf3a223d5539c1ee7903070f257c",
       "../services/analysis/process_owner.py": "6b2d4d771b01e420203863f6d0bc1cc7ea26915b8b287c0db3262bd6bbe73876",
       "../services/analysis/server.py": "2536291b06ead6f80106d4aa2f7abdde3fa590aba8eeeb383f3718225a229fd9"
     },
-    "runtimeBytes": {
+    "baselineRecipeSha256": "03ac6f9cf28c255c22091218ced6616c648e4359702f5a29658fcc3febb42dd7",
+    "ffmpegIdentityAcceptanceSha256": "370bd7987cc5c82a3c1dae703177986f7bea26f72cc33cd12fbd9355a932ba1b",
+    "readinessKind": "pinned-source-configuration-for-target-validation",
+    "backendRuntimeBytes": {
       "../runtime/process_gate.py": 906,
       "../services/analysis/jobs.py": 15049,
       "../services/analysis/process_owner.py": 9015,
       "../services/analysis/server.py": 8374
     },
-    "status": "source-reviewed-native-runtime-not-validated"
+    "backendSourceAcceptanceSha256": "db126eae5e1261c4c8d779bcbc04206ed1eb2fd53af2d60dce93e0d27acd2a0b"
   }
 }

@@ -5,7 +5,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import platform
+from release_platform import platform_id, venv_python, require_ready_profile, require_interpreter
 import shutil
 import subprocess
 import sys
@@ -42,7 +42,7 @@ def sha256(path):
 
 def read_manifest(root):
     p = safe_path(root, 'assets/models/manifest-release-v1.json')
-    data = json.loads(p.read_text())
+    data = json.loads(p.read_text(encoding='utf-8'))
     if data.get('schemaVersion') != 1 or not isinstance(data.get('models'), list) or not data['models']:
         raise SetupError('Invalid release model manifest')
     ids = set()
@@ -157,7 +157,8 @@ def ensure_asset(root, asset):
 def run(args, capture=False):
     try:
         result = subprocess.run([str(x) for x in args], check=True, text=True,
-                                stdout=subprocess.PIPE if capture else None)
+                                stdout=subprocess.PIPE if capture else None, encoding="utf-8",
+                                env=dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1"))
         return result.stdout.strip() if capture else None
     except (subprocess.CalledProcessError, OSError) as error:
         raise SetupError(f'Command failed: {args[0]}: {error}') from error
@@ -165,49 +166,76 @@ def run(args, capture=False):
 
 def interpreter_info(executable):
     return json.loads(run([executable, '-c',
-        'import json,sys,platform;print(json.dumps({"version":list(sys.version_info[:3]),"machine":platform.machine()}))'], True))
+        'import json,sys,platform;print(json.dumps({"version":list(sys.version_info[:3]),"machine":platform.machine(),"system":platform.system(),"bits":64 if sys.maxsize>2**32 else 32}))'], True))
 
 
-def ensure_environment(root, name, executable, lock_relative):
+def select_profile(manifest):
+    selected = platform_id()
+    native = require_ready_profile(manifest.get('platforms', {}).get(selected, {}))
+    fingerprint = hashlib.sha256(json.dumps(native, sort_keys=True, separators=(',', ':')).encode('utf-8')).hexdigest()
+    return dict(manifest, environments=native['environments'], ffmpeg=native['ffmpeg'],
+                platform=native['platform'], _platformId=selected, _profileSha256=fingerprint)
+
+
+def validate_environment(root, name, manifest):
+    selected = manifest['_platformId']
+    minor = [3, 12] if name == 'science' else [3, 9]
+    executable = venv_python(safe_path(root, '.runtime/venv-' + name), selected)
+    require_interpreter(interpreter_info(executable), selected, minor)
+    run([executable, '-m', 'pip', 'check'])
+    pins = manifest['environments'][name]['packages']
+    versions = json.loads(run([executable, '-c',
+        'import importlib.metadata,json,sys;print(json.dumps({n:importlib.metadata.version(n) for n in sys.argv[1:]}))', *pins], True))
+    if versions != pins:
+        raise SetupError(name + ': installed package versions differ from native manifest')
+    if name == 'pose':
+        run([executable, '-c', 'import cv2,onnxruntime as ort;assert "CPUExecutionProvider" in ort.get_available_providers();print(cv2.__version__)'], True)
+    else:
+        run([executable, '-c', 'import numpy,sklearn,joblib'], True)
+
+
+def ensure_environment(root, name, executable, manifest):
     if name not in ('science', 'pose'):
         raise SetupError('Unknown release environment')
+    selected = manifest['_platformId']
     dest = safe_path(root, '.runtime/venv-' + name)
     marker = dest / '.release-environment.json'
     if dest.exists() and not marker.is_file():
         raise SetupError(f'Refusing unmanaged environment {dest}; existing contents preserved')
-    lock = safe_path(root, lock_relative)
+    lock = safe_path(root, manifest['environments'][name]['lock'])
     lock_sha = sha256(lock)
     minor = [3, 12] if name == 'science' else [3, 9]
+    binding = {'schemaVersion': 2, 'lockSha256': lock_sha, 'pythonMinor': minor,
+               'platformId': selected, 'profileSha256': manifest['_profileSha256']}
     if dest.exists():
-        state = json.loads(marker.read_text())
-        if state.get('status') != 'complete' or state.get('lockSha256') != lock_sha:
-            raise SetupError(f'Incomplete or changed managed environment {dest}; see INSTALL.md repair instructions')
-        info = interpreter_info(dest / 'bin/python')
-        if info['version'][:2] != minor or info['machine'] != 'arm64':
-            raise SetupError(f'Wrong interpreter in {dest}')
-        run([dest / 'bin/python', '-m', 'pip', 'check'])
+        state = json.loads(marker.read_text(encoding='utf-8'))
+        legacy_mac = selected == 'macos-arm64' and 'platformId' not in state
+        if state.get('status') != 'complete' or state.get('lockSha256') != lock_sha or (not legacy_mac and any(state.get(k) != v for k, v in binding.items())):
+            raise SetupError(f'Incomplete or changed managed environment {dest}; existing contents preserved; see installation repair instructions')
+        validate_environment(root, name, manifest)
+        if legacy_mac:
+            marker.write_text(json.dumps(dict(state, **binding)) + '\n', encoding='utf-8')
         return dest
-    info = interpreter_info(executable)
-    if info['version'][:2] != minor or info['machine'] != 'arm64':
-        raise SetupError(f'{name} requires ARM64 Python {minor[0]}.{minor[1]}; got {info}')
+    require_interpreter(interpreter_info(executable), selected, minor)
     dest.parent.mkdir(parents=True, exist_ok=True)
     run([executable, '-m', 'venv', dest])
-    marker.write_text(json.dumps({'status': 'installing', 'lockSha256': lock_sha, 'pythonMinor': minor}) + '\n')
-    run([dest / 'bin/python', '-m', 'pip', 'install', '--no-cache-dir', '--require-hashes', '--only-binary=:all:', '-r', lock])
-    run([dest / 'bin/python', '-m', 'pip', 'check'])
-    marker.write_text(json.dumps({'status': 'complete', 'lockSha256': lock_sha, 'pythonMinor': minor}) + '\n')
+    marker.write_text(json.dumps(dict(binding, status='installing')) + '\n', encoding='utf-8')
+    python = venv_python(dest, selected)
+    run([python, '-m', 'pip', 'install', '--no-cache-dir', '--require-hashes', '--only-binary=:all:', '-r', lock])
+    validate_environment(root, name, manifest)
+    marker.write_text(json.dumps(dict(binding, status='complete')) + '\n', encoding='utf-8')
     return dest
 
 
 def ensure_ffmpeg(root, manifest):
-    dest = safe_path(root, '.runtime/bin/ffmpeg')
+    dest = safe_path(root, manifest['ffmpeg']['path'])
     asset = manifest['ffmpeg']
     if dest.exists():
         verify_asset(dest, asset)
         return
     # Normal venv interpreters are symlinks to a user-installed Python outside
     # the project. Contain the environment directory, not its interpreter link.
-    python = safe_path(root, '.runtime/venv-science') / 'bin/python'
+    python = venv_python(safe_path(root, '.runtime/venv-science'), manifest['_platformId'])
     source = Path(run([python, '-c', 'import imageio_ffmpeg;print(imageio_ffmpeg.get_ffmpeg_exe())'], True))
     verify_asset(source, asset)
     dest.parent.mkdir(parents=True, exist_ok=True)
@@ -217,7 +245,8 @@ def ensure_ffmpeg(root, manifest):
     temp = Path(temp_name)
     try:
         shutil.copyfile(source, temp)
-        temp.chmod(0o755)
+        if manifest["_platformId"] == "macos-arm64":
+            temp.chmod(0o755)
         os.link(temp, dest)
     finally:
         temp.unlink(missing_ok=True)
@@ -230,25 +259,18 @@ def check_release(root, manifest):
             verify_asset(safe_path(root, asset['path']), asset)
         except SetupError as error:
             issues.append(str(error))
-    for name, minor in (('science', [3, 12]), ('pose', [3, 9])):
+    for name in ('science', 'pose'):
         try:
             env = safe_path(root, '.runtime/venv-' + name)
-            state = json.loads((env / '.release-environment.json').read_text())
-            lock = safe_path(root, f'services/analysis/requirements-{name}-macos-arm64.lock')
-            if state.get('status') != 'complete' or state.get('lockSha256') != sha256(lock) or sha256(lock) != manifest['environments'][name]['lockSha256']:
-                raise SetupError(f'{name}: environment does not match the release lock')
-            info = interpreter_info(env / 'bin/python')
-            if info['version'][:2] != minor or info['machine'] != 'arm64':
-                raise SetupError(f'{name}: wrong Python interpreter')
-            pins = manifest['environments'][name]['packages']
-            versions = json.loads(run([env / 'bin/python', '-c',
-                'import importlib.metadata,json,sys;print(json.dumps({n:importlib.metadata.version(n) for n in sys.argv[1:]}))', *pins], True))
-            if versions != pins:
-                raise SetupError(f'{name}: installed package versions differ from manifest')
+            state = json.loads((env / '.release-environment.json').read_text(encoding='utf-8'))
+            lock = safe_path(root, manifest['environments'][name]['lock'])
+            if state.get('status') != 'complete' or state.get('platformId') != manifest['_platformId'] or state.get('profileSha256') != manifest['_profileSha256'] or state.get('lockSha256') != sha256(lock) or sha256(lock) != manifest['environments'][name]['lockSha256']:
+                raise SetupError(f'{name}: native environment marker does not match this release; run setup:release')
+            validate_environment(root, name, manifest)
         except (SetupError, OSError, ValueError) as error:
             issues.append(str(error))
     try:
-        verify_asset(safe_path(root, '.runtime/bin/ffmpeg'), manifest['ffmpeg'])
+        verify_asset(safe_path(root, manifest['ffmpeg']['path']), manifest['ffmpeg'])
     except SetupError as error:
         issues.append(str(error))
     for relative in manifest.get('requiredRuntimeFiles', []):
@@ -267,16 +289,14 @@ def main(argv=None):
     args = parser.parse_args(argv)
     root = Path(__file__).resolve().parents[1]
     try:
-        manifest = read_manifest(root)
+        manifest = select_profile(read_manifest(root))
         for name in ('science', 'pose'):
             environment = manifest['environments'][name]
             if sha256(safe_path(root, environment['lock'])) != environment['lockSha256']:
                 raise SetupError(name + ': requirements lock checksum differs from manifest')
-        if platform.system() != 'Darwin' or platform.machine() != 'arm64' or int(platform.mac_ver()[0].split('.')[0]) < 13:
-            raise SetupError('Release v1 requires macOS 13+ on Apple Silicon (ARM64)')
         if args.install:
             for name, executable in (('science', args.science_python), ('pose', args.pose_python)):
-                ensure_environment(root, name, executable, f'services/analysis/requirements-{name}-macos-arm64.lock')
+                ensure_environment(root, name, executable, manifest)
             ensure_ffmpeg(root, manifest)
             for asset in manifest['models']:
                 print('Verifying ' + asset['id'], flush=True)

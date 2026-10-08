@@ -1,6 +1,6 @@
-# FS_elem v0.2.0 installation
+# FS_elem v0.2.1 candidate installation
 
-Target: macOS 13 or later, Apple Silicon ARM64, Node.js 24 with npm/npx. A local release uses two isolated interpreters: Python 3.12 for science and Python 3.9 for pose. RAM 8 GB is the target, not a verified performance promise. Start processes sequentially; only one analysis runs at a time.
+Targets: macOS 13 or later on Apple Silicon ARM64 and Windows 10/11 x64, CPU. Native Windows commands are in [installation-windows.md](installation-windows.md). Node.js 24 with npm/npx is required. v0.2.1 package installation/startup is pending; saved Mac fixtures do not certify a native package. [Current status](v0.2.1.md). A local release uses two isolated interpreters: Python 3.12 for science and Python 3.9 for pose. RAM 8 GB is the target, not a verified performance promise. Start processes sequentially; only one analysis runs at a time.
 
 ## Commands
 
@@ -13,13 +13,13 @@ npm run check:release -- --science-python "$(uv python find 3.12)"
 npm run start:release
 ```
 
-Open http://127.0.0.1:5174/analysis . Keep the terminal open. Ctrl+C stops both services. The v0.2.0 launcher serves the existing compiled interface through the local production worker. FS_elem.command is the Mac entry point; npm run start:release remains the terminal alternative. Installation can build the frontend when preparing a fresh source checkout; the accepted release build is reused for the current local kit.
+Open http://127.0.0.1:5174/analysis . Keep the terminal open. Ctrl+C stops both services. The v0.2.1 launcher serves the existing compiled interface through the local production worker. FS_elem.command is the Mac entry point; npm run start:release remains the terminal alternative. Setup installs the frozen frontend dependency lock and reuses the included compiled UI. It does not rebuild that UI. A development build is a separate command.
 
 Alternatively provide already installed ARM64 interpreter paths through `--science-python` and `--pose-python`. Interpreter patch versions may differ from the research environment; the exact installed patch is recorded in acceptance. Public standalone 20251031 provides CPython 3.9.25 and 3.12.12; no Codex runtime is required. uv is an interpreter acquisition option, not an inference dependency.
 
 ## Installed files and integrity
 
-The bootstrap writes only project `.runtime/venv-science`, `.runtime/venv-pose`, `.runtime/bin/ffmpeg`, managed setup markers, frontend dependencies/build outputs and missing model assets in `assets/models`. It never reuses existing scientific environments or the global rtmlib checkpoint cache. It installs ARM64 wheel hash locks with normal pip dependency resolution and `pip check`, obtains the two official checkpoint ZIPs, extracts exactly one ONNX byte stream without extracting archive paths, then verifies pinned ONNX size and SHA256 before publishing the file. Archive SHA is not available and is explicitly null; archive size and final checkpoint SHA are distinct.
+The bootstrap writes only project `.runtime/venv-science`, `.runtime/venv-pose`, `.runtime/bin/ffmpeg`, managed setup markers, frontend dependencies and missing model assets in `assets/models`. New installation creates isolated environments and does not adopt the global rtmlib checkpoint cache. An already managed Mac environment may migrate its marker only after the current platform, lock and profile identity checks pass; unmanaged or incompatible environments are preserved and rejected. It installs ARM64 wheel hash locks with normal pip dependency resolution and `pip check`, obtains the two official checkpoint ZIPs, extracts exactly one ONNX byte stream without extracting archive paths, then verifies pinned ONNX size and SHA256 before publishing the file. Archive SHA is not available and is explicitly null; archive size and final checkpoint SHA are distinct.
 
 Science: 8 packages; pose: 13 packages. Torch and plotting packages are unnecessary for the fixed runtime. Both `opencv-python` and `opencv-contrib-python` remain at 5.0.0.93 because rtmlib0.0.15 declares both and this matches historical dependencies. They share the `cv2` namespace; a clean smoke must verify the effective runtime and compare against the selected baseline. This is an explicit compatibility limitation, not permission to change versions.
 

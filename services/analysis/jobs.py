@@ -15,6 +15,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 if str(ROOT/'scripts') not in sys.path:sys.path.insert(0,str(ROOT/'scripts'))
 from source_diagnostics import validate_diagnostics, public_source_error
+from process_owner import OwnedProcess, OwnershipError
 TERMINAL={'succeeded','failed','cancelled'}
 
 
@@ -115,6 +116,7 @@ class JobManager:
             raise ApiError(415,'UNSUPPORTED_FORMAT','Use MP4, MOV, M4V or WebM')
         if require_ready and not self.ready:raise ApiError(503,'RUNTIME_UNAVAILABLE','Run release setup before analysis')
         with self.lock:
+            if self.stop.is_set():raise ApiError(503,'SERVICE_STOPPING','Service is stopping')
             pending=sum(j['state']=='queued' for j in self.jobs.values())+self.uploading
             if pending>=4:raise ApiError(429,'QUEUE_FULL','Wait for queued analyses to finish')
             self.uploading+=1
@@ -138,7 +140,9 @@ class JobManager:
                 'source':{'filename':filename,'sizeBytes':received,'sha256':digest.hexdigest()},
                 'progress':{'stage':'queued','currentFrame':None,'totalFrames':None,'percent':None},'error':None,
                 'links':{'self':base,'result':base+'/result','pose':base+'/pose','media':base+'/media'}}
-            with self.lock:self.jobs[jid]=job;write_atomic(directory/'job.json',job);self.queue.put(jid)
+            with self.lock:
+                if self.stop.is_set():raise ApiError(503,'SERVICE_STOPPING','Service is stopping')
+                self.jobs[jid]=job;write_atomic(directory/'job.json',job);self.queue.put(jid)
             return self.get(jid)
         finally:
             with self.lock:self.uploading-=1
@@ -171,18 +175,8 @@ class JobManager:
                 '--job',str(directory),'--video',str(video),'--config',str(self.config)]
 
     def _cleanup(self,process):
-        """Every runtime descendant inherits this new session; terminate the entire group."""
-        if os.name=='posix':
-            try:os.killpg(process.pid,signal.SIGTERM)
-            except ProcessLookupError:pass
-        elif process.poll() is None:process.terminate()
-        try:process.wait(timeout=3)
-        except subprocess.TimeoutExpired:pass
-        if os.name=='posix':
-            try:os.killpg(process.pid,signal.SIGKILL)
-            except ProcessLookupError:pass
-        elif process.poll() is None:process.kill()
-        process.wait(timeout=3)
+        """Stop only the retained owner: Windows JobObject or original POSIX session."""
+        process.stop()
 
     def _read_progress(self,process,directory,jid,diagnostics=None):
         size=0
@@ -222,9 +216,8 @@ class JobManager:
                 self._update(jid,state='running',progress={'stage':'probe','currentFrame':None,'totalFrames':None,'percent':None})
             directory=self.directory/jid
             try:
-                process=subprocess.Popen(self._command(directory),cwd=ROOT,stdin=subprocess.DEVNULL,
-                    stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,start_new_session=True,
-                    env={**os.environ,'OMP_NUM_THREADS':'2','OPENBLAS_NUM_THREADS':'2','MKL_NUM_THREADS':'2','NUMEXPR_NUM_THREADS':'2'})
+                process=OwnedProcess.launch(self._command(directory),cwd=ROOT,
+                    env={**os.environ,'PYTHONUTF8':'1','OMP_NUM_THREADS':'2','OPENBLAS_NUM_THREADS':'2','MKL_NUM_THREADS':'2','NUMEXPR_NUM_THREADS':'2'})
                 self.process=process
                 reader=threading.Thread(target=self._read_progress,args=(process,directory,jid,diagnostics),daemon=True);reader.start()
                 deadline=time.monotonic()+self.max_wall_seconds
@@ -245,7 +238,11 @@ class JobManager:
             except Exception:
                 if process is not None:
                     try:self._cleanup(process)
-                    except (OSError,subprocess.TimeoutExpired):pass
+                    # The enclosing RUNTIME_ERROR records unsafe completion; never report success.
+                    except Exception:
+                        self.stop.set()
+                        self.ready=False
+                        self.issues=['Owned analysis cleanup failed; restart the local service']
                 self._fail(jid,'RUNTIME_ERROR','Analysis process could not finish safely; inspect local files')
             finally:
                 if process and process.stdout:process.stdout.close()
@@ -260,4 +257,11 @@ class JobManager:
         with self.lock:
             for jid,job in list(self.jobs.items()):
                 if job['state'] not in TERMINAL:self.cancel(jid)
-        if self.thread:self.thread.join(timeout=10)
+        if self.thread:
+            self.thread.join(timeout=10)
+            if self.thread.is_alive():
+                # Do not report graceful close while the retained worker remains alive.
+                process=self.process
+                if process is not None:self._cleanup(process)
+                self.thread.join(timeout=3)
+                if self.thread.is_alive():raise OwnershipError('Analysis worker did not close')

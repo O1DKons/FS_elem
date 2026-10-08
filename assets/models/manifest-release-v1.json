@@ -145,12 +145,189 @@
     "shared/event-editing.mjs",
     "shared/axel-review.mjs",
     "configs/axel-release-ort4-v2.json",
-    "configs/axel-release-ort2-v2.json"
+    "configs/axel-release-ort2-v2.json",
+    "scripts/release-platform.mjs",
+    "scripts/release_platform.py",
+    "scripts/release-control.mjs",
+    "FS_elem.cmd",
+    "configs/axel-release-ort4-windows-x64-v2.json",
+    "scripts/release-owned-web-worker.mjs",
+    "scripts/release-web-worker.mjs",
+    "runtime/process_gate.py",
+    "services/analysis/process_owner.py"
   ],
   "limitations": [
     "Research models, no validated new-video accuracy target",
     "1.5/2.5 are nominal definitions, not measured physical turns",
     "Raw FFmpeg and upstream ONNX are not bundled in GitHub",
     "Checkpoint-specific upstream licensing remains unverified; see third-party.md"
-  ]
+  ],
+  "platforms": {
+    "macos-arm64": {
+      "status": "ready",
+      "platform": {
+        "system": "macOS",
+        "architecture": "arm64",
+        "minVersion": "13"
+      },
+      "environments": {
+        "science": {
+          "pythonMinor": "3.12",
+          "lock": "services/analysis/requirements-science-macos-arm64.lock",
+          "lockSha256": "1e40e7635b80402059c3be3b5e514fcd7812001640b5e426ee2e5c703f98a821",
+          "packages": {
+            "cloudpickle": "3.1.2",
+            "imageio-ffmpeg": "0.6.0",
+            "joblib": "1.6.0",
+            "narwhals": "2.26.0",
+            "numpy": "2.5.3",
+            "scikit-learn": "1.9.0",
+            "scipy": "1.18.1",
+            "threadpoolctl": "3.6.0"
+          }
+        },
+        "pose": {
+          "pythonMinor": "3.9",
+          "lock": "services/analysis/requirements-pose-macos-arm64.lock",
+          "lockSha256": "4be74d2d4efcd57c700f3e81a4f96e1848338959c1f7f4ada9e33d6a8c7a17dd",
+          "packages": {
+            "coloredlogs": "15.0.1",
+            "flatbuffers": "25.12.19",
+            "humanfriendly": "10.0",
+            "mpmath": "1.3.0",
+            "numpy": "2.0.2",
+            "onnxruntime": "1.19.2",
+            "opencv-contrib-python": "5.0.0.93",
+            "opencv-python": "5.0.0.93",
+            "packaging": "26.3",
+            "protobuf": "6.33.6",
+            "rtmlib": "0.0.15",
+            "sympy": "1.14.0",
+            "tqdm": "4.70.1"
+          }
+        }
+      },
+      "ffmpeg": {
+        "id": "ffmpeg",
+        "path": ".runtime/bin/ffmpeg",
+        "sizeBytes": 49368728,
+        "sha256": "6d175a4743ca50256e89a8cdd731100f9cee33bd79aeea46894d209410dc6617",
+        "distribution": "imageio-ffmpeg==0.6.0 macOS arm64 wheel; local installation only",
+        "version": "7.1",
+        "binaryLicense": "GPL-2.0-or-later (verified local executable -L)",
+        "wrapperLicense": "BSD-2-Clause"
+      }
+    },
+    "windows-x64": {
+      "status": "ready",
+      "platform": {
+        "system": "Windows",
+        "architecture": "x64",
+        "minVersion": "10",
+        "desktopTargets": [
+          "10",
+          "11"
+        ]
+      },
+      "environments": {
+        "science": {
+          "pythonMinor": "3.12",
+          "lock": "services/analysis/requirements-science-windows-x64.lock",
+          "lockSha256": "d6a35ee85c30403021db8e9a080657f18e52bd1006859f1d476505b493462300",
+          "packages": {
+            "cloudpickle": "3.1.2",
+            "imageio-ffmpeg": "0.6.0",
+            "joblib": "1.6.0",
+            "narwhals": "2.26.0",
+            "numpy": "2.5.3",
+            "scikit-learn": "1.9.0",
+            "scipy": "1.18.1",
+            "threadpoolctl": "3.6.0"
+          }
+        },
+        "pose": {
+          "pythonMinor": "3.9",
+          "lock": "services/analysis/requirements-pose-windows-x64.lock",
+          "lockSha256": "fcd316f5c16dc76acf90bf344786bf553c50100d8efcbbcb86d9f1bbd539c963",
+          "packages": {
+            "coloredlogs": "15.0.1",
+            "flatbuffers": "25.12.19",
+            "humanfriendly": "10.0",
+            "mpmath": "1.3.0",
+            "numpy": "2.0.2",
+            "onnxruntime": "1.19.2",
+            "opencv-contrib-python": "5.0.0.93",
+            "opencv-python": "5.0.0.93",
+            "packaging": "26.3",
+            "protobuf": "6.33.6",
+            "rtmlib": "0.0.15",
+            "sympy": "1.14.0",
+            "tqdm": "4.70.1"
+          }
+        }
+      },
+      "ffmpeg": {
+        "id": "ffmpeg",
+        "path": ".runtime/bin/ffmpeg.exe",
+        "sizeBytes": 87638016,
+        "sha256": "2ce797a0f88d7f067180338fb227f7b1928ea727bd9a4d7a1d022f7c52af71a3",
+        "distribution": "imageio-ffmpeg==0.6.0 pinned Windows x64 wheel member; identity verified, Windows execution unverified",
+        "version": null,
+        "binaryLicense": null,
+        "wrapperLicense": "BSD-2-Clause",
+        "wheelMetadata": {
+          "filename": "imageio_ffmpeg-0.6.0-py3-none-win_amd64.whl",
+          "url": "https://files.pythonhosted.org/packages/2c/c6/fa760e12a2483469e2bf5058c5faff664acf66cadb4df2ad6205b016a73d/imageio_ffmpeg-0.6.0-py3-none-win_amd64.whl",
+          "bytes": 31246824,
+          "sha256": "02fa47c83703c37df6bfe4896aab339013f62bf02c5ebf2dce6da56af04ffc0a",
+          "bodyVerified": true
+        },
+        "wheelMember": "imageio_ffmpeg/binaries/ffmpeg-win-x86_64-v7.1.exe",
+        "filenameDeclaredVersion": "7.1",
+        "executableFormat": "PE32+",
+        "executableMachine": "AMD64",
+        "wheelCRCVerified": true,
+        "identityAcceptanceSha256": "370bd7987cc5c82a3c1dae703177986f7bea26f72cc33cd12fbd9355a932ba1b"
+      },
+      "pending": [
+        "actual Windows executable -version and -L/configuration output",
+        "native conditional dependency resolution/install/DLL imports",
+        "native application/owned-tree/desktop validation"
+      ],
+      "readinessKind": "pinned-source-configuration-for-target-validation"
+    }
+  },
+  "backendRuntimeSource": {
+    "acceptanceSha256": "db126eae5e1261c4c8d779bcbc04206ed1eb2fd53af2d60dce93e0d27acd2a0b",
+    "files": [
+      {
+        "path": "runtime/process_gate.py",
+        "bytes": 906,
+        "sha256": "bdd10b07c12f34ef977a01cfc10e3d339671e91dbc1f1138041edb8b40bda1fd"
+      },
+      {
+        "path": "services/analysis/jobs.py",
+        "bytes": 15049,
+        "sha256": "7e7d6d3fd6b5c2325872bd2011d03365cd06bf3a223d5539c1ee7903070f257c"
+      },
+      {
+        "path": "services/analysis/process_owner.py",
+        "bytes": 9015,
+        "sha256": "6b2d4d771b01e420203863f6d0bc1cc7ea26915b8b287c0db3262bd6bbe73876"
+      },
+      {
+        "path": "services/analysis/server.py",
+        "bytes": 8374,
+        "sha256": "2536291b06ead6f80106d4aa2f7abdde3fa590aba8eeeb383f3718225a229fd9"
+      }
+    ]
+  },
+  "platformValidation": {
+    "windows-x64": {
+      "status": "not-executed",
+      "nativeRuntimePass": false,
+      "executableRuntimeVersion": null,
+      "licenseConfiguration": null
+    }
+  }
 }
