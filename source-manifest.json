@@ -1,6 +1,6 @@
 {
-  "acceptedBaseAcceptanceSha256": "69f2deae7d0ef374ede81250c86342e958fe66cd2e37058c0eef2b01d2151795",
-  "acceptedBaseFreezeSha256": "8fa27679c082e7f688a4eb815568120c419c6e3f64ec637faa23abc5a7f9fc83",
+  "acceptedBaseAcceptanceSha256": "4398c6f4a6d6265b124d485071863adcb7cfb04257f6af260f7eddbe2df31c78",
+  "acceptedBaseFreezeSha256": "b5054d6e673a436fa80743a2251b47d3208fda07784b88d2da41aa40f0debe13",
   "correctionFreezeSha256": "d7d6ea39eb71ce92582552e57e545b929ab894ed50d6d4ef4b47a67d7953fce0",
   "diagnosticsExcluded": true,
   "files": [
@@ -21,6 +21,12 @@
       "mode": "0644",
       "path": ".github/workflows/windows-release-checks.yml",
       "sha256": "d5db482d89f2c1a0304c6bf8a83533a40b9c0b16d302c4c70242fd0267e93902"
+    },
+    {
+      "bytes": 6444,
+      "mode": "0644",
+      "path": ".github/workflows/windows-selected-nn-cc95d95b21294941ae0c705a9edab91f.yml",
+      "sha256": "4894939e759ff626e70e4737c0464575da44d9590e7e0886a303609ee5f04fc8"
     },
     {
       "bytes": 160,
@@ -1715,52 +1721,22 @@
       "sha256": "1d472a96ec845a82d4bbd09f9c97537c3f2d28b21d9c1621b0a7e954ddfae758"
     },
     {
+      "bytes": 5541,
+      "mode": "0644",
+      "path": "tools/release/windows-smoke/admission-template.json",
+      "sha256": "90bc37793ef288a498d54f930c506952f9c01afb64d81fe280c8708685e9819a"
+    },
+    {
       "bytes": 18571,
       "mode": "0644",
       "path": "tools/release/windows-smoke/ci_host_bridge.py",
       "sha256": "d1772f9e3dc24b73df9c594e07ac2d857399a839d81eb807d4a1a17589a91284"
     },
     {
-      "bytes": 5541,
-      "mode": "0644",
-      "path": "tools/release/windows-smoke/admission-template.json",
-      "sha256": "f2673a496994df35a94a4c50a69b0f7d5f41bcec1fe149f43deff5b8bb15efe8"
-    },
-    {
-      "bytes": 6444,
-      "mode": "0644",
-      "path": ".github/workflows/windows-selected-nn-c699aa4e96586d5af4d44a4bdffa2f9c.yml",
-      "sha256": "ece1096df3f42d7e69a3c70f2cc6561fa46079a8f426780e1a75d8236254f570"
-    },
-    {
-      "bytes": 33709,
-      "mode": "0644",
-      "path": "tools/release/windows-smoke/windows_nn_operator.py",
-      "sha256": "545c3b65d1784ad68e6d25b189c0ff5531c3746c77075d35fa976cd94b0ca27a"
-    },
-    {
-      "bytes": 11667,
-      "mode": "0644",
-      "path": "tools/release/windows-smoke/source-plan.json",
-      "sha256": "3b2cf606af4399f749274070c1f50659d577739bd40e12a7a03438a169b90924"
-    },
-    {
-      "bytes": 2868,
-      "mode": "0644",
-      "path": "tools/release/windows-smoke/source-freeze.json",
-      "sha256": "6cfb193677af3bfa852ec3bc727f76846838fab559c7d3773eef74fb962cf926"
-    },
-    {
       "bytes": 7198,
       "mode": "0644",
       "path": "tools/release/windows-smoke/remote-contract.json",
       "sha256": "a87f9047f47fb126d93b666b4283137fedb01a038844a94cd80d7e26220c5d3d"
-    },
-    {
-      "bytes": 8789,
-      "mode": "0644",
-      "path": "tools/release/windows-smoke/remote_support.py",
-      "sha256": "2d8c383ca5d49ceecde4cc04742e131985b949909ec3655ff45b64f0d2844ee4"
     },
     {
       "bytes": 13445,
@@ -1775,10 +1751,34 @@
       "sha256": "c084d74ce2e808c38662c6b82433df5ddba1f597ccc0fe72dc8b8f0ea340ab9f"
     },
     {
+      "bytes": 8789,
+      "mode": "0644",
+      "path": "tools/release/windows-smoke/remote_support.py",
+      "sha256": "2d8c383ca5d49ceecde4cc04742e131985b949909ec3655ff45b64f0d2844ee4"
+    },
+    {
       "bytes": 3548,
       "mode": "0644",
       "path": "tools/release/windows-smoke/remote_witness.py",
       "sha256": "b0052b1947e8a49407b45e42993c06ec3317cde24300b9d0190497c100d051b9"
+    },
+    {
+      "bytes": 2868,
+      "mode": "0644",
+      "path": "tools/release/windows-smoke/source-freeze.json",
+      "sha256": "6cfb193677af3bfa852ec3bc727f76846838fab559c7d3773eef74fb962cf926"
+    },
+    {
+      "bytes": 11667,
+      "mode": "0644",
+      "path": "tools/release/windows-smoke/source-plan.json",
+      "sha256": "3b2cf606af4399f749274070c1f50659d577739bd40e12a7a03438a169b90924"
+    },
+    {
+      "bytes": 33709,
+      "mode": "0644",
+      "path": "tools/release/windows-smoke/windows_nn_operator.py",
+      "sha256": "545c3b65d1784ad68e6d25b189c0ff5531c3746c77075d35fa976cd94b0ca27a"
     }
   ],
   "integrationSourceAcceptanceSha256": "594c79ee1334c078a078c0072055ba0715fa1bc356c32c7063e156c0c809862c",
@@ -1810,9 +1810,9 @@
     "ordinaryNoNNWindowsAcceptanceSha256": "3e3d35504110c8fc6e87a5c8150c7a068d4ae89bb4c949d3b486f55a51794fc6",
     "ordinaryNoNNWindowsNativePass": "ROOT_ACCEPTED_CI8_c5e6561",
     "remoteSourceAcceptanceSha256": "a3d25321534956325a48360137e93f1b10abae903f22c7528f86bbdade6d5840",
-    "sourceAcceptanceSha256": "00295fe2e1a56d19187fc1587b26275c47e4f1828cc0e1c38fddaf05dae35819",
+    "sourceAcceptanceSha256": "b4a3aff2edbb486dc6898a4faf20f1a8539885cdadbf15c6520241e61ff578f1",
     "status": "INERT_SOURCE_REQUIRES_DISTINCT_EXTERNAL_ROOT_SELECTED_PUSH_BINDING",
-    "workflowNonce": "c699aa4e96586d5af4d44a4bdffa2f9c"
+    "workflowNonce": "cc95d95b21294941ae0c705a9edab91f"
   },
   "sourceProjectionSha256": "2287ddc6a153f7d9edb85136caf3397cbf0f1840a6a95b9e3aa48de7d465bac5",
   "status": "CANDIDATE_PENDING_NATIVE_VALIDATION",

@@ -1,4 +1,4 @@
-name: Windows v0.2.1 selected NN c699aa4e96586d5af4d44a4bdffa2f9c
+name: Windows v0.2.1 selected NN cc95d95b21294941ae0c705a9edab91f
 on:
   push:
     branches: [release/v0.2.1]
@@ -9,7 +9,7 @@ jobs:
     if: >-
       github.event_name == 'push' &&
       github.ref == 'refs/heads/release/v0.2.1' &&
-      github.event.head_commit.message == 'FS_elem v0.2.1 Windows NN once: c699aa4e96586d5af4d44a4bdffa2f9c' &&
+      github.event.head_commit.message == 'FS_elem v0.2.1 Windows NN once: cc95d95b21294941ae0c705a9edab91f' &&
       github.run_number == '1' &&
       github.run_attempt == '1'
     runs-on: windows-2022
@@ -26,7 +26,7 @@ jobs:
         run: |
           if ([string]::IsNullOrWhiteSpace($env:FS_ELEM_V021_WINDOWS_SMOKE_BINDING)) { throw 'External Root selected-push binding missing' }
           $binding = $env:FS_ELEM_V021_WINDOWS_SMOKE_BINDING | ConvertFrom-Json
-          if ($binding.authorizedSelectedPush -ne $true -or $binding.allowedCommit -cne $env:GITHUB_SHA -or $binding.triggerNonce -cne 'c699aa4e96586d5af4d44a4bdffa2f9c' -or [string]$binding.allowedRunNumber -cne $env:GITHUB_RUN_NUMBER -or $env:GITHUB_RUN_ATTEMPT -cne '1') { throw 'Selected event is not externally authorized' }
+          if ($binding.authorizedSelectedPush -ne $true -or $binding.allowedCommit -cne $env:GITHUB_SHA -or $binding.triggerNonce -cne 'cc95d95b21294941ae0c705a9edab91f' -or [string]$binding.allowedRunNumber -cne $env:GITHUB_RUN_NUMBER -or $env:GITHUB_RUN_ATTEMPT -cne '1') { throw 'Selected event is not externally authorized' }
           if ($binding.firstNoNNWindowsCIAccepted -ne $true -or $binding.macPublicNNClosed -ne $true -or $binding.oneHeavySlotReserved -ne $true -or $binding.bridgeSourcesBound -ne $true) { throw 'Mandatory Root admission unresolved' }
       - uses: actions/setup-node@v4
         with:
@@ -87,7 +87,7 @@ jobs:
         env:
           FS_ELEM_V021_WINDOWS_SMOKE_BINDING: ${{ secrets.FS_ELEM_V021_WINDOWS_SMOKE_BINDING }}
         run: |
-          & '${{ steps.science.outputs.python-path }}' -I -S -B tools/release/windows-smoke/ci_host_bridge.py --template tools/release/windows-smoke/admission-template.json --template-sha256 fc1203e55cd3bf3b84f4a08761f793a0aab59c04cf676b35524f73810e0d85a9 --prerequisites (Join-Path $env:RUNNER_TEMP 'fs-elem-v021-prerequisites.json')
+          & '${{ steps.science.outputs.python-path }}' -I -S -B tools/release/windows-smoke/ci_host_bridge.py --template tools/release/windows-smoke/admission-template.json --template-sha256 90bc37793ef288a498d54f930c506952f9c01afb64d81fe280c8708685e9819a --prerequisites (Join-Path $env:RUNNER_TEMP 'fs-elem-v021-prerequisites.json')
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Save explicit public-sample diagnostic witness only
         if: always()
