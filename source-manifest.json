@@ -867,7 +867,7 @@
     {
       "path": "assets/models/manifest-release-v1.json",
       "bytes": 12142,
-      "sha256": "e243ca9844a6441cc860f4a7712bee8ccb6852190716c519fcb6e9a12c4a9186"
+      "sha256": "dd5d2c2c0fa39407488830cd45fb56940e59b5bb53145d2fabcf92d6fb89b6ff"
     },
     {
       "path": "assets/models/nominal.joblib",
@@ -912,7 +912,7 @@
     {
       "path": "configs/axel-release-ort4-windows-x64-v2.json",
       "bytes": 13368,
-      "sha256": "ae3ba2f68a6a039eae2ac434de708978f459df50790b49df0798946160445463"
+      "sha256": "d1dff249dbcc32d27de7d406144da5f2b9157e4a2d0b08c185a9891506a22f1c"
     },
     {
       "path": "contracts/analysis-result.mjs",

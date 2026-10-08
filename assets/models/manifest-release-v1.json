@@ -312,8 +312,8 @@
       },
       {
         "path": "services/analysis/process_owner.py",
-        "bytes": 9015,
-        "sha256": "6b2d4d771b01e420203863f6d0bc1cc7ea26915b8b287c0db3262bd6bbe73876"
+        "bytes": 9111,
+        "sha256": "8fbd5c1651a7ce84a3008d0b1d018ec6309f180a86113aeeed70905d4a8276d9"
       },
       {
         "path": "services/analysis/server.py",
