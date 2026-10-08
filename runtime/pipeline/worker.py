@@ -38,7 +38,8 @@ def probe(video,recipe,config):
     if sha(ffmpeg)!=recipe['ffmpeg']['sha256']:raise ValueError('Pinned FFmpeg changed')
     command=[str(ffmpeg),'-hide_banner','-nostdin','-i',str(video),'-map','0:v:0',
         '-vf','showinfo','-fps_mode','passthrough','-f','null','-']
-    process=subprocess.run(command,capture_output=True,text=True,check=True)
+    process=subprocess.run(command,capture_output=True,text=True,check=True,
+        creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0) if os.name=='nt' else 0)
     pairs=re.findall(r'\bn:\s*(\d+)\s+pts:\s*[-\d]+\s+pts_time:([-.\deE+]+)',process.stderr)
     if [int(i) for i,_ in pairs]!=list(range(count)):
         raise ValueError('FFmpeg source-frame coverage differs')

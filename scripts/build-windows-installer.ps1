@@ -76,6 +76,16 @@ function Copy-Pip([string]$Python,[string]$Site){
 }
 try{
  $inputs=Get-Content -LiteralPath (Join-Path $PackageRoot 'packaging\windows\runtime-inputs.json') -Raw -Encoding UTF8|ConvertFrom-Json
+ $iscc='C:\Program Files (x86)\Inno Setup 6\ISCC.exe'
+ if(-not(Test-Path -LiteralPath $iscc)){throw 'Inno Setup build compiler missing'}
+ $compiler=Get-Item -LiteralPath $iscc
+ $compilerInfo=$compiler.VersionInfo
+ $compilerVersion=[version]::new($compilerInfo.FileMajorPart,$compilerInfo.FileMinorPart,$compilerInfo.FileBuildPart,$compilerInfo.FilePrivatePart)
+ Write-Json (Join-Path $WorkRoot 'compiler-input.json') @{
+  publisher='JRSoftware';path=$iscc;fileVersion=$compilerInfo.FileVersion;resolvedVersion=$compilerVersion.ToString();
+  bytes=$compiler.Length;sha256=(Get-FileHash -LiteralPath $iscc -Algorithm SHA256).Hash.ToLowerInvariant()
+ }
+ if($compilerVersion.Major -ne $inputs.innoSetup.major -or $compilerVersion -lt [version]$inputs.innoSetup.minimumVersion){throw "Incompatible Inno Setup compiler $compilerVersion"}
  $nodeVersion=(&$Node --version|Out-String).Trim().TrimStart('v')
  if($LASTEXITCODE -ne 0 -or -not $nodeVersion.StartsWith('24.')){throw 'Build requiresNode24'}
  foreach($pair in @(@($SciencePython,'3.12.10'),@($PosePython,'3.9.13'))){
@@ -177,8 +187,6 @@ try{
   (Join-Path $PackageRoot 'scripts\prepare-windows-bundle.py'),$payload)
  $out=Join-Path $WorkRoot 'artifacts'
  New-Item -ItemType Directory -Path $out|Out-Null
- $iscc='C:\Program Files (x86)\Inno Setup 6\ISCC.exe'
- if(-not(Test-Path -LiteralPath $iscc)){throw 'Inno Setup build compiler missing'}
  Invoke-Tool 'compile-installer' $iscc @("/DPayloadDir=$payload","/DOutputDir=$out",(Join-Path $PackageRoot 'packaging\windows\FS_elem.iss'))
  $installer=Join-Path $out 'FS_elem-Setup-0.2.2-x64.exe'
  if(-not(Test-Path -LiteralPath $installer)){throw 'Installer artifact missing'}

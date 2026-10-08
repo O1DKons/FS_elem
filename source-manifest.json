@@ -21,8 +21,8 @@
     },
     {
       "path": ".github/workflows/windows-installer.yml",
-      "bytes": 2276,
-      "sha256": "ef73e49c5d8268259fa5ff38795f42134d92e36e3f834b9c34e030d335afc067"
+      "bytes": 2974,
+      "sha256": "baa77df0a8ee53a568ccea8a0bd86e332b8a3b98ed6555915c7ee4d8ae2d6d38"
     },
     {
       "path": ".github/workflows/windows-release-checks.yml",
@@ -1076,8 +1076,8 @@
     },
     {
       "path": "packaging/windows/runtime-inputs.json",
-      "bytes": 1036,
-      "sha256": "4f7947370467e8f41db1055d38cfcd68fcf0f915fdc505411c54c6a9b40f7972"
+      "bytes": 1264,
+      "sha256": "434da930da34bfadee7e5708d80663f4db8b0dc35f198d453eba443a45b8d461"
     },
     {
       "path": "runtime/API.md",
@@ -1116,8 +1116,8 @@
     },
     {
       "path": "runtime/pipeline/support.py",
-      "bytes": 3243,
-      "sha256": "ccffd3c9e66c1a7a45edfa7581859557f8c4965dd7e63d1786df15c045d8802d"
+      "bytes": 3339,
+      "sha256": "03c34eb770a089f543fc7369c22fdd9969a58ace4ae45eddf4c1b1a05ff193bf"
     },
     {
       "path": "runtime/pipeline/temporal.py",
@@ -1141,8 +1141,8 @@
     },
     {
       "path": "runtime/pipeline/worker.py",
-      "bytes": 7387,
-      "sha256": "5a6770d998ea56b01791e725ef9aa6ea6f477c36f1ef8b7666c0e15e194b6328"
+      "bytes": 7475,
+      "sha256": "de033e64ad977435c8b92b173713f3737c1e50ea0693b5f0e4393362c2bf674d"
     },
     {
       "path": "runtime/pose_export.py",
@@ -1176,8 +1176,8 @@
     },
     {
       "path": "scripts/build-windows-installer.ps1",
-      "bytes": 13572,
-      "sha256": "d51f7a251cf34a974afa84950ea3d9f266ebb2d80c8c5dc04ef88ef2843b74f4"
+      "bytes": 14267,
+      "sha256": "491335ce5a363104edb274c6f23ef47caf212a38426306132680138034f3ac82"
     },
     {
       "path": "scripts/build.mjs",
@@ -1351,8 +1351,8 @@
     },
     {
       "path": "services/analysis/process_owner.py",
-      "bytes": 9015,
-      "sha256": "6b2d4d771b01e420203863f6d0bc1cc7ea26915b8b287c0db3262bd6bbe73876"
+      "bytes": 9111,
+      "sha256": "8fbd5c1651a7ce84a3008d0b1d018ec6309f180a86113aeeed70905d4a8276d9"
     },
     {
       "path": "services/analysis/requirements-pose-macos-arm64.lock",

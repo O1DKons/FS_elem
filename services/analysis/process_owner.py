@@ -107,7 +107,8 @@ class OwnedProcess:
         try:
             # No sitecustomize/.pth/user imports may run before job assignment.
             process=subprocess.Popen([sys.executable,'-I','-S','-B','-X','utf8',str(GATE),*argv],cwd=cwd,env=env,
-                stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,encoding='utf-8',close_fds=True)
+                stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,encoding='utf-8',close_fds=True,
+                creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0) if os.name=='nt' else 0)
             job.assign(process) # All future descendants inherit this job; gate has not spawned any.
             process.stdin.write(TOKEN);process.stdin.flush();process.stdin.close()
             return cls(process,job)

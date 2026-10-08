@@ -36,7 +36,8 @@ def progress(stage, current_frame=0, total_frames=0):
 
 def run_child(argv, log_path):
     with Path(log_path).open('x') as log:
-        with subprocess.Popen(argv,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True) as process:
+        with subprocess.Popen(argv,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,
+                creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0) if os.name=='nt' else 0) as process:
             try:
                 for line in process.stdout:
                     log.write(line)

@@ -28,8 +28,9 @@
     "docs/release/model-card.md"
   ],
   "innoSetup": {
-    "version": "6.4.3",
+    "major": 6,
+    "minimumVersion": "6.3.0",
+    "versionResolution": "Prefer installed official Inno Setup 6 compiler; otherwise resolve current stable innosetup package. Exact compiler FileVersion, SHA256 and size retained in compiler-input.json.",
     "buildHostOnly": true
   }
 }
-
