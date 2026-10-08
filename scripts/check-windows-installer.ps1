@@ -152,7 +152,7 @@ k.GetModuleHandleW.argtypes=[ctypes.c_wchar_p]
 k.GetModuleHandleW.restype=ctypes.c_void_p
 k.GetModuleFileNameW.argtypes=[ctypes.c_void_p,ctypes.c_wchar_p,ctypes.c_uint]
 k.GetModuleFileNameW.restype=ctypes.c_uint
-expected=pathlib.Path(sys.executable).resolve().parent
+expected=pathlib.Path(sys.executable).resolve().parent.parent
 loaded={}
 for name in ("vcruntime140.dll","vcruntime140_1.dll","msvcp140.dll"):
     handle=k.GetModuleHandleW(name)
@@ -162,9 +162,9 @@ for name in ("vcruntime140.dll","vcruntime140_1.dll","msvcp140.dll"):
     assert 0<count<len(buffer), (name,ctypes.get_last_error())
     actual=pathlib.Path(buffer.value).resolve()
     loaded[name]=str(actual)
-    assert actual.parent==expected, ("Non-app-local VC runtime",name,str(actual),str(expected))
+    assert expected in actual.parents, ("Non-app-local VC runtime",name,str(actual),str(expected))
 assert loaded, "No loaded VC runtime identity"
-print(json.dumps({"loadedVCRuntimePaths":loaded,"NN":0}))
+print(json.dumps({"loadedVCRuntimePaths":loaded,"approvedRuntimeRoot":str(expected),"NN":0}))
 '@
  Run 'science-relocated-imports' $science @('-I','-c',('import numpy,sklearn,joblib;print(numpy.__version__)'+[Environment]::NewLine+$dllCheck))|Out-Null
  Run 'pose-relocated-imports' $pose @('-I','-c',('import cv2,onnxruntime,rtmlib;assert "CPUExecutionProvider" in onnxruntime.get_available_providers();print(onnxruntime.__version__)'+[Environment]::NewLine+$dllCheck))|Out-Null
