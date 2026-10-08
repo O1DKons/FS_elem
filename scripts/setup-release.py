@@ -75,17 +75,23 @@ def validate_url(url):
         raise SetupError('Invalid model URL')
 
 
-def verify_asset(path, asset):
+def verify_asset(path, asset, progress=None):
+    if progress:
+        progress(dict(type='progress', stage='verify-model', model=asset['id'], bytes=0,
+                      total=asset['sizeBytes'], message='Проверка модели'))
     if not path.is_file() or path.stat().st_size != asset['sizeBytes']:
         raise SetupError(f"{asset['id']}: size/checksum mismatch at {asset['path']}; existing file preserved")
     if sha256(path) != asset['sha256']:
         raise SetupError(f"{asset['id']}: checksum mismatch at {asset['path']}; existing file preserved")
+    if progress:
+        progress(dict(type='progress', stage='verify-model', model=asset['id'],
+                      bytes=asset['sizeBytes'], total=asset['sizeBytes'], message='Модель проверена'))
 
 
-def ensure_asset(root, asset):
+def ensure_asset(root, asset, progress=None):
     path = safe_path(root, asset['path'])
     if path.exists():
-        verify_asset(path, asset)
+        verify_asset(path, asset, progress)
         return path
     url = asset.get('url')
     if not url:
@@ -100,6 +106,9 @@ def ensure_asset(root, asset):
         download_size = asset.get('downloadSizeBytes', asset['sizeBytes'])
         with os.fdopen(fd, 'wb') as target, urlopen(url, timeout=60) as response:
             validate_url(response.geturl())
+            if progress:
+                progress(dict(type='progress', stage='download', model=asset['id'], bytes=0,
+                              total=download_size, message='Загрузка модели'))
             while True:
                 block = response.read(1024 * 1024)
                 if not block:
@@ -108,6 +117,9 @@ def ensure_asset(root, asset):
                 if count > download_size:
                     raise SetupError(f"{asset['id']}: download exceeds pinned size")
                 target.write(block)
+                if progress:
+                    progress(dict(type='progress', stage='download', model=asset['id'], bytes=count,
+                                  total=download_size, message='Загрузка модели'))
         if count != download_size:
             raise SetupError(f"{asset['id']}: download size differs from manifest")
         if asset.get('downloadSha256') and sha256(temp) != asset['downloadSha256']:
@@ -141,7 +153,7 @@ def ensure_asset(root, asset):
                     raise
                 raise SetupError('Invalid model ZIP: ' + str(error)) from error
             publish = extracted
-        verify_asset(publish, asset)
+        verify_asset(publish, asset, progress)
         # Exclusive publication protects even a file created while downloading.
         try:
             os.link(publish, path)
@@ -158,6 +170,7 @@ def run(args, capture=False):
     try:
         result = subprocess.run([str(x) for x in args], check=True, text=True,
                                 stdout=subprocess.PIPE if capture else None, encoding="utf-8",
+                                creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0) if os.name == 'nt' else 0,
                                 env=dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1"))
         return result.stdout.strip() if capture else None
     except (subprocess.CalledProcessError, OSError) as error:

@@ -1,3 +1,11 @@
+# FS_elem v0.2.2 — Windows installer
+
+Windows users: download **FS_elem-Setup.exe** from the versioned GitHub release, install it, and open the FS_elem shortcut. No terminal or separate Python/Node installation is required. First launch prepares the existing models automatically and shows progress; internet is required for the initial model download (about 308 MB). Later launches do not install dependencies.
+
+See [Windows installation](docs/release/installation-windows-simple.md). The existing browser interface opens automatically. Stop FS_elem from its launcher window. Results remain in your user data after uninstalling. This release changes installation and startup; model accuracy and video-processing speed are unchanged.
+
+The instructions below describe the source/developer distribution and the previous Mac setup.
+
 # FS_elem v0.2.1 — кандидат
 
 Локальный анализ видео фигурного катания: загрузите полную запись, дождитесь обработки и проверьте предполагаемые аксели на исходном видео. Результат содержит временные интервалы, предполагаемый класс **1A / 2A** или **«Номинал не определён»**, а также доступные точки позы.

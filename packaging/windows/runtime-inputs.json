@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "packageVersion": "0.2.2",
+  "node": {
+    "major": 24,
+    "versionResolution": "exact version supplied by build-host Node24; matching official ZIP checked against that release SHASUMS256.txt",
+    "baseUrl": "https://nodejs.org/dist"
+  },
+  "python": {
+    "science": {
+      "version": "3.12.10",
+      "minor": "3.12",
+      "url": "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip"
+    },
+    "pose": {
+      "version": "3.9.13",
+      "minor": "3.9",
+      "url": "https://www.python.org/ftp/python/3.9.13/python-3.9.13-embed-amd64.zip"
+    }
+  },
+  "frontend": {
+    "pnpmVersion": "11.19.0",
+    "nodeLinker": "hoisted"
+  },
+  "integrity": "Archive SHA256 and sizes retained in build-inputs.json and shipped runtime-inputs-receipt.json. Dependency and FFmpeg identity remain accepted hash-lock/recipe values.",
+  "licenseFiles": [
+    "docs/release/third-party.md",
+    "docs/release/model-card.md"
+  ],
+  "innoSetup": {
+    "version": "6.4.3",
+    "buildHostOnly": true
+  }
+}
+
