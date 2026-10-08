@@ -198,6 +198,7 @@ class FirstRunTests(unittest.TestCase):
 
     def test_node_accepts_python_receipt_then_rejects_mutation(self):
         import os
+        import re
         import shutil
         import subprocess
         node = os.environ.get('FS_ELEM_TEST_NODE') or shutil.which('node')
@@ -213,6 +214,14 @@ class FirstRunTests(unittest.TestCase):
         (self.root / self.model['path']).write_bytes(b'corrupt')
         result = subprocess.run(command, text=True, capture_output=True, timeout=5)
         self.assertNotEqual(result.returncode, 0)
+        mismatch = re.search(r'fingerprintMismatch=(\{[^\r\n]*\})', result.stderr)
+        self.assertIsNotNone(mismatch, result.stderr)
+        diagnostic = json.loads(mismatch.group(1))
+        self.assertTrue(diagnostic['isFile'])
+        self.assertIn('sizeBytes', diagnostic['fields'])
+        self.assertEqual(diagnostic['expected']['sizeBytes'], str(self.model['sizeBytes']))
+        self.assertEqual(diagnostic['actual']['sizeBytes'], '7')
+        self.assertLess(len(mismatch.group(0)), 1500)
 
 
 if __name__ == '__main__':

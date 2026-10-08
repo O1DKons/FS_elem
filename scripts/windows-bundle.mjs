@@ -64,8 +64,14 @@ export function requireDesktopReady(root) {
       // Windows CPython st_ctime is creation time; Node exposes it as birthtime.
       const ctime = process.platform === 'win32' ? info.birthtimeNs : info.ctimeNs;
       if (!info.isFile() || row.sizeBytes !== Number(info.size) || row.ctimeNs !== ctime.toString() ||
-          ['dev', 'ino', 'mtimeNs'].some(key => row[key] !== info[key].toString()))
-        throw Error('Ready file changed: ' + row.path);
+          ['dev', 'ino', 'mtimeNs'].some(key => row[key] !== info[key].toString())) {
+        const current = { sizeBytes: Number(info.size), dev: info.dev.toString(), ino: info.ino.toString(),
+          mtimeNs: info.mtimeNs.toString(), ctimeNs: ctime.toString() };
+        const fields = Object.keys(current).filter(key => row[key] !== current[key]);
+        const bounded = values => Object.fromEntries(fields.map(key => [key, String(values[key]).slice(0, 80)]));
+        const diagnostic = { isFile: info.isFile(), fields, expected: bounded(row), actual: bounded(current) };
+        throw Error('Ready file changed: ' + row.path + '; fingerprintMismatch=' + JSON.stringify(diagnostic));
+      }
     }
     return state;
   } catch (error) {
