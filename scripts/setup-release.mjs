@@ -36,9 +36,36 @@ if (args.includes('--install')) {
     join(dirname(process.execPath), '../lib/node_modules/npm/bin/npx-cli.js')].filter(Boolean);
   const npx = candidates.find(existsSync);
   if (!npx) {console.error('Bundled npm/npx Node CLI is missing; install the standard Node.js24 distribution.');process.exit(1);}
-  const installed = spawnSync(process.execPath, [npx, '--yes', 'pnpm@11.19.0', '--dir', 'apps/web', 'install', '--frozen-lockfile',
-    '--store-dir', join(root, '.runtime/pnpm-store')],
-    {cwd: root, stdio: 'inherit', env});
+  let installed;
+  if (process.platform === 'win32') {
+    // Avoid npx's generated .cmd shim in a project path containing '&'.
+    const npm = join(dirname(npx), 'npm-cli.js');
+    if (!existsSync(npm)) {console.error('Bundled npm Node CLI is missing.');process.exit(1);}
+    const bootstrap = join(root, '.runtime/frontend-bootstrap');
+    const prepared = spawnSync(process.execPath, [npm, 'install', '--prefix', bootstrap,
+      '--no-save', '--package-lock=false', '--ignore-scripts', '--bin-links=false',
+      '--no-audit', '--no-fund', 'pnpm@11.19.0'],
+      {cwd: root, stdio: 'inherit', env, shell: false});
+    if (prepared.error || prepared.status !== 0) {
+      console.error(prepared.error?.message ?? 'Pinned pnpm bootstrap failed.');process.exit(prepared.status ?? 1);
+    }
+    const packageRoot = join(bootstrap, 'node_modules/pnpm');
+    let pnpm;
+    try {
+      const metadata = JSON.parse(readFileSync(join(packageRoot, 'package.json'), 'utf8'));
+      const entry = typeof metadata.bin === 'string' ? metadata.bin : metadata.bin?.pnpm;
+      if (metadata.version !== '11.19.0' || typeof entry !== 'string' || !existsSync(join(packageRoot, entry)))
+        throw Error('Pinned pnpm package or Node entry point is missing.');
+      pnpm = join(packageRoot, entry);
+    } catch (error) {console.error(error.message);process.exit(1);}
+    installed = spawnSync(process.execPath, [pnpm, '--dir', 'apps/web', 'install', '--frozen-lockfile',
+      '--store-dir', join(root, '.runtime/pnpm-store')],
+      {cwd: root, stdio: 'inherit', env, shell: false});
+  } else {
+    installed = spawnSync(process.execPath, [npx, '--yes', 'pnpm@11.19.0', '--dir', 'apps/web', 'install', '--frozen-lockfile',
+      '--store-dir', join(root, '.runtime/pnpm-store')],
+      {cwd: root, stdio: 'inherit', env});
+  }
   if (installed.error || installed.status !== 0) {
     console.error(installed.error?.message ?? 'Frontend installation failed.');process.exit(installed.status ?? 1);
   }

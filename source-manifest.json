@@ -1445,10 +1445,10 @@
       "sha256": "b989ca53a9479d10bacfbbed3ddaef90b2c4a54dac1f2d37531cca3c626493b2"
     },
     {
-      "bytes": 3652,
+      "bytes": 5239,
       "mode": "0644",
       "path": "scripts/setup-release.mjs",
-      "sha256": "887097f83c7c6b26e6e27940db6c5ec914b2c11aa1850f0d0a6229e802f0a27f"
+      "sha256": "13d37c7651b1a3e3f3eb32ed701ff0fd147c761da6606b6bdc7b28967d2213b4"
     },
     {
       "bytes": 14889,
@@ -1726,7 +1726,7 @@
     "baseListedFiles": 284,
     "baseSourceManifestSha256": "e4d94b1c70775240ad5033027b26e30035bac16f55db6a3b7bca4df7cf6ef403",
     "inheritedSourceProjectionSha256": "2287ddc6a153f7d9edb85136caf3397cbf0f1840a6a95b9e3aa48de7d465bac5",
-    "listedBytesExcludingManifest": 8085031,
+    "listedBytesExcludingManifest": 8086618,
     "listedFiles": 285,
     "payloadFilesIncludingManifest": 286,
     "policyPath": ".gitattributes",
@@ -1751,6 +1751,19 @@
     "sourceFreezeSha256": "6e79b084055c7827ff11fe4f132b8feef18517571fbe96d765c85edb358ad3d0",
     "sourceOnly": true,
     "wheelSha256": "4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"
+  },
+  "windowsFrontendBootstrapDelta": {
+    "MacBranchPreserved": true,
+    "PeerDisposition": "pending",
+    "nativeWindowsValidation": "pending",
+    "newSourceBytes": 5239,
+    "newSourceSha256": "13d37c7651b1a3e3f3eb32ed701ff0fd147c761da6606b6bdc7b28967d2213b4",
+    "oldSourceBytes": 3652,
+    "oldSourceSha256": "887097f83c7c6b26e6e27940db6c5ec914b2c11aa1850f0d0a6229e802f0a27f",
+    "pinnedPnpmVersionUnchanged": "11.19.0",
+    "sourceFreezeSha256": "c3e073e25798f0ac35acaae457ca281eb5a119b3c6ac7079693aca19cc3e76f3",
+    "sourceIntakeSha256": "8b75bc1249cacc4d6761c54b44a5a3e2d34d6b5351b14a64ca1923bc4d475c62",
+    "sourceOnly": true
   },
   "windowsPoseDependencyDelta": {
     "baseCandidate3FreezeSha256": "b87fa628384680506d968b30545465acf5ab3b1e3c84f3f8632407afb543c1aa",
