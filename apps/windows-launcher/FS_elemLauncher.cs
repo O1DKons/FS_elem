@@ -265,6 +265,9 @@ internal sealed class LauncherForm : Form
         url = null;
         progress.Style = ProgressBarStyle.Marquee;
         status.Text = "Проверяем компоненты FS_elem…";
+        Exception failure = null;
+        try
+        {
         try
         {
             if (child != null) throw new IOException("Предыдущий процесс ещё не завершён.");
@@ -308,11 +311,14 @@ internal sealed class LauncherForm : Form
             child = null;
             if (!closing) ShowError(error ?? "FS_elem остановился (код " + exit + "). Нажмите «Повторить».");
         }
-        catch (Exception ex)
+        catch (Exception ex) {failure = ex;}
+        // The stock Framework compiler is C#5: await must be outside catch.
+        if (failure != null)
         {
             if (closing) return; // FormClosing owns the same retained handles.
-            if (await StopOwned()) ShowError(ex.Message);
+            if (await StopOwned()) ShowError(failure.Message);
             else ShowUnresolvedStop();
+        }
         }
         finally {busy = false; nodeReady = null;}
     }

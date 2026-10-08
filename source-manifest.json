@@ -851,8 +851,8 @@
     },
     {
       "path": "apps/windows-launcher/FS_elemLauncher.cs",
-      "bytes": 27010,
-      "sha256": "7ddabec13b7bd193adc00e9e05e62a7e0567c63cbf403cc27055db2042199f4e"
+      "bytes": 27203,
+      "sha256": "34dbbc356496c36bf1a85828acae497058903d4856105bb4ddafab3a767edcda"
     },
     {
       "path": "assets/models/family.joblib",
@@ -1566,6 +1566,6 @@
     }
   ],
   "fileCount": 311,
-  "totalBytes": 8326881,
+  "totalBytes": 8327074,
   "recordedAtUTC": "2026-10-08T21:26:57.183218+00:00"
 }
