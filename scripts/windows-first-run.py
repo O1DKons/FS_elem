@@ -41,7 +41,9 @@ def fingerprint(path):
     if not path.is_file() or path.is_symlink():
         raise setup.SetupError('Missing or linked bundle file: ' + str(path))
     state = path.stat()
-    return dict(sizeBytes=state.st_size, dev=str(state.st_dev), ino=str(state.st_ino),
+    # Node/libuv uses the legacy 32-bit Windows volume serial; Python3.12 can expose 64 bits.
+    device = state.st_dev & 0xffffffff if os.name == 'nt' else state.st_dev
+    return dict(sizeBytes=state.st_size, dev=str(device), ino=str(state.st_ino),
                 mtimeNs=str(state.st_mtime_ns), ctimeNs=str(state.st_ctime_ns))
 
 

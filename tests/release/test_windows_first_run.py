@@ -92,6 +92,22 @@ class FirstRunTests(unittest.TestCase):
         self.no_install.start()
         self.addCleanup(self.no_install.stop)
 
+    def test_windows_volume_serial_matches_native_node_without_truncating_other_fields(self):
+        # Observed native Python3.12/Node24 mismatch: only volume serial width differs.
+        source = mock.Mock()
+        source.is_file.return_value = True
+        source.is_symlink.return_value = False
+        source.stat.return_value = mock.Mock(st_size=17, st_dev=10116456482831564288,
+            st_ino=79228162514264337593543950433, st_mtime_ns=1729000000123456700,
+            st_ctime_ns=1728000000123456700)
+        expected = dict(sizeBytes=17, dev='1692368384', ino='79228162514264337593543950433',
+            mtimeNs='1729000000123456700', ctimeNs='1728000000123456700')
+        with mock.patch.object(first.os, 'name', 'nt'):
+            self.assertEqual(first.fingerprint(source), expected)
+        expected['dev'] = '10116456482831564288'
+        with mock.patch.object(first.os, 'name', 'posix'):
+            self.assertEqual(first.fingerprint(source), expected)
+
     # Removing receipt bindings or metadata checks would accept a changed file.
     def test_verified_receipt_reused_then_model_mutation_invalidates_it(self):
         self.assertFalse(first.bootstrap(self.root, self.events.append)['cached'])
