@@ -51,7 +51,7 @@ try:
     shared.ROOT.mkdir()
     for name in ("tmp","logs"):
         (shared.ROOT / name).mkdir()
-    shared.save("root-entry.json",{"rootParentPid":os.getpid(),"originalGrantSha256":sys.argv[3],
+    shared.save("root-entry.json",{"rootParentPid":os.getpid(),"originalGrantSha256":sys.argv[4],
         "originQpcTicksDecimal":origin,"qpcFrequencyDecimal":frequency,
         "workDeadlineQpcTicksDecimal":str(core.WORK_QPC),"wholeDeadlineQpcTicksDecimal":str(core.WHOLE_QPC),
         "exactCommit":gate["exactCommit"],"runId":gate["runId"],"runAttempt":gate["runAttempt"]})
@@ -141,7 +141,7 @@ try:
     result.update({"freshIndependentPostWitnessJobAccounting":accounting,
         "freshSavedOutputPins":output_pins,"savedResultPoseSourceIdentical":True,
         "controllerPid":parent["controllerPid"],"scientificAccuracyVerified":False,
-        "runtimeGrantSha256":runtime_sha,"originalGrantSha256":sys.argv[3]})
+        "runtimeGrantSha256":runtime_sha,"originalGrantSha256":sys.argv[4]})
 except BaseException as error:
     shared.first_cause(error)
 finally:

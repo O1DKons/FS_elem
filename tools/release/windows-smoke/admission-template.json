@@ -1,81 +1,79 @@
 {
-  "schemaVersion": 1,
-  "sourceOnly": true,
   "actualGranted": false,
-  "selector": {
-    "event": "push",
-    "ref": "refs/heads/release/v0.2.1",
-    "commitMessage": "FS_elem v0.2.1 Windows NN once: cc95d95b21294941ae0c705a9edab91f",
-    "nonce": "cc95d95b21294941ae0c705a9edab91f",
-    "runAttempt": "1",
-    "runNumber": "1"
-  },
-  "publicOverlayDirectory": "tools/release/windows-smoke",
-  "installerPrerequisitesAccepted": false,
-  "sourcePins": {
-    "operator": {
-      "name": "windows_nn_operator.py",
-      "bytes": 33709,
-      "sha256": "545c3b65d1784ad68e6d25b189c0ff5531c3746c77075d35fa976cd94b0ca27a"
-    },
-    "plan": {
-      "name": "source-plan.json",
-      "bytes": 11667,
-      "sha256": "3b2cf606af4399f749274070c1f50659d577739bd40e12a7a03438a169b90924"
-    },
-    "sourceFreeze": {
-      "name": "source-freeze.json",
-      "bytes": 2868,
-      "sha256": "6cfb193677af3bfa852ec3bc727f76846838fab559c7d3773eef74fb962cf926"
-    },
-    "remoteContract": {
-      "name": "remote-contract.json",
-      "bytes": 7198,
-      "sha256": "a87f9047f47fb126d93b666b4283137fedb01a038844a94cd80d7e26220c5d3d"
-    },
-    "remoteSupport": {
-      "name": "remote_support.py",
-      "bytes": 8789,
-      "sha256": "2d8c383ca5d49ceecde4cc04742e131985b949909ec3655ff45b64f0d2844ee4"
-    },
-    "remoteEntry": {
-      "name": "remote_entry.py",
-      "bytes": 13445,
-      "sha256": "c370c73d0e54ddd1844061e13d8a2d54bd6a991178205eb15b5dee12ebe89975"
-    },
-    "remoteOuter": {
-      "name": "remote_outer.py",
-      "bytes": 4433,
-      "sha256": "c084d74ce2e808c38662c6b82433df5ddba1f597ccc0fe72dc8b8f0ea340ab9f"
-    },
-    "remoteWitness": {
-      "name": "remote_witness.py",
-      "bytes": 3548,
-      "sha256": "b0052b1947e8a49407b45e42993c06ec3317cde24300b9d0190497c100d051b9"
-    }
-  },
+  "authority": "This public template is inert. Only separate external Root actual scope binds exact prepared commit/nonce/tree/source/caps and authorizes private sanitized binding before one selected push. Private allowedRunNumber must identify exactly the one authorized event; reruns/repushes cannot reuse it. Ordinary candidate4 excludes this new workflow; after noNN acceptance, selected candidate5 first introduces its unique filename. Exact run_number1/attempt1 is required.",
   "fixedGate": {
     "actualGranted": false,
+    "canonicalCPU4_1AndModelsPreserved": true,
+    "capsBytes": {
+      "logs": 262144,
+      "regular": 1073741824,
+      "rss": 2147483648,
+      "tmp": 33554432
+    },
+    "cleanupSeconds": 30,
+    "externalWaitAndFreshPhysicalRequired": true,
     "firstNoNNWindowsCIAccepted": false,
+    "focusedSourcePeerAccepted": false,
     "macPublicNNClosed": false,
     "oneHeavySlotReserved": false,
-    "focusedSourcePeerAccepted": false,
     "remoteOuterContractBound": false,
     "remoteOuterExecutableSourceBound": false,
-    "externalWaitAndFreshPhysicalRequired": true,
-    "canonicalCPU4_1AndModelsPreserved": true,
+    "retry": 0,
     "runtimeProjectionAllowed": false,
     "wholeSeconds": 300,
-    "workSeconds": 270,
-    "cleanupSeconds": 30,
-    "retry": 0,
-    "capsBytes": {
-      "rss": 2147483648,
-      "regular": 1073741824,
-      "tmp": 33554432,
-      "logs": 262144
+    "workSeconds": 270
+  },
+  "freshPrerequisitesByRef": {
+    "checkArgv": [
+      "npm.cmd",
+      "run",
+      "check:release",
+      "--",
+      "--science-python",
+      "<science setup-python output>"
+    ],
+    "compiledUI": "reuse; no rebuild",
+    "installArgv": [
+      "npm.cmd",
+      "run",
+      "setup:release",
+      "--",
+      "--science-python",
+      "<science setup-python output>",
+      "--pose-python",
+      "<pose setup-python output>"
+    ],
+    "node": "24 x64",
+    "pose": "3.9 x64",
+    "recoveredOnceForLiterals": true,
+    "science": "3.12 x64",
+    "wholeReview": false,
+    "workflow": {
+      "bytes": 2878,
+      "name": "windows-release-checks.yml",
+      "sha256": "d5db482d89f2c1a0304c6bf8a83533a40b9c0b16d302c4c70242fd0267e93902"
     }
   },
+  "installerPrerequisitesAccepted": false,
+  "installerSourcePins": [
+    {
+      "bytes": 5239,
+      "path": "scripts/setup-release.mjs",
+      "sha256": "13d37c7651b1a3e3f3eb32ed701ff0fd147c761da6606b6bdc7b28967d2213b4"
+    },
+    {
+      "bytes": 14889,
+      "path": "scripts/setup-release.py",
+      "sha256": "3515eb05323f3b034a83f24043e3036d143bd6302c0d7cb5023ded8162b9e594"
+    }
+  ],
+  "metadataRefShape": {
+    "bytes": "positive integer",
+    "name": "basename only",
+    "sha256": "64 lowercase hex"
+  },
+  "noCircularCommitLiteral": true,
+  "noPrivateRootPathsOrRawGrant": true,
   "privateBindingEnvironment": "FS_ELEM_V021_WINDOWS_SMOKE_BINDING",
   "privateBindingRequiredFields": [
     "authorizedSelectedPush",
@@ -96,10 +94,11 @@
     "allowedRunNumber",
     "bridgeSourceRef"
   ],
-  "metadataRefShape": {
-    "name": "basename only",
-    "bytes": "positive integer",
-    "sha256": "64 lowercase hex"
+  "publicOverlayDirectory": "tools/release/windows-smoke",
+  "rootSourceAcceptanceRef": {
+    "bytes": 1419,
+    "name": "coordinator-v0.2.1-witness-binding-fix-source-final-acceptance-v1.json",
+    "sha256": "41c49955c8b38af7d659ada2ddee9930253a713d38a31dff1e2ed432b26517c1"
   },
   "runtimeFieldsAllowed": [
     "exactCommit <- GITHUB_SHA matching private allowedCommit",
@@ -108,60 +107,61 @@
     "original E QPC <- runtime projection inside E only",
     "runNumber <- GITHUB_RUN_NUMBER == 1 matching private Root allowedRunNumber1; only first introduction of unique workflow"
   ],
-  "rootSourceAcceptanceRef": {
-    "name": "coordinator-v0.2.1-windows-remote-smoke-source-final-acceptance-v1.json",
-    "bytes": 6394,
-    "sha256": "a3d25321534956325a48360137e93f1b10abae903f22c7528f86bbdade6d5840"
+  "schemaVersion": 1,
+  "selector": {
+    "commitMessage": "FS_elem v0.2.1 Windows NN once: 56b54188ad774bef90a7883449f57a22",
+    "event": "push",
+    "nonce": "56b54188ad774bef90a7883449f57a22",
+    "ref": "refs/heads/release/v0.2.1",
+    "runAttempt": "1",
+    "runNumber": "1"
   },
+  "sourceOnly": true,
   "sourcePeerRef": {
-    "name": "combined-source-peer-result.json",
     "bytes": 3808,
+    "name": "combined-source-peer-result.json",
     "sha256": "4663a31b35dad47cab2cc174a8676dd1fa77a929a83622babbb6d759d4fb402f"
   },
-  "authority": "This public template is inert. Only separate external Root actual scope binds exact prepared commit/nonce/tree/source/caps and authorizes private sanitized binding before one selected push. Private allowedRunNumber must identify exactly the one authorized event; reruns/repushes cannot reuse it. Ordinary candidate4 excludes this new workflow; after noNN acceptance, selected candidate5 first introduces its unique filename. Exact run_number1/attempt1 is required.",
-  "noPrivateRootPathsOrRawGrant": true,
-  "noCircularCommitLiteral": true,
-  "installerSourcePins": [
-    {
-      "path": "scripts/setup-release.mjs",
-      "bytes": 5239,
-      "sha256": "13d37c7651b1a3e3f3eb32ed701ff0fd147c761da6606b6bdc7b28967d2213b4"
+  "sourcePins": {
+    "operator": {
+      "bytes": 33709,
+      "name": "windows_nn_operator.py",
+      "sha256": "545c3b65d1784ad68e6d25b189c0ff5531c3746c77075d35fa976cd94b0ca27a"
     },
-    {
-      "path": "scripts/setup-release.py",
-      "bytes": 14889,
-      "sha256": "3515eb05323f3b034a83f24043e3036d143bd6302c0d7cb5023ded8162b9e594"
+    "plan": {
+      "bytes": 11667,
+      "name": "source-plan.json",
+      "sha256": "3b2cf606af4399f749274070c1f50659d577739bd40e12a7a03438a169b90924"
+    },
+    "remoteContract": {
+      "bytes": 7198,
+      "name": "remote-contract.json",
+      "sha256": "9a6b6ede2887360b07394028ffdd06f49d0348a5df73fcc3bbec1c62fea1e2a4"
+    },
+    "remoteEntry": {
+      "bytes": 13445,
+      "name": "remote_entry.py",
+      "sha256": "086a8cd7e40b2e05b7469648937433b2be4ddd0b4b7bf0d7102af2bd4e5fa885"
+    },
+    "remoteOuter": {
+      "bytes": 4433,
+      "name": "remote_outer.py",
+      "sha256": "e6c48bfb7c7e0ebc215622cee5ea03d2860a8ef312e348abe0e00ed8af3eb218"
+    },
+    "remoteSupport": {
+      "bytes": 8789,
+      "name": "remote_support.py",
+      "sha256": "2d8c383ca5d49ceecde4cc04742e131985b949909ec3655ff45b64f0d2844ee4"
+    },
+    "remoteWitness": {
+      "bytes": 3548,
+      "name": "remote_witness.py",
+      "sha256": "9d8b6453c30f1c0c88a01e6aeaa05dca4f3dfb0b206d92a56881f18249be5133"
+    },
+    "sourceFreeze": {
+      "bytes": 2868,
+      "name": "source-freeze.json",
+      "sha256": "4b691a609c66cebe395ee8c9153f3813d78e05104e460bfc8bc9a9417773e7d1"
     }
-  ],
-  "freshPrerequisitesByRef": {
-    "workflow": {
-      "name": "windows-release-checks.yml",
-      "bytes": 2878,
-      "sha256": "d5db482d89f2c1a0304c6bf8a83533a40b9c0b16d302c4c70242fd0267e93902"
-    },
-    "recoveredOnceForLiterals": true,
-    "wholeReview": false,
-    "node": "24 x64",
-    "science": "3.12 x64",
-    "pose": "3.9 x64",
-    "installArgv": [
-      "npm.cmd",
-      "run",
-      "setup:release",
-      "--",
-      "--science-python",
-      "<science setup-python output>",
-      "--pose-python",
-      "<pose setup-python output>"
-    ],
-    "checkArgv": [
-      "npm.cmd",
-      "run",
-      "check:release",
-      "--",
-      "--science-python",
-      "<science setup-python output>"
-    ],
-    "compiledUI": "reuse; no rebuild"
   }
 }

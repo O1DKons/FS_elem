@@ -18,15 +18,15 @@ try:
         shared.guard()
         time.sleep(0.02)
     retained = shared.read("root-retained.json")
-    if retained["runtimeGrantSha256"] != sys.argv[3] or retained["originQpcTicksDecimal"] != origin:
+    if retained["runtimeGrantSha256"] != sys.argv[4] or retained["originQpcTicksDecimal"] != origin:
         core.fail("Root-retained-Job-ack-mismatch")
     shared.guard()
-    argv = shared.runtime_argv("windows_nn_operator.py",sys.argv[3],package,origin,frequency,
+    argv = shared.runtime_argv("windows_nn_operator.py",sys.argv[4],package,origin,frequency,
         shared.ROOT / "controller")
     process = subprocess.Popen(argv,cwd=package,env=shared.environment(),
         stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,bufsize=-1)
     shared.save("controller-parent-entry.json",{"controllerPid":process.pid,"originQpcTicksDecimal":origin,
-        "qpcFrequencyDecimal":frequency,"runtimeGrantSha256":sys.argv[3]})
+        "qpcFrequencyDecimal":frequency,"runtimeGrantSha256":sys.argv[4]})
     reader = shared.RawReader(process.stdout,"controller-raw.bin")
     # Preserve raw controller output for the external supervisor, without decoding.
     def forward():

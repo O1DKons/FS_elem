@@ -25,8 +25,8 @@
     {
       "bytes": 6444,
       "mode": "0644",
-      "path": ".github/workflows/windows-selected-nn-cc95d95b21294941ae0c705a9edab91f.yml",
-      "sha256": "4894939e759ff626e70e4737c0464575da44d9590e7e0886a303609ee5f04fc8"
+      "path": ".github/workflows/windows-selected-nn-56b54188ad774bef90a7883449f57a22.yml",
+      "sha256": "4e3e8a4a4f12f9f7f4a6e5c376f1bc775f7f54e2e9851231805e664d161c0974"
     },
     {
       "bytes": 160,
@@ -1721,10 +1721,10 @@
       "sha256": "1d472a96ec845a82d4bbd09f9c97537c3f2d28b21d9c1621b0a7e954ddfae758"
     },
     {
-      "bytes": 5541,
+      "bytes": 5540,
       "mode": "0644",
       "path": "tools/release/windows-smoke/admission-template.json",
-      "sha256": "90bc37793ef288a498d54f930c506952f9c01afb64d81fe280c8708685e9819a"
+      "sha256": "a1a42868da8131596008638bf530e7d42b907a392b5392f98139db749c28db2a"
     },
     {
       "bytes": 18571,
@@ -1736,19 +1736,19 @@
       "bytes": 7198,
       "mode": "0644",
       "path": "tools/release/windows-smoke/remote-contract.json",
-      "sha256": "a87f9047f47fb126d93b666b4283137fedb01a038844a94cd80d7e26220c5d3d"
+      "sha256": "9a6b6ede2887360b07394028ffdd06f49d0348a5df73fcc3bbec1c62fea1e2a4"
     },
     {
       "bytes": 13445,
       "mode": "0644",
       "path": "tools/release/windows-smoke/remote_entry.py",
-      "sha256": "c370c73d0e54ddd1844061e13d8a2d54bd6a991178205eb15b5dee12ebe89975"
+      "sha256": "086a8cd7e40b2e05b7469648937433b2be4ddd0b4b7bf0d7102af2bd4e5fa885"
     },
     {
       "bytes": 4433,
       "mode": "0644",
       "path": "tools/release/windows-smoke/remote_outer.py",
-      "sha256": "c084d74ce2e808c38662c6b82433df5ddba1f597ccc0fe72dc8b8f0ea340ab9f"
+      "sha256": "e6c48bfb7c7e0ebc215622cee5ea03d2860a8ef312e348abe0e00ed8af3eb218"
     },
     {
       "bytes": 8789,
@@ -1760,13 +1760,13 @@
       "bytes": 3548,
       "mode": "0644",
       "path": "tools/release/windows-smoke/remote_witness.py",
-      "sha256": "b0052b1947e8a49407b45e42993c06ec3317cde24300b9d0190497c100d051b9"
+      "sha256": "9d8b6453c30f1c0c88a01e6aeaa05dca4f3dfb0b206d92a56881f18249be5133"
     },
     {
       "bytes": 2868,
       "mode": "0644",
       "path": "tools/release/windows-smoke/source-freeze.json",
-      "sha256": "6cfb193677af3bfa852ec3bc727f76846838fab559c7d3773eef74fb962cf926"
+      "sha256": "4b691a609c66cebe395ee8c9153f3813d78e05104e460bfc8bc9a9417773e7d1"
     },
     {
       "bytes": 11667,
@@ -1781,7 +1781,7 @@
       "sha256": "545c3b65d1784ad68e6d25b189c0ff5531c3746c77075d35fa976cd94b0ca27a"
     }
   ],
-  "integrationSourceAcceptanceSha256": "594c79ee1334c078a078c0072055ba0715fa1bc356c32c7063e156c0c809862c",
+  "integrationSourceAcceptanceSha256": "41c49955c8b38af7d659ada2ddee9930253a713d38a31dff1e2ed432b26517c1",
   "manifestExcludesItself": true,
   "overlayFreezeSha256": "9f003bee64f15c9eb876c56d5b275214a7a65e1a8d0a12c8840f3542eb338be8",
   "pendingValidation": [

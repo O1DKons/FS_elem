@@ -18,7 +18,7 @@ try:
     meter = core.NativeReadout()
     core.METER = meter
     owned = owner_module.OwnedProcess.launch(
-        shared.runtime_argv("remote_outer.py",sys.argv[3],package,origin,frequency),
+        shared.runtime_argv("remote_outer.py",sys.argv[4],package,origin,frequency),
         cwd=package,env=shared.environment())
     core.OWNED = owned
     core.audit_stop(owned)
@@ -28,7 +28,7 @@ try:
     reader.start()
     shared.save("witness-entry.json",{"witnessPid":os.getpid(),"witnessIdentity":meter.parent_identity,
         "outerGatePid":owned.pid,"outerJobHandleDecimal":str(int(owned.job.handle)),
-        "originQpcTicksDecimal":origin,"qpcFrequencyDecimal":frequency,"runtimeGrantSha256":sys.argv[3]})
+        "originQpcTicksDecimal":origin,"qpcFrequencyDecimal":frequency,"runtimeGrantSha256":sys.argv[4]})
     samples, last = 0, None
     while owned.poll() is None:
         shared.guard()
