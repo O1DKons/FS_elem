@@ -39,18 +39,48 @@ function Require-Gone($Old){
  })
  if($remaining.Count -gt 0){throw 'Owned original process generation remains'}
 }
+function Limit-Text([string]$Value,[int]$MaxBytes){
+ $bytes=[Text.Encoding]::UTF8.GetBytes($Value)
+ if($bytes.Length -le $MaxBytes){return $Value}
+ $encoding=[Text.UTF8Encoding]::new($false,$true)
+ for($size=$MaxBytes;$size -ge $MaxBytes-3;$size--){
+  try{return $encoding.GetString($bytes,0,$size)}catch [Text.DecoderFallbackException]{}
+ }
+ throw 'Cannot retain bounded UTF8 response prefix'
+}
 function Wait-Ready($Process){
  $deadline=[DateTime]::UtcNow.AddSeconds(90)
+ $lastProxy=$null;$lastUi=$null;$lastError=$null
  while([DateTime]::UtcNow -lt $deadline){
   if($Process.HasExited){throw 'Installed GUI exited before ready'}
   try{
-   $health=Invoke-WebRequest 'http://127.0.0.1:5174/api/analysis/health' -TimeoutSec 2 -UseBasicParsing -NoProxy
-   $ui=Invoke-WebRequest 'http://127.0.0.1:5174/analysis' -TimeoutSec 2 -UseBasicParsing -NoProxy
+   $health=Invoke-WebRequest 'http://127.0.0.1:5174/api/analysis/health' -TimeoutSec 2 -UseBasicParsing -NoProxy -SkipHttpErrorCheck
+   $content=[string]$health.Content
+   $lastProxy=@{status=[int]$health.StatusCode;body=(Limit-Text $content 8192);bodyTruncated=([Text.Encoding]::UTF8.GetByteCount($content) -gt 8192)}
+   $ui=Invoke-WebRequest 'http://127.0.0.1:5174/analysis' -TimeoutSec 2 -UseBasicParsing -NoProxy -SkipHttpErrorCheck
+   $content=[string]$ui.Content
+   $lastUi=@{status=[int]$ui.StatusCode;body=(Limit-Text $content 8192);bodyTruncated=([Text.Encoding]::UTF8.GetByteCount($content) -gt 8192)}
    $body=$health.Content|ConvertFrom-Json
    if($health.StatusCode -eq 200 -and $ui.StatusCode -eq 200 -and $body.status -eq 'ready' -and $body.inferenceAvailable -eq $true -and $body.PSObject.Properties.Name -contains 'activeJobId' -and $null -eq $body.activeJobId){return}
-  }catch{}
+  }catch{$failure=$_.Exception.Message;$lastError=Limit-Text $failure 4096}
   Start-Sleep -Milliseconds 500
  }
+ # Preserve actual HTTP evidence while owned services are still running.
+ # These diagnostic responses never satisfy or weaken the readiness gate.
+ $summary.lastProxyReadiness=$lastProxy;$summary.lastUiReadiness=$lastUi;$summary.lastReadinessError=$lastError
+ $probeEvidence=[Collections.Generic.List[object]]::new()
+ foreach($url in 'http://127.0.0.1:5175/health','http://127.0.0.1:5174/api/analysis/health','http://127.0.0.1:5174/analysis'){
+  try{
+   $response=Invoke-WebRequest $url -TimeoutSec 2 -UseBasicParsing -NoProxy -SkipHttpErrorCheck -MaximumRedirection 0
+   $content=[string]$response.Content
+   $probeEvidence.Add(@{url=$url;status=[int]$response.StatusCode;body=(Limit-Text $content 8192);bodyTruncated=([Text.Encoding]::UTF8.GetByteCount($content) -gt 8192)})
+  }catch{
+   $failure=$_.Exception.Message
+   $probeEvidence.Add(@{url=$url;error=(Limit-Text $failure 4096)})
+  }
+ }
+ $summary.readinessFailure=$probeEvidence
+ [IO.File]::WriteAllText((Join-Path $Logs 'readiness-http.json'),($probeEvidence|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
  throw 'Installed application readiness deadline exceeded'
 }
 function Controller-Pid($Process){
