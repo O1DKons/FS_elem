@@ -168,7 +168,8 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, default=SCRIPTS.parent)
     args = parser.parse_args(argv)
-    emit = lambda value: print(json.dumps(value, ensure_ascii=False), flush=True)
+    # ASCII JSON is UTF-8 compatible even when isolated Windows stdout uses a legacy code page.
+    emit = lambda value: print(json.dumps(value, ensure_ascii=True), flush=True)
     try:
         bootstrap(args.root, emit)
         return 0

@@ -108,6 +108,24 @@ class FirstRunTests(unittest.TestCase):
         with mock.patch.object(first.os, 'name', 'posix'):
             self.assertEqual(first.fingerprint(source), expected)
 
+    def test_json_progress_preserves_unicode_and_first_error_on_cp1252_stdout(self):
+        import io
+        message = 'Проверка файлов: ' + str(self.root)
+        first_error = 'Исходная ошибка: ' + str(self.root)
+        def progress_then_error(root, emit):
+            self.assertEqual(root, self.root)
+            emit(dict(type='progress', stage='verify', message=message))
+            raise first.setup.SetupError(first_error)
+        raw = io.BytesIO()
+        output = io.TextIOWrapper(raw, encoding='cp1252', newline='\n')
+        with mock.patch.object(first.sys, 'stdout', output), \
+                mock.patch.object(first, 'bootstrap', side_effect=progress_then_error):
+            self.assertEqual(first.main(['--root', str(self.root)]), 1)
+        output.flush()
+        events = [json.loads(line) for line in raw.getvalue().decode('utf-8').splitlines()]
+        self.assertEqual(events, [dict(type='progress', stage='verify', message=message),
+            dict(type='error', stage='verify', message=first_error)])
+
     # Removing receipt bindings or metadata checks would accept a changed file.
     def test_verified_receipt_reused_then_model_mutation_invalidates_it(self):
         self.assertFalse(first.bootstrap(self.root, self.events.append)['cached'])

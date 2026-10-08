@@ -1321,8 +1321,8 @@
     },
     {
       "path": "scripts/windows-first-run.py",
-      "bytes": 8548,
-      "sha256": "7a901152bbf44904aa0fe482ace8dd2059c32e9f985e241701a3d97845347801"
+      "bytes": 8643,
+      "sha256": "73368d8be881e22fa0088baca888a0f7b6e7dcb91a8d20e7275209ffe77d673a"
     },
     {
       "path": "server/api.mjs",
@@ -1491,8 +1491,8 @@
     },
     {
       "path": "tests/release/test_windows_first_run.py",
-      "bytes": 13088,
-      "sha256": "306210dbe45843914a3de78dda02bb8a55064492c8919daff11773faff4875b6"
+      "bytes": 14149,
+      "sha256": "43c12de547d6a00f839bfe48c212dcabae15c1ebc499d261f5dfbf9364e6a95c"
     },
     {
       "path": "tests/release/windows-desktop.test.mjs",
@@ -1566,6 +1566,6 @@
     }
   ],
   "fileCount": 311,
-  "totalBytes": 8330562,
+  "totalBytes": 8331718,
   "recordedAtUTC": "2026-10-08T21:26:57.183218+00:00"
 }
