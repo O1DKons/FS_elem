@@ -93,11 +93,14 @@ class FirstRunTests(unittest.TestCase):
         self.addCleanup(self.no_install.stop)
 
     def test_windows_volume_serial_matches_native_node_without_truncating_other_fields(self):
+        import stat
         # Observed native Python3.12/Node24 mismatch: only volume serial width differs.
         source = mock.Mock()
         source.is_file.return_value = True
         source.is_symlink.return_value = False
-        source.stat.return_value = mock.Mock(st_size=17, st_dev=10116456482831564288,
+        source.stat.side_effect = AssertionError('Use the fresh lstat snapshot without another stat query')
+        source.lstat.return_value = mock.Mock(st_mode=stat.S_IFREG | 0o600,
+            st_size=17, st_dev=10116456482831564288,
             st_ino=79228162514264337593543950433, st_mtime_ns=1729000000123456700,
             st_ctime_ns=1728000000123456700)
         expected = dict(sizeBytes=17, dev='1692368384', ino='79228162514264337593543950433',
@@ -107,6 +110,25 @@ class FirstRunTests(unittest.TestCase):
         expected['dev'] = '10116456482831564288'
         with mock.patch.object(first.os, 'name', 'posix'):
             self.assertEqual(first.fingerprint(source), expected)
+        self.assertEqual(source.lstat.call_count, 2)
+        source.stat.assert_not_called()
+
+    def test_fingerprint_rejects_actual_directory(self):
+        directory = self.root / 'not-a-regular-file'
+        directory.mkdir()
+        with self.assertRaises(first.setup.SetupError):
+            first.fingerprint(directory)
+
+    def test_fingerprint_rejects_actual_final_symlink(self):
+        target = self.root / 'regular-target'
+        target.write_bytes(b'verified regular bytes')
+        link = self.root / 'linked-file'
+        try:
+            link.symlink_to(target)
+        except (OSError, NotImplementedError) as error:
+            self.skipTest('Host does not permit creating a symlink: ' + str(error))
+        with self.assertRaises(first.setup.SetupError):
+            first.fingerprint(link)
 
     def test_json_progress_preserves_unicode_and_first_error_on_cp1252_stdout(self):
         import io

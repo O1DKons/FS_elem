@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import re
+import stat
 import sys
 import tempfile
 
@@ -38,9 +39,9 @@ def relative_file(root, path):
 
 
 def fingerprint(path):
-    if not path.is_file() or path.is_symlink():
+    state = path.lstat()
+    if not stat.S_ISREG(state.st_mode):
         raise setup.SetupError('Missing or linked bundle file: ' + str(path))
-    state = path.stat()
     # Node/libuv uses the legacy 32-bit Windows volume serial; Python3.12 can expose 64 bits.
     device = state.st_dev & 0xffffffff if os.name == 'nt' else state.st_dev
     return dict(sizeBytes=state.st_size, dev=str(device), ino=str(state.st_ino),

@@ -116,11 +116,50 @@ try{
  # WScript may expose an ANSI target. Read the actual .lnk via IShellLinkW.
  Add-Type -TypeDefinition @'
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Win32.SafeHandles;
 public static class InstallerFilePath {
+    public sealed class WindowRecord {
+        public uint ProcessId;
+        public string Handle, ClassName, Title;
+        public bool Visible;
+    }
+    private delegate bool EnumWindowProc(IntPtr window, IntPtr data);
+    [DllImport("user32.dll", SetLastError=true)]
+    private static extern bool EnumWindows(EnumWindowProc callback, IntPtr data);
+    [DllImport("user32.dll")]
+    private static extern uint GetWindowThreadProcessId(IntPtr window, out uint processId);
+    [DllImport("user32.dll")]
+    private static extern bool IsWindowVisible(IntPtr window);
+    [DllImport("user32.dll", CharSet=CharSet.Unicode)]
+    private static extern int GetClassName(IntPtr window, StringBuilder name, int size);
+    [DllImport("user32.dll", CharSet=CharSet.Unicode)]
+    private static extern int GetWindowText(IntPtr window, StringBuilder text, int size);
+    public static WindowRecord[] OwnedWindows(uint[] processIds) {
+        var wanted = new HashSet<uint>(processIds);
+        var result = new List<WindowRecord>();
+        bool overflow = false;
+        EnumWindowProc callback = (window, data) => {
+            uint pid;
+            GetWindowThreadProcessId(window, out pid);
+            if (!wanted.Contains(pid)) return true;
+            if (result.Count >= 128) {overflow = true; return false;}
+            var name = new StringBuilder(256);
+            var title = new StringBuilder(256);
+            GetClassName(window, name, name.Capacity);
+            GetWindowText(window, title, title.Capacity);
+            result.Add(new WindowRecord {ProcessId=pid, Handle=window.ToInt64().ToString(),
+                ClassName=name.ToString(), Title=title.ToString(), Visible=IsWindowVisible(window)});
+            return true;
+        };
+        bool enumerated = EnumWindows(callback, IntPtr.Zero);
+        if (overflow) throw new IOException("Owned window snapshot exceeds128 entries");
+        if (!enumerated) throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error(), "EnumWindows failed");
+        return result.ToArray();
+    }
     [ComImport, Guid("000214F9-0000-0000-C000-000000000046"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     private interface IShellLinkW {
         [PreserveSig]
@@ -232,8 +271,27 @@ print(json.dumps({"loadedVCRuntimePaths":loaded,"approvedRuntimeRoot":str(expect
  $owned=Snapshot $controller
  $owned+=@(Get-CimInstance Win32_Process -Filter ("ProcessId="+$launcher.Id)|Select-Object ProcessId,ParentProcessId,CreationDate,Name)
  $summary.cooperativeSnapshot=$owned
- if(@($owned|Where-Object{$_.Name -eq 'conhost.exe'}).Count -gt 0){throw 'Unexpected owned console process'}
- $summary.ownedConsoleProcessCount=0
+ $summary.ownedConsoleProcessCount=@($owned|Where-Object{$_.Name -eq 'conhost.exe'}).Count
+ $shells=@($owned|Where-Object{$_.Name -in @('cmd.exe','powershell.exe','pwsh.exe')})
+ if($shells.Count -gt 0){throw 'Unexpected owned command shell process'}
+ $current=@(Get-CimInstance Win32_Process|Select-Object ProcessId,CreationDate)
+ foreach($original in $owned){
+  if(@($current|Where-Object{$_.ProcessId -eq $original.ProcessId -and $_.CreationDate -eq $original.CreationDate}).Count -ne 1){throw 'Owned window probe process generation changed'}
+ }
+ $windows=@([InstallerFilePath]::OwnedWindows([uint[]]@($owned|ForEach-Object{$_.ProcessId})))
+ $summary.ownedWindowSnapshot=$windows
+ $current=@(Get-CimInstance Win32_Process|Select-Object ProcessId,CreationDate)
+ foreach($original in $owned){
+  if(@($current|Where-Object{$_.ProcessId -eq $original.ProcessId -and $_.CreationDate -eq $original.CreationDate}).Count -ne 1){throw 'Owned window probe process generation changed during enumeration'}
+ }
+ if(@($windows|Where-Object{[string]::IsNullOrEmpty($_.ClassName)}).Count -gt 0){throw 'Cannot classify an owned window'}
+ $guiWindow=@($windows|Where-Object{$_.ProcessId -eq $launcher.Id -and $_.Handle -eq $launcher.MainWindowHandle.ToInt64().ToString()})
+ if($guiWindow.Count -ne 1){throw 'EnumWindows did not observe the current native GUI window'}
+ $consoleBrokers=@($owned|Where-Object{$_.Name -eq 'conhost.exe'}|ForEach-Object{$_.ProcessId})
+ $visibleConsoles=@($windows|Where-Object{$_.Visible -and ($_.ClassName -eq 'ConsoleWindowClass' -or $_.ProcessId -in $consoleBrokers)})
+ $summary.visibleOwnedConsoleWindowCount=$visibleConsoles.Count
+ if($visibleConsoles.Count -gt 0){throw 'Visible owned console window violates shortcut launch requirement'}
+ $summary.ownedWindowEnumerationConfirmed=$true
  $bad=Invoke-WebRequest 'http://127.0.0.1:5174/api/analysis/jobs' -Method POST -Headers @{'X-Filename'='not-a-video.txt'} -ContentType 'application/octet-stream' -Body ([Text.Encoding]::UTF8.GetBytes('invalid')) -SkipHttpErrorCheck -TimeoutSec 10 -NoProxy
  $summary.unsupportedUploadStatus=$bad.StatusCode
  if($bad.StatusCode -ne 415){throw 'Unsupported upload did not return415'}

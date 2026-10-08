@@ -1186,8 +1186,8 @@
     },
     {
       "path": "scripts/check-windows-installer.ps1",
-      "bytes": 16717,
-      "sha256": "ffe250b414114a11114aa7e3d63f9b9cc4b3c8122cebb44ed8944507d925b93f"
+      "bytes": 20470,
+      "sha256": "2f51bede07d1ef0c54631e1ba9890ee10b4af781f94263ef8b9aa8603b7979ca"
     },
     {
       "path": "scripts/config.mjs",
@@ -1321,8 +1321,8 @@
     },
     {
       "path": "scripts/windows-first-run.py",
-      "bytes": 8643,
-      "sha256": "73368d8be881e22fa0088baca888a0f7b6e7dcb91a8d20e7275209ffe77d673a"
+      "bytes": 8648,
+      "sha256": "26ad47cc104017a6d16de5e0ad508efe625ec9ae8be4823bbcde2d350c783a6b"
     },
     {
       "path": "server/api.mjs",
@@ -1491,8 +1491,8 @@
     },
     {
       "path": "tests/release/test_windows_first_run.py",
-      "bytes": 14149,
-      "sha256": "43c12de547d6a00f839bfe48c212dcabae15c1ebc499d261f5dfbf9364e6a95c"
+      "bytes": 15131,
+      "sha256": "a17f31a687f422323958adc8eb8cc2001f388e2217a8acf304c160224a005c56"
     },
     {
       "path": "tests/release/windows-desktop.test.mjs",
@@ -1566,6 +1566,6 @@
     }
   ],
   "fileCount": 311,
-  "totalBytes": 8333706,
+  "totalBytes": 8338446,
   "recordedAtUTC": "2026-10-08T21:26:57.183218+00:00"
 }
