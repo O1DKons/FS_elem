@@ -7,7 +7,7 @@
 [Setup]
 AppId={{1253D5F8-57BA-4DEA-A660-E93AD4B94E39}
 AppName=FS_elem
-AppVersion=0.2.3
+AppVersion=0.2.4
 AppPublisher=FS_elem
 DefaultDirName={localappdata}\Programs\FS_elem
 DefaultGroupName=FS_elem
@@ -18,7 +18,7 @@ MinVersion=10.0
 DisableProgramGroupPage=yes
 DisableDirPage=auto
 OutputDir={#OutputDir}
-OutputBaseFilename=FS_elem-Setup-0.2.3-x64
+OutputBaseFilename=FS_elem-Setup-0.2.4-x64
 Compression=lzma2/normal
 SolidCompression=yes
 UninstallDisplayIcon={app}\FS_elem.exe

@@ -30,16 +30,23 @@ def read_json(path):
     return json.loads(body)
 
 
-def relative_file(root, path, canonical_root=None):
+def relative_name(path):
     if not isinstance(path, str) or '\\' in path or ':' in path:
         raise setup.SetupError('Invalid relative bundle path')
-    if Path(path).as_posix() != path or (Path(root) / path).is_symlink():
+    relative = Path(path)
+    if relative.as_posix() != path:
+        raise setup.SetupError('Noncanonical bundle path')
+    if relative.is_absolute() or '..' in relative.parts or not relative.parts:
+        raise setup.SetupError('Path must be relative to the release directory')
+    return relative
+
+
+def relative_file(root, path, canonical_root=None):
+    relative = relative_name(path)
+    if (Path(root) / relative).is_symlink():
         raise setup.SetupError('Noncanonical or linked bundle path')
     if canonical_root is None:
         return setup.safe_path(root, path)
-    relative = Path(path)
-    if relative.is_absolute() or '..' in relative.parts or not relative.parts:
-        raise setup.SetupError('Path must be relative to the release directory')
     # Resolve through the supplied root again to detect replacement of its alias.
     result = (Path(root) / relative).resolve()
     try:
@@ -59,11 +66,11 @@ def fingerprint(path):
                 mtimeNs=str(state.st_mtime_ns), ctimeNs=str(state.st_ctime_ns))
 
 
-def binding(root, canonical_root=None):
+def binding(root, canonical_root=None, physical_paths=True):
     bundle = read_json(root / BUNDLE)
     manifest = setup.select_profile(setup.read_manifest(root))
     if (manifest['_platformId'] != 'windows-x64' or bundle.get('schemaVersion') != 1
-            or bundle.get('packageVersion') != '0.2.3' or bundle.get('platformId') != 'windows-x64'
+            or bundle.get('packageVersion') != '0.2.4' or bundle.get('platformId') != 'windows-x64'
             or bundle.get('nativeProfileSha256') != manifest['_profileSha256']):
         raise setup.SetupError('Windows bundle/profile binding differs from this release')
     interpreters = {n: f'.runtime/venv-{n}/Scripts/python.exe' for n in ('science', 'pose')}
@@ -77,7 +84,10 @@ def binding(root, canonical_root=None):
     windows_paths = set()
     for row in rows:
         path = row.get('path')
-        relative_file(root, path, canonical_root)
+        if physical_paths:
+            relative_file(root, path, canonical_root)
+        else:
+            relative_name(path)
         if path.casefold() in windows_paths or path in (BUNDLE, RECEIPT):
             raise setup.SetupError('Duplicate or dynamic bundle inventory path')
         windows_paths.add(path.casefold())
@@ -104,7 +114,7 @@ def cached_ready(root):
     root = Path(root).absolute()
     canonical_root = root.resolve()
     try:
-        bundle, manifest, expected = binding(root, canonical_root)
+        bundle, manifest, expected = binding(root, canonical_root, physical_paths=False)
         state = read_json(root / RECEIPT)
         if (state.get('schemaVersion') != 1 or state.get('status') != 'complete'
                 or state.get('bundleSha256') != setup.sha256(root / BUNDLE)
@@ -112,11 +122,14 @@ def cached_ready(root):
                 or state.get('nativeProfileSha256') != manifest['_profileSha256']):
             return False
         rows = state.get('files', [])
-        if len(rows) != len(expected) or {r['path'] for r in rows} != set(expected):
+        if not isinstance(rows, list) or len(rows) != len(expected) or {r['path'] for r in rows} != set(expected):
             return False
+        # Prove full name/digest coverage before touching any receipt file.
         for row in rows:
-            if row.get('sha256') != expected[row['path']]:
+            digest = expected[row['path']]
+            if not isinstance(digest, str) or not re.fullmatch(r'[0-9a-f]{64}', digest) or row.get('sha256') != digest:
                 return False
+        for row in rows:
             current = fingerprint(relative_file(root, row['path'], canonical_root))
             if any(row.get(k) != value for k, value in current.items()):
                 return False

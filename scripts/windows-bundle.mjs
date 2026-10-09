@@ -12,9 +12,12 @@ function inside(root, file) {
   const part = relative(resolve(root), resolve(file));
   return part !== '' && !part.startsWith('..') && !isAbsolute(part);
 }
-function installedFile(root, value, canonicalRoot = realpathSync(root)) {
+function relativeName(value) {
   if (typeof value !== 'string' || !value || /[\\:]/.test(value) || value.split('/').includes('..') || isAbsolute(value))
     throw Error('Invalid relative bundle path');
+}
+function installedFile(root, value, canonicalRoot = realpathSync(root)) {
+  relativeName(value);
   const file = resolve(root, value);
   if (!inside(root, file) || !inside(canonicalRoot, realpathSync(file)) || lstatSync(file).isSymbolicLink())
     throw Error('Bundle file escapes installed application');
@@ -35,7 +38,7 @@ export function requireDesktopReady(root) {
     const state = read(join(root, '.runtime/windows-ready.json'));
     const native = models.platforms?.['windows-x64'];
     const nativeSha = createHash('sha256').update(canonical(native)).digest('hex');
-    if (bundle.schemaVersion !== 1 || bundle.packageVersion !== '0.2.3' || bundle.platformId !== 'windows-x64' ||
+    if (bundle.schemaVersion !== 1 || bundle.packageVersion !== '0.2.4' || bundle.platformId !== 'windows-x64' ||
         native?.status !== 'ready' || bundle.nativeProfileSha256 !== nativeSha || state.schemaVersion !== 1 ||
         state.status !== 'complete' || state.bundleSha256 !== sha(bundleFile) ||
         state.modelManifestSha256 !== sha(modelFile) || state.nativeProfileSha256 !== nativeSha)
@@ -45,23 +48,31 @@ export function requireDesktopReady(root) {
     if (!Array.isArray(bundle.files) || !bundle.files.length || bundle.files.length > 100000)
       throw Error('Missing bundle inventory');
     for (const row of bundle.files) {
-      installedFile(root, row.path, canonicalRoot);
+      relativeName(row.path);
       if (windowsPaths.has(row.path.toLowerCase()) || !Number.isSafeInteger(row.bytes) || row.bytes < 0 || !/^[a-f0-9]{64}$/.test(row.sha256))
         throw Error('Invalid bundle inventory');
       windowsPaths.add(row.path.toLowerCase());
       expected.set(row.path, row.sha256);
     }
     for (const row of models.models) {
+      relativeName(row.path);
       if (windowsPaths.has(row.path.toLowerCase()) && !expected.has(row.path)) throw Error('Duplicate Windows model path');
       windowsPaths.add(row.path.toLowerCase());
       if (expected.has(row.path) && expected.get(row.path) !== row.sha256) throw Error('Model/bundle checksum mismatch');
       expected.set(row.path, row.sha256);
     }
     expected.set('assets/models/manifest-release-v1.json', sha(modelFile));
-    if (!Array.isArray(state.files) || state.files.length !== expected.size || new Set(state.files.map(r => r.path)).size !== expected.size)
+    if (!Array.isArray(state.files) || state.files.length !== expected.size ||
+        new Set(state.files.map(r => r.path)).size !== expected.size ||
+        state.files.some(row => !expected.has(row.path)))
       throw Error('Incomplete ready receipt');
+    // Both exact name coverage and authoritative digest binding precede the physical scan.
     for (const row of state.files) {
-      if (row.sha256 !== expected.get(row.path)) throw Error('Changed ready checksum binding');
+      const digest = expected.get(row.path);
+      if (!expected.has(row.path) || typeof digest !== 'string' || !/^[a-f0-9]{64}$/.test(digest) || row.sha256 !== digest)
+        throw Error('Changed ready checksum binding');
+    }
+    for (const row of state.files) {
       const info = statSync(installedFile(root, row.path, canonicalRoot), { bigint: true });
       // Windows CPython st_ctime is creation time; Node exposes it as birthtime.
       const ctime = process.platform === 'win32' ? info.birthtimeNs : info.ctimeNs;

@@ -1,12 +1,12 @@
-name: Windows v0.2.3 installer
+name: Windows v0.2.4 installer
 on:
   push:
-    branches: [release/v0.2.3]
+    branches: [release/v0.2.4]
   workflow_dispatch:
 permissions:
   contents: read
 concurrency:
-  group: fs-elem-v023-windows-installer
+  group: fs-elem-v024-windows-installer
   cancel-in-progress: false
 jobs:
   build-install:
@@ -42,26 +42,26 @@ jobs:
       - name: Build self-contained installer and check native installation
         shell: pwsh
         run: |
-          ./scripts/build-windows-installer.ps1 -PackageRoot $env:GITHUB_WORKSPACE -WorkRoot (Join-Path $env:RUNNER_TEMP 'fs-elem-v023-installer') -SciencePython '${{ steps.science.outputs.python-path }}' -PosePython '${{ steps.pose.outputs.python-path }}' -NativeCheck
+          ./scripts/build-windows-installer.ps1 -PackageRoot $env:GITHUB_WORKSPACE -WorkRoot (Join-Path $env:RUNNER_TEMP 'fs-elem-v024-installer') -SciencePython '${{ steps.science.outputs.python-path }}' -PosePython '${{ steps.pose.outputs.python-path }}' -NativeCheck
       - name: Save Setup.exe and checksums
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: fs-elem-v023-windows-setup-${{ github.run_id }}
-          path: ${{ runner.temp }}/fs-elem-v023-installer/artifacts/*
+          name: fs-elem-v024-windows-setup-${{ github.run_id }}
+          path: ${{ runner.temp }}/fs-elem-v024-installer/artifacts/*
           if-no-files-found: warn
           retention-days: 14
       - name: Save bounded native build and installation evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: fs-elem-v023-windows-install-evidence-${{ github.run_id }}
+          name: fs-elem-v024-windows-install-evidence-${{ github.run_id }}
           path: |
-            ${{ runner.temp }}/fs-elem-v023-installer/build-summary.json
-            ${{ runner.temp }}/fs-elem-v023-installer/build-inputs.json
-            ${{ runner.temp }}/fs-elem-v023-installer/compiler-input.json
-            ${{ runner.temp }}/fs-elem-v023-installer/vc-runtime-inputs.json
-            ${{ runner.temp }}/fs-elem-v023-installer/native-install-check.json
-            ${{ runner.temp }}/fs-elem-v023-installer/logs/*
+            ${{ runner.temp }}/fs-elem-v024-installer/build-summary.json
+            ${{ runner.temp }}/fs-elem-v024-installer/build-inputs.json
+            ${{ runner.temp }}/fs-elem-v024-installer/compiler-input.json
+            ${{ runner.temp }}/fs-elem-v024-installer/vc-runtime-inputs.json
+            ${{ runner.temp }}/fs-elem-v024-installer/native-install-check.json
+            ${{ runner.temp }}/fs-elem-v024-installer/logs/*
           if-no-files-found: warn
           retention-days: 14

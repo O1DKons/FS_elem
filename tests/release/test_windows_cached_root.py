@@ -64,7 +64,7 @@ class CachedRootTests(unittest.TestCase):
             self.skipTest('Explicit Node executable unavailable')
         first.bootstrap(self.root, self.events.append)
         alias, outside = self.root_alias()
-        first_inventory_path = self.bundle['files'][0]['path']
+        first_inventory_path = json.loads((self.root / first.RECEIPT).read_text('utf-8'))['files'][0]['path']
         outside_file = outside / first_inventory_path
         outside_file.parent.mkdir(parents=True, exist_ok=True)
         outside_file.write_bytes((self.root / first_inventory_path).read_bytes())
@@ -81,8 +81,8 @@ fs.readFileSync=function(file,...args){
   const body=original.call(this,file,...args);
   if (String(file)===modelFile) {
     modelReads+=1;
-    // First read parses the manifest. Second returns its final preliminary hash body.
-    if (modelReads===2 && !swapped) {
+    // Third read supplies the authoritative manifest digest before the single physical scan.
+    if (modelReads===3 && !swapped) {
       fs.unlinkSync(root);
       fs.symlinkSync(outside,root,'dir');
       swapped=true;
@@ -95,7 +95,7 @@ const {requireDesktopReady}=await import(checker);
 let message=null;
 try {requireDesktopReady(root);} catch(error) {message=String(error.message);}
 const expected='Bundle file escapes installed application';
-const accepted=swapped && modelReads===2 && message!==null && message.includes(expected);
+const accepted=swapped && modelReads===3 && message!==null && message.includes(expected);
 console.log(JSON.stringify({swapped,modelReads,message,accepted}));
 if (!accepted) process.exitCode=1;
 """
@@ -105,7 +105,7 @@ if (!accepted) process.exitCode=1;
         self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
         observation = json.loads(result.stdout)
         self.assertTrue(observation['swapped'])
-        self.assertEqual(observation['modelReads'], 2)
+        self.assertEqual(observation['modelReads'], 3)
         self.assertIn('Bundle file escapes installed application', observation['message'])
 
 

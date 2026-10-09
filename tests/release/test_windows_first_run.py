@@ -76,7 +76,7 @@ class FirstRunTests(unittest.TestCase):
                       'sha256': digest(self.files['assets/models/model.bin']), 'url': None}
         put('assets/models/manifest-release-v1.json', json.dumps({
             'schemaVersion': 1, 'models': [self.model], 'platforms': {'windows-x64': self.native}}))
-        self.bundle = {'schemaVersion': 1, 'packageVersion': '0.2.3', 'platformId': 'windows-x64',
+        self.bundle = {'schemaVersion': 1, 'packageVersion': '0.2.4', 'platformId': 'windows-x64',
                        'nativeProfileSha256': self.profile_sha,
                        'node': {'path': '.runtime/node/node.exe', 'version': '24.15.0'},
                        'interpreters': {n: f'.runtime/venv-{n}/Scripts/python.exe' for n in ('science', 'pose')},
