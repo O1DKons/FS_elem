@@ -63,7 +63,7 @@ def binding(root, canonical_root=None):
     bundle = read_json(root / BUNDLE)
     manifest = setup.select_profile(setup.read_manifest(root))
     if (manifest['_platformId'] != 'windows-x64' or bundle.get('schemaVersion') != 1
-            or bundle.get('packageVersion') != '0.2.2' or bundle.get('platformId') != 'windows-x64'
+            or bundle.get('packageVersion') != '0.2.3' or bundle.get('platformId') != 'windows-x64'
             or bundle.get('nativeProfileSha256') != manifest['_profileSha256']):
         raise setup.SetupError('Windows bundle/profile binding differs from this release')
     interpreters = {n: f'.runtime/venv-{n}/Scripts/python.exe' for n in ('science', 'pose')}

@@ -1317,12 +1317,12 @@
     {
       "path": "scripts/windows-bundle.mjs",
       "bytes": 6902,
-      "sha256": "5e6a8825ae6c6cb638b603ee5e6d474eacf597135b14a8a207645d3a074c1e48"
+      "sha256": "7564a7401ca7c5b45209fb4dbee09899433f377a1bf472d9ff49022f1f996fcb"
     },
     {
       "path": "scripts/windows-first-run.py",
       "bytes": 9360,
-      "sha256": "aa89be085c89c58ef5e93648dc78dccd869e1b6ad900b3e8b8e5c3862d7a8217"
+      "sha256": "4071e7f829898ea7e5e2cefee5b63646bfd768c55a6cb25b5df9a9217f52666c"
     },
     {
       "path": "server/api.mjs",
@@ -1497,12 +1497,12 @@
     {
       "path": "tests/release/test_windows_first_run.py",
       "bytes": 15131,
-      "sha256": "a17f31a687f422323958adc8eb8cc2001f388e2217a8acf304c160224a005c56"
+      "sha256": "aaa40b76fd60de04890c077bb5c98aaa449e5ee40b944dce359df4b2e3607f4f"
     },
     {
       "path": "tests/release/windows-desktop.test.mjs",
       "bytes": 7082,
-      "sha256": "38a537977d9324f48497a871f326bdd3d0012e1b135c4da9cc426fa6c86084ac"
+      "sha256": "f9dff560c228134e52f80dbe890fa28e46ca46cdbd3452e9314decc0b7e656c8"
     },
     {
       "path": "tests/test_release_bootstrap.py",

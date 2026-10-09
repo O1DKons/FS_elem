@@ -74,7 +74,7 @@ function syntheticDesktop(root) {
   const nativeSha = hash(JSON.stringify(native));
   const files = ['.runtime/venv-science/Scripts/python.exe', 'services/analysis/server.py', 'assets/models/manifest-release-v1.json'];
   const inventory = files.map(name => { const body = fs.readFileSync(path.join(app, name)); return { path: name, bytes: body.length, sha256: hash(body) }; });
-  const bundle = put('windows-bundle.json', JSON.stringify({schemaVersion: 1, packageVersion: '0.2.2', platformId: 'windows-x64', nativeProfileSha256: nativeSha, files: inventory}));
+  const bundle = put('windows-bundle.json', JSON.stringify({schemaVersion: 1, packageVersion: '0.2.3', platformId: 'windows-x64', nativeProfileSha256: nativeSha, files: inventory}));
   put('.runtime/windows-ready.json', JSON.stringify({schemaVersion: 1, status: 'complete', bundleSha256: hash(fs.readFileSync(bundle)), nativeProfileSha256: nativeSha, modelManifestSha256: hash(fs.readFileSync(manifest)), files: inventory.map(row => {
     const s = fs.statSync(path.join(app, row.path), {bigint: true});
     return {path: row.path, sha256: row.sha256, sizeBytes: Number(s.size), dev:s.dev.toString(),ino:s.ino.toString(),mtimeNs:s.mtimeNs.toString(),ctimeNs:s.ctimeNs.toString()};

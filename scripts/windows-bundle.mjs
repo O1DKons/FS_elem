@@ -35,7 +35,7 @@ export function requireDesktopReady(root) {
     const state = read(join(root, '.runtime/windows-ready.json'));
     const native = models.platforms?.['windows-x64'];
     const nativeSha = createHash('sha256').update(canonical(native)).digest('hex');
-    if (bundle.schemaVersion !== 1 || bundle.packageVersion !== '0.2.2' || bundle.platformId !== 'windows-x64' ||
+    if (bundle.schemaVersion !== 1 || bundle.packageVersion !== '0.2.3' || bundle.platformId !== 'windows-x64' ||
         native?.status !== 'ready' || bundle.nativeProfileSha256 !== nativeSha || state.schemaVersion !== 1 ||
         state.status !== 'complete' || state.bundleSha256 !== sha(bundleFile) ||
         state.modelManifestSha256 !== sha(modelFile) || state.nativeProfileSha256 !== nativeSha)
