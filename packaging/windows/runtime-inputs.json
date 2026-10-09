@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "packageVersion": "0.2.2",
+  "packageVersion": "0.2.3",
   "node": {
     "major": 24,
     "versionResolution": "exact version supplied by build-host Node24; matching official ZIP checked against that release SHASUMS256.txt",

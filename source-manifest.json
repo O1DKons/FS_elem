@@ -1,11 +1,11 @@
 {
   "schemaVersion": 3,
-  "version": "0.2.2",
+  "version": "0.2.3",
   "status": "WINDOWS_INSTALLER_SOURCE_CANDIDATE_NATIVE_CHECK_PENDING",
   "readyForRelease": false,
   "manifestExcludesItself": true,
-  "baselineCommit": "3dcd2704639d0bc5f1f0c2ad8d1fbe44be80518d",
-  "baselineVersion": "0.2.1",
+  "baselineCommit": "f791d6a5edb8558130d18484cf40722c2f6b09c2",
+  "baselineVersion": "0.2.2",
   "scientificValidationUnchanged": true,
   "privateUpstreamModelsIncluded": false,
   "files": [
@@ -22,7 +22,7 @@
     {
       "path": ".github/workflows/windows-installer.yml",
       "bytes": 2849,
-      "sha256": "39ca885be0c3dd0fa204c6771b49f19a5ed76fc5553875e5eee0b2916a99cb08"
+      "sha256": "bdb90f518134bd1137f6bb5d3517e2811d89901c634ff5dc3346614eede27220"
     },
     {
       "path": ".github/workflows/windows-release-checks.yml",
@@ -852,7 +852,7 @@
     {
       "path": "apps/windows-launcher/FS_elemLauncher.cs",
       "bytes": 27203,
-      "sha256": "34dbbc356496c36bf1a85828acae497058903d4856105bb4ddafab3a767edcda"
+      "sha256": "21371e51091cbc0b479fdd5bb4525c9b94e3989c1654effbef5ff0683a7d65ef"
     },
     {
       "path": "assets/models/family.joblib",
@@ -1067,17 +1067,17 @@
     {
       "path": "package.json",
       "bytes": 797,
-      "sha256": "c97a9f016edf2eb16c29f8012e8f8ac76c75a6cd35bfeff9afa741cf7fbc01ca"
+      "sha256": "7251f197b30e4c7372abf8f5da3822032967f94ddc32f7e33fbf7e33d58d0a71"
     },
     {
       "path": "packaging/windows/FS_elem.iss",
       "bytes": 1639,
-      "sha256": "165d38c3784f31e8367f7c897f1a55f7e8a5b831263b2f825d55bd426fd50822"
+      "sha256": "4292c0c7c06888860d8806db579f1d1bbd8c21039ba34aff0f0603184ac475ee"
     },
     {
       "path": "packaging/windows/runtime-inputs.json",
       "bytes": 1325,
-      "sha256": "ae3f976dbb2c25344740acc2cd0411ab46beca238ea0c4a75ff8b3cacf9c22cb"
+      "sha256": "cfc351f7661b23203cc5f1e1208390c2ee08f28d9d48f21f705900a205b87e3d"
     },
     {
       "path": "runtime/API.md",
@@ -1177,7 +1177,7 @@
     {
       "path": "scripts/build-windows-installer.ps1",
       "bytes": 15960,
-      "sha256": "1b31cb6b0828680c3804a4330c244444b1f9fd340fa69aa83634ec8f353d35ce"
+      "sha256": "fd390df19cb56a1f1a6029e7fd7bfcfff5e71ebcc4db4a1d7d8dc00ff8c6c1c0"
     },
     {
       "path": "scripts/build.mjs",
@@ -1217,7 +1217,7 @@
     {
       "path": "scripts/prepare-windows-bundle.py",
       "bytes": 10104,
-      "sha256": "91a1a53adbf24c2b3d8bd7193eb7c633fe844ccda435749cc163c44735a3cb28"
+      "sha256": "17feb160c01c29318217f4556cd4b3df17a05a8e32271a4576dda7e24acb143f"
     },
     {
       "path": "scripts/release-control.mjs",
@@ -1316,13 +1316,13 @@
     },
     {
       "path": "scripts/windows-bundle.mjs",
-      "bytes": 6709,
-      "sha256": "4cef7cb9e01f6cd796a347b5faf752506c43442d38250bc6a8e131bbfdf88413"
+      "bytes": 6902,
+      "sha256": "5e6a8825ae6c6cb638b603ee5e6d474eacf597135b14a8a207645d3a074c1e48"
     },
     {
       "path": "scripts/windows-first-run.py",
-      "bytes": 8648,
-      "sha256": "26ad47cc104017a6d16de5e0ad508efe625ec9ae8be4823bbcde2d350c783a6b"
+      "bytes": 9360,
+      "sha256": "aa89be085c89c58ef5e93648dc78dccd869e1b6ad900b3e8b8e5c3862d7a8217"
     },
     {
       "path": "server/api.mjs",
@@ -1490,6 +1490,11 @@
       "sha256": "e918fb7a0380c6ea8c5b618582720bd67bba9d50a4a82657d315fcf9aac698f8"
     },
     {
+      "path": "tests/release/test_windows_cached_root.py",
+      "bytes": 4654,
+      "sha256": "25d884d879494d55f499f84d5b359f47af26c5290d44c1946a10dfc421386cf6"
+    },
+    {
       "path": "tests/release/test_windows_first_run.py",
       "bytes": 15131,
       "sha256": "a17f31a687f422323958adc8eb8cc2001f388e2217a8acf304c160224a005c56"
@@ -1565,7 +1570,7 @@
       "sha256": "545c3b65d1784ad68e6d25b189c0ff5531c3746c77075d35fa976cd94b0ca27a"
     }
   ],
-  "fileCount": 311,
-  "totalBytes": 8338446,
-  "recordedAtUTC": "2026-10-08T21:26:57.183218+00:00"
+  "fileCount": 312,
+  "totalBytes": 8344005,
+  "recordedAtUTC": "2026-10-09T00:28:01.362693+00:00"
 }

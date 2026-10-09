@@ -12,11 +12,11 @@ function inside(root, file) {
   const part = relative(resolve(root), resolve(file));
   return part !== '' && !part.startsWith('..') && !isAbsolute(part);
 }
-function installedFile(root, value) {
+function installedFile(root, value, canonicalRoot = realpathSync(root)) {
   if (typeof value !== 'string' || !value || /[\\:]/.test(value) || value.split('/').includes('..') || isAbsolute(value))
     throw Error('Invalid relative bundle path');
   const file = resolve(root, value);
-  if (!inside(root, file) || !inside(realpathSync(root), realpathSync(file)) || lstatSync(file).isSymbolicLink())
+  if (!inside(root, file) || !inside(canonicalRoot, realpathSync(file)) || lstatSync(file).isSymbolicLink())
     throw Error('Bundle file escapes installed application');
   return file;
 }
@@ -27,6 +27,8 @@ const canonical = value => JSON.stringify(ordered(value)).replace(/[\u007f-\ufff
 
 export function requireDesktopReady(root) {
   try {
+    // Retain the supplied root: each file must still resolve through its live alias.
+    const canonicalRoot = realpathSync(root);
     const bundleFile = join(root, 'windows-bundle.json');
     const modelFile = join(root, 'assets/models/manifest-release-v1.json');
     const bundle = read(bundleFile), models = read(modelFile);
@@ -43,7 +45,7 @@ export function requireDesktopReady(root) {
     if (!Array.isArray(bundle.files) || !bundle.files.length || bundle.files.length > 100000)
       throw Error('Missing bundle inventory');
     for (const row of bundle.files) {
-      installedFile(root, row.path);
+      installedFile(root, row.path, canonicalRoot);
       if (windowsPaths.has(row.path.toLowerCase()) || !Number.isSafeInteger(row.bytes) || row.bytes < 0 || !/^[a-f0-9]{64}$/.test(row.sha256))
         throw Error('Invalid bundle inventory');
       windowsPaths.add(row.path.toLowerCase());
@@ -60,7 +62,7 @@ export function requireDesktopReady(root) {
       throw Error('Incomplete ready receipt');
     for (const row of state.files) {
       if (row.sha256 !== expected.get(row.path)) throw Error('Changed ready checksum binding');
-      const info = statSync(installedFile(root, row.path), { bigint: true });
+      const info = statSync(installedFile(root, row.path, canonicalRoot), { bigint: true });
       // Windows CPython st_ctime is creation time; Node exposes it as birthtime.
       const ctime = process.platform === 'win32' ? info.birthtimeNs : info.ctimeNs;
       if (!info.isFile() || row.sizeBytes !== Number(info.size) || row.ctimeNs !== ctime.toString() ||

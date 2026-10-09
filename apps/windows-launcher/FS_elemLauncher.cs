@@ -14,8 +14,8 @@ using System.Windows.Forms;
 using Microsoft.Win32.SafeHandles;
 
 [assembly: AssemblyTitle("FS_elem")]
-[assembly: AssemblyVersion("0.2.2.0")]
-[assembly: AssemblyFileVersion("0.2.2.0")]
+[assembly: AssemblyVersion("0.2.3.0")]
+[assembly: AssemblyFileVersion("0.2.3.0")]
 
 internal static class Program
 {

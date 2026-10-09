@@ -195,7 +195,7 @@ def assemble(args):
                      for name, path in [("node", args.node_zip), ("science", args.science_zip), ("pose", args.pose_zip)]]})
     files = inventory(app)
     write_json(app / "windows-bundle.json", {
-        "schemaVersion": 1, "packageVersion": "0.2.2", "platformId": "windows-x64",
+        "schemaVersion": 1, "packageVersion": "0.2.3", "platformId": "windows-x64",
         "nativeProfileSha256": profile_sha,
         "node": {"path": ".runtime/node/node.exe", "version": args.node_version},
         "interpreters": {"science": ".runtime/venv-science/Scripts/python.exe",

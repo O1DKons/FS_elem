@@ -216,15 +216,15 @@ try{
  $out=Join-Path $WorkRoot 'artifacts'
  New-Item -ItemType Directory -Path $out|Out-Null
  Invoke-Tool 'compile-installer' $iscc @('/Q',"/DPayloadDir=$payload","/DOutputDir=$out",(Join-Path $PackageRoot 'packaging\windows\FS_elem.iss'))
- $installer=Join-Path $out 'FS_elem-Setup-0.2.2-x64.exe'
+ $installer=Join-Path $out 'FS_elem-Setup-0.2.3-x64.exe'
  if(-not(Test-Path -LiteralPath $installer)){throw 'Installer artifact missing'}
  $hash=(Get-FileHash -LiteralPath $installer -Algorithm SHA256).Hash.ToLowerInvariant()
- [IO.File]::WriteAllText((Join-Path $out 'SHA256SUMS.txt'),"$hash  FS_elem-Setup-0.2.2-x64.exe"+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
+ [IO.File]::WriteAllText((Join-Path $out 'SHA256SUMS.txt'),"$hash  FS_elem-Setup-0.2.3-x64.exe"+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
  if($NativeCheck){
   Invoke-Tool 'native-installer-check' (Join-Path $PSHOME 'pwsh.exe') @('-NoProfile','-File',(Join-Path $PackageRoot 'scripts\check-windows-installer.ps1'),'-Installer',$installer,'-WorkRoot',$WorkRoot,'-Logs',$logs)
  }
  Write-Json (Join-Path $WorkRoot 'build-summary.json') @{
-  status='built';version='0.2.2';installer=$installer;installerBytes=(Get-Item -LiteralPath $installer).Length;
+  status='built';version='0.2.3';installer=$installer;installerBytes=(Get-Item -LiteralPath $installer).Length;
   installerSha256=$hash;startedUTC=$started.ToString('o');terminalUTC=[DateTime]::UtcNow.ToString('o');
   commands=$commands;NN=0;nativeCheckRequested=[bool]$NativeCheck
  }

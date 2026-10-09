@@ -30,12 +30,23 @@ def read_json(path):
     return json.loads(body)
 
 
-def relative_file(root, path):
+def relative_file(root, path, canonical_root=None):
     if not isinstance(path, str) or '\\' in path or ':' in path:
         raise setup.SetupError('Invalid relative bundle path')
     if Path(path).as_posix() != path or (Path(root) / path).is_symlink():
         raise setup.SetupError('Noncanonical or linked bundle path')
-    return setup.safe_path(root, path)
+    if canonical_root is None:
+        return setup.safe_path(root, path)
+    relative = Path(path)
+    if relative.is_absolute() or '..' in relative.parts or not relative.parts:
+        raise setup.SetupError('Path must be relative to the release directory')
+    # Resolve through the supplied root again to detect replacement of its alias.
+    result = (Path(root) / relative).resolve()
+    try:
+        result.relative_to(canonical_root)
+    except ValueError:
+        raise setup.SetupError('Path resolves outside the release directory') from None
+    return result
 
 
 def fingerprint(path):
@@ -48,7 +59,7 @@ def fingerprint(path):
                 mtimeNs=str(state.st_mtime_ns), ctimeNs=str(state.st_ctime_ns))
 
 
-def binding(root):
+def binding(root, canonical_root=None):
     bundle = read_json(root / BUNDLE)
     manifest = setup.select_profile(setup.read_manifest(root))
     if (manifest['_platformId'] != 'windows-x64' or bundle.get('schemaVersion') != 1
@@ -66,7 +77,7 @@ def binding(root):
     windows_paths = set()
     for row in rows:
         path = row.get('path')
-        relative_file(root, path)
+        relative_file(root, path, canonical_root)
         if path.casefold() in windows_paths or path in (BUNDLE, RECEIPT):
             raise setup.SetupError('Duplicate or dynamic bundle inventory path')
         windows_paths.add(path.casefold())
@@ -90,9 +101,10 @@ def binding(root):
 
 
 def cached_ready(root):
-    root = Path(root).resolve()
+    root = Path(root).absolute()
+    canonical_root = root.resolve()
     try:
-        bundle, manifest, expected = binding(root)
+        bundle, manifest, expected = binding(root, canonical_root)
         state = read_json(root / RECEIPT)
         if (state.get('schemaVersion') != 1 or state.get('status') != 'complete'
                 or state.get('bundleSha256') != setup.sha256(root / BUNDLE)
@@ -105,7 +117,7 @@ def cached_ready(root):
         for row in rows:
             if row.get('sha256') != expected[row['path']]:
                 return False
-            current = fingerprint(relative_file(root, row['path']))
+            current = fingerprint(relative_file(root, row['path'], canonical_root))
             if any(row.get(k) != value for k, value in current.items()):
                 return False
         return state
@@ -130,9 +142,10 @@ def publish_receipt(root, value):
 
 
 def bootstrap(root, emit):
-    root = Path(root).resolve()
+    supplied_root = Path(root).absolute()
+    root = supplied_root.resolve()
     emit(dict(type='progress', stage='verify', message='Проверка компонентов'))
-    if cached_ready(root):
+    if cached_ready(supplied_root):
         emit(dict(type='ready', stage='complete', cached=True, message='Готово'))
         return dict(cached=True)
     # Only this bootstrap-owned receipt is invalidated; user jobs and verified models remain.
