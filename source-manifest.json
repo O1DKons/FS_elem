@@ -947,7 +947,7 @@
     {
       "path": "configs/mac-offline-ci-host-template.json",
       "bytes": 10529,
-      "sha256": "537952dedcce204c362eedab24af158db4a11a01eae085a70db6b759b0ba84df"
+      "sha256": "fe7c4c8c0635228a781e49b41c88d95e6a00b115cfa99d3f8661783cd9ebee5c"
     },
     {
       "path": "configs/mac-recipe-binding.json",
@@ -1566,8 +1566,8 @@
     },
     {
       "path": "tests/release/LauncherContractTests.swift",
-      "bytes": 5703,
-      "sha256": "d6dc6b948e472b091c6f1a9458c92c0201b6356a71c30bccd689f04495e10d78"
+      "bytes": 5745,
+      "sha256": "23aafc2779b3665f22f45765fe1f83db5359b0a0fd503f78de10f5514055e418"
     },
     {
       "path": "tests/release/api-cooperative-grace.test.mjs",
@@ -1601,8 +1601,8 @@
     },
     {
       "path": "tests/release/macos-swift-test-runner/main.swift",
-      "bytes": 1291,
-      "sha256": "e59c334d417178fb00c2aa833252c1c0085f13ccf30b3ec81e976692616689cc"
+      "bytes": 1771,
+      "sha256": "25356b8cc5df3321d9a62f3bc33d3520cef3042f05947ebcc383f40a6ba75ae4"
     },
     {
       "path": "tests/release/owned-web-worker.test.mjs",
@@ -1751,11 +1751,11 @@
     }
   ],
   "fileCount": 348,
-  "totalBytes": 8846165,
+  "totalBytes": 8846687,
   "recordedAtUTC": "2026-10-12T21:33:10.792183+00:00",
   "sourceUpstreamONNXIncluded": false,
   "installerUpstreamONNXBundlingAuthorized": true,
   "privateDataIncluded": false,
-  "sourceCorrection": "Add genuine selected XCTest Swift overlay import for unchanged seven fixtures",
+  "sourceCorrection": "Genuine native Apple XCTest runner, same seven bodies with ObjC discovery signatures and exact no-failure/no-skip gates",
   "consumerSigningAccepted": false
 }

@@ -181,13 +181,13 @@
     },
     {
       "path": "tests/release/LauncherContractTests.swift",
-      "bytes": 5703,
-      "sha256": "d6dc6b948e472b091c6f1a9458c92c0201b6356a71c30bccd689f04495e10d78"
+      "bytes": 5745,
+      "sha256": "23aafc2779b3665f22f45765fe1f83db5359b0a0fd503f78de10f5514055e418"
     },
     {
       "path": "tests/release/macos-swift-test-runner/main.swift",
-      "bytes": 1291,
-      "sha256": "e59c334d417178fb00c2aa833252c1c0085f13ccf30b3ec81e976692616689cc"
+      "bytes": 1771,
+      "sha256": "25356b8cc5df3321d9a62f3bc33d3520cef3042f05947ebcc383f40a6ba75ae4"
     },
     {
       "path": "scripts/run-macos-offline-ci-host.py",

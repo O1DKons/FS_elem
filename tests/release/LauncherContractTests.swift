@@ -5,7 +5,7 @@ import Foundation
 import Darwin
 
 final class LauncherContractTests: XCTestCase {
-    func testPrivateWritableShutdownHasRetainedWaitAndBothEOF() throws {
+    @objc func testPrivateWritableShutdownHasRetainedWaitAndBothEOF() throws {
         let folder = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: folder.appendingPathComponent("scripts"),
                                                withIntermediateDirectories: true)
@@ -31,7 +31,7 @@ final class LauncherContractTests: XCTestCase {
         wait(for: [completion], timeout: 15)
     }
 
-    func testMalformedFrameDrainsLaterOutputToPhysicalEOF() throws {
+    @objc func testMalformedFrameDrainsLaterOutputToPhysicalEOF() throws {
         let folder = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: folder.appendingPathComponent("scripts"),
                                                withIntermediateDirectories: true)
@@ -62,7 +62,7 @@ final class LauncherContractTests: XCTestCase {
         wait(for: [completion], timeout: 15)
     }
 
-    func testOldGenerationCannotEnableBrowserAfterRetry() {
+    @objc func testOldGenerationCannotEnableBrowserAfterRetry() {
         var gate = LauncherGate()
         let old = UUID(), current = UUID()
         XCTAssertTrue(gate.begin(old))
@@ -72,7 +72,7 @@ final class LauncherContractTests: XCTestCase {
         XCTAssertFalse(gate.accepts(old))
         XCTAssertTrue(gate.accepts(current))
     }
-    func testStoppedMessageCannotReplaceWaitAndBothEOF() {
+    @objc func testStoppedMessageCannotReplaceWaitAndBothEOF() {
         var gate = LauncherGate(); let id = UUID()
         XCTAssertTrue(gate.begin(id)); gate.stop()
         XCTAssertFalse(gate.finish(id, proof: ClosureProof(waited: true, stdoutEOF: true,
@@ -80,13 +80,13 @@ final class LauncherContractTests: XCTestCase {
         XCTAssertFalse(gate.begin(UUID()))
         XCTAssertFalse(gate.accepts(id))
     }
-    func testRetainedWaitWithoutGroupDisappearanceBlocksRetry() {
+    @objc func testRetainedWaitWithoutGroupDisappearanceBlocksRetry() {
         var gate = LauncherGate(); let id = UUID(); XCTAssertTrue(gate.begin(id))
         XCTAssertFalse(gate.finish(id, proof: ClosureProof(waited: true, stdoutEOF: true,
                                                          stderrEOF: true, groupGone: false)))
         XCTAssertFalse(gate.closed)
     }
-    func testExternalOrCredentialedURLCannotEnableOpenButton() {
+    @objc func testExternalOrCredentialedURLCannotEnableOpenButton() {
         for url in ["https://127.0.0.1:5174/analysis", "http://example.com:5174/analysis",
                     "http://user@127.0.0.1:5174/analysis", "http://127.0.0.1:5174/analysis?x=1",
                     "http://127.0.0.1:5174/other"] {
@@ -94,7 +94,7 @@ final class LauncherContractTests: XCTestCase {
             XCTAssertThrowsError(try EventDecoder.decode(bytes))
         }
     }
-    func testMalformedProgressAndOversizedFramesFailClosed() {
+    @objc func testMalformedProgressAndOversizedFramesFailClosed() {
         let bytes = try! JSONSerialization.data(withJSONObject: ["type": "progress", "bytes": 101, "total": 100])
         XCTAssertThrowsError(try EventDecoder.decode(bytes))
         XCTAssertThrowsError(try EventDecoder.decode(Data(repeating: 32, count: EventDecoder.frameLimit + 1)))
