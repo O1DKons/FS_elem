@@ -2,6 +2,7 @@
 import XCTest
 import Foundation
 import Darwin
+import Dispatch
 
 let expectedNames: Set<String> = [
     "testPrivateWritableShutdownHasRetainedWaitAndBothEOF",
@@ -27,14 +28,18 @@ final class RunObserver: NSObject, XCTestObservation {
         print("Test Case '\(testCase.name)' passed")
     }
 }
-let observer = RunObserver()
-XCTestObservationCenter.shared.addTestObserver(observer)
-let suite = XCTestSuite(forTestCaseClass: LauncherContractTests.self)
-suite.run()
-XCTestObservationCenter.shared.removeTestObserver(observer)
-guard let run = suite.testRun else { exit(1) }
-print("Executed \(run.executionCount) tests, with \(run.failureCount) failures")
-guard expectedNames.count == 7, run.executionCount == 7,
-      run.failureCount == 0, run.skipCount == 0, run.hasSucceeded,
-      !observer.invalid, observer.completed == expectedNames else { exit(1) }
-exit(0)
+let suiteTask = DispatchWorkItem {
+    let observer = RunObserver()
+    XCTestObservationCenter.shared.addTestObserver(observer)
+    let suite = XCTestSuite(forTestCaseClass: LauncherContractTests.self)
+    suite.run()
+    XCTestObservationCenter.shared.removeTestObserver(observer)
+    guard let run = suite.testRun else { exit(1) }
+    print("Executed \(run.executionCount) tests, with \(run.failureCount) failures")
+    guard expectedNames.count == 7, run.executionCount == 7,
+          run.failureCount == 0, run.skipCount == 0, run.hasSucceeded,
+          !observer.invalid, observer.completed == expectedNames else { exit(1) }
+    exit(0)
+}
+DispatchQueue.global(qos: .userInitiated).async(execute: suiteTask)
+dispatchMain()
