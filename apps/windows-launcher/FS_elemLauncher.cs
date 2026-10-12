@@ -507,13 +507,13 @@ internal sealed class WindowsChild : IDisposable
         IntPtr handle = process;
         if (handle == IntPtr.Zero) return false;
         var elapsed = Stopwatch.StartNew();
-        uint result = await Task.Run(() => Native.WaitForSingleObject(handle, timeout));
+        uint result = await Task.Run(() => Native.WaitForSingleObject(handle, timeout)).ConfigureAwait(false);
         if (result != 0) return false;
         // A failed reader is closed, but is never reported as successful output.
         int remaining = Math.Max(0, (int)timeout - (int)elapsed.ElapsedMilliseconds);
-        if (await Task.WhenAny(reader, Task.Delay(remaining)) != reader) return false;
+        if (await Task.WhenAny(reader, Task.Delay(remaining)).ConfigureAwait(false) != reader) return false;
         remaining = Math.Max(0, (int)timeout - (int)elapsed.ElapsedMilliseconds);
-        if (await Task.WhenAny(Completion, Task.Delay(remaining)) != Completion) return false;
+        if (await Task.WhenAny(Completion, Task.Delay(remaining)).ConfigureAwait(false) != Completion) return false;
         if (reader.IsFaulted) {var observed = reader.Exception;}
         if (Completion.IsFaulted) {var observed = Completion.Exception;}
         stopped = true;

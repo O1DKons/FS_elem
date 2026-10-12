@@ -851,8 +851,8 @@
     },
     {
       "path": "apps/windows-launcher/FS_elemLauncher.cs",
-      "bytes": 32680,
-      "sha256": "ed924afdf45719d2115f644b786caae32decd3a73da9e76cb4dfd157d541eb40"
+      "bytes": 32746,
+      "sha256": "05f9b333faa487a7aa184d5c94df64945f08afe594dfd72590378030e93f9b79"
     },
     {
       "path": "assets/models/family.joblib",
@@ -1181,8 +1181,8 @@
     },
     {
       "path": "scripts/build-windows-installer.ps1",
-      "bytes": 18136,
-      "sha256": "ccbed8220156d3d328066eb443483a7efd093216fbf576946d306c4f377f36ee"
+      "bytes": 18148,
+      "sha256": "48015412423e25ac48639ff8960de4cb97ff66968c514ac35b78d0a57fe98413"
     },
     {
       "path": "scripts/build.mjs",
@@ -1556,8 +1556,8 @@
     },
     {
       "path": "tests/windows-launcher/LauncherTests.cs",
-      "bytes": 5315,
-      "sha256": "2484ae75e82953dbfb7da15c3a61d6c2099f806e227697428f4c7c49a2794a78"
+      "bytes": 10069,
+      "sha256": "694a1d5ea3e2243d59fc185bad2a8784dffcc7c0279fde94f3a6aec2966bbb9f"
     },
     {
       "path": "tools/release/windows-smoke/admission-template.json",
@@ -1611,9 +1611,10 @@
     }
   ],
   "fileCount": 320,
-  "totalBytes": 8448993,
-  "recordedAtUTC": "2026-10-12T12:43:24.325913+00:00",
+  "totalBytes": 8453825,
+  "recordedAtUTC": "2026-10-12T14:04:30.082701+00:00",
   "sourceUpstreamONNXIncluded": false,
   "installerUpstreamONNXBundlingAuthorized": true,
-  "privateDataIncluded": false
+  "privateDataIncluded": false,
+  "sourceCorrection": "CI1 launcher fixture STA/native-handle continuation scheduling; boundedtest watchdog; nativeacceptance pending"
 }

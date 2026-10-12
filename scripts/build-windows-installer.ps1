@@ -173,7 +173,7 @@ try{
  Invoke-Tool 'compile-launcher' $csc (@('/nologo','/utf8output','/codepage:65001','/target:winexe','/platform:x64',"/out:$launcher")+$refs+@($cs))
  $testExe=Join-Path $WorkRoot 'LauncherTests.exe'
  Invoke-Tool 'compile-launcher-tests' $csc (@('/nologo','/utf8output','/codepage:65001','/target:exe','/platform:x64','/main:LauncherTests',"/out:$testExe")+$refs+@($cs,(Join-Path $PackageRoot 'tests\windows-launcher\LauncherTests.cs')))
- Invoke-Tool 'launcher-protocol-tests' $testExe @()
+ Invoke-Tool 'launcher-protocol-tests' $testExe @('--watchdog')
  Invoke-Tool 'assembly-tests' $SciencePython @('-I','-B',(Join-Path $PackageRoot 'tests\release\test_windows_bundle_assembly.py'))
  Invoke-Tool 'offline-model-assembly-tests' $SciencePython @('-I','-B',(Join-Path $PackageRoot 'tests\release\test_windows_offline_models.py'))
  $payload=Join-Path $WorkRoot 'payload'
