@@ -10,8 +10,9 @@ const media = new Set([
   'grant-demo/screenshots/timeline-2a.png'
 ]);
 const models = new Set(['assets/models/flight.joblib', 'assets/models/family.joblib', 'assets/models/nominal.joblib']);
-// Installed upstream checkpoints are runtime inputs; archive only manifest rows.
-// The row admission below still rejects listing any ONNX in the public payload.
+// This verifies the public SOURCE checkout, not the installed offline bundle.
+// Build-host acquisition embeds both manifest-pinned ONNX files in Setup.exe;
+// installed admission is the complete windows-bundle.json inventory.
 const ignored = p => ['assets/models/yolox.onnx', 'assets/models/rtmw.onnx'].includes(p) ||
   p.split('/').some(v => ['.git', 'node_modules', '__pycache__'].includes(v)) ||
   p.startsWith('.runtime/') || p.startsWith('dist/') || p.startsWith('phase-cache/') ||

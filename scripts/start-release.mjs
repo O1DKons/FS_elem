@@ -11,6 +11,27 @@ import {requireDesktopReady, prepareDesktopConfig, attachDesktopControl} from '.
 const children = [];
 let stopping = false;
 let desktop = false;
+let firstFailure = null;
+function reportFailure(error) {
+  if (firstFailure) return;
+  firstFailure = error;
+  if (desktop) console.log(JSON.stringify({type: 'error', stage: 'start', message: error.message, details: error.details}));
+  console.error(error.message);
+}
+function serviceDiagnostic(child, service) {
+  let tail = '';
+  child.stderr?.setEncoding('utf8');
+  child.stderr?.on('data', text => {
+    tail = (tail + text).slice(-4096);
+    process.stderr.write(text); // Preserve the raw stderr log as well as a bounded cause.
+  });
+  return (reason, details = {}) => {
+    const stderrTail = tail.slice(-2048).trim();
+    const error = Error(service + ': ' + reason + (stderrTail ? '\n' + stderrTail : ''));
+    error.details = {service, pid: child.pid ?? null, ...details, stderrTail};
+    return error;
+  };
+}
 async function stop(code = 0) {
   if (stopping) return;
   stopping = true;
@@ -24,25 +45,29 @@ async function stop(code = 0) {
 }
 process.on('SIGINT', () => stop());
 process.on('SIGTERM', () => stop());
-function ready(child, subscribe, accept) {
+function ready(child, subscribe, accept, diagnostic) {
   return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(Error('Service readiness timed out')), 15000);
-    const fail = () => {clearTimeout(timer); reject(Error('Service failed to start'));};
-    child.once('error', fail);
-    child.once('exit', fail);
+    let settled = false;
+    const cleanup = () => {clearTimeout(timer);child.off('error', failedSpawn);child.off('exit', failedExit);};
+    const fail = error => {if (settled) return;settled = true;cleanup();reject(error);};
+    const failedSpawn = error => fail(diagnostic('spawn failed: ' + error.message, {spawnCode: error.code ?? null}));
+    const failedExit = (code, signal) => fail(diagnostic('exited before ready (code=' + code + ', signal=' + signal + ')', {exitCode: code, signal}));
+    const timer = setTimeout(() => fail(diagnostic('readiness timed out after 15000 ms')), 15000);
+    child.once('error', failedSpawn);
+    child.once('exit', failedExit);
     subscribe(value => {
+      if (settled) return;
       try {
         if (!accept(value)) return;
-        clearTimeout(timer);
-        child.off('error', fail);child.off('exit', fail);
+        settled = true;cleanup();
         resolve();
-      } catch (error) {clearTimeout(timer);reject(error);}
+      } catch (error) {fail(error);}
     });
   });
 }
-function watch(child) {
-  child.on('exit', () => {
-    if (!stopping) {console.error('Один из сервисов остановился.');stop(1);}
+function watch(child, diagnostic) {
+  child.on('exit', (code, signal) => {
+    if (!stopping) {reportFailure(diagnostic('stopped unexpectedly (code=' + code + ', signal=' + signal + ')', {exitCode: code, signal}));stop(1);}
   });
 }
 
@@ -97,22 +122,24 @@ try {
   const analysis = spawn(python, [join(projectRoot, 'services/analysis/server.py'), '--port', String(config.analysisPort),
     '--config', recipe, '--jobs', desktop ? config.jobsDir : join(projectRoot, '.runtime/jobs'),
     '--max-wall-seconds', String(maxWallSeconds)],
-    {cwd: projectRoot, stdio: ['pipe', 'pipe', 'inherit'], windowsHide: true,
+    {cwd: projectRoot, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true,
       env: {...process.env, FS_ELEM_CONTROL_STDIN: '1', PYTHONIOENCODING: 'utf-8', PYTHONUTF8: '1'}});
   children.push({child: analysis, channel: 'stdin'});
+  const analysisDiagnostic = serviceDiagnostic(analysis, 'analysis API');
   const lines = createInterface({input: analysis.stdout});
   if (desktop) lines.on('line', line => console.log(line));
   await ready(analysis, listener => lines.on('line', listener), line => {
     try { return JSON.parse(line).port === config.analysisPort; }
     catch (error) { if (desktop) return false; throw error; }
-  });
+  }, analysisDiagnostic);
   if (stopping) throw Error('Desktop startup cancelled');
-  watch(analysis);
+  watch(analysis, analysisDiagnostic);
   const web = spawn(process.execPath, [join(projectRoot, 'scripts/release-owned-web-worker.mjs'), configFile],
-    {cwd: join(projectRoot, 'apps/web'), stdio: ['ignore', 'inherit', 'inherit', 'ipc'], windowsHide: true});
+    {cwd: join(projectRoot, 'apps/web'), stdio: ['ignore', 'inherit', 'pipe', 'ipc'], windowsHide: true});
   children.push({child: web, channel: 'ipc'});
-  await ready(web, listener => web.on('message', listener), message => message?.ready === true);
-  watch(web);
+  const webDiagnostic = serviceDiagnostic(web, 'web UI');
+  await ready(web, listener => web.on('message', listener), message => message?.ready === true, webDiagnostic);
+  watch(web, webDiagnostic);
   if (stopping) throw Error('Desktop startup cancelled');
   if (desktop) console.log(JSON.stringify({type: 'ready', url: `http://${config.host}:${config.port}/analysis`, profile}));
   else {
@@ -126,7 +153,6 @@ try {
     if (opened.error || opened.status !== 0) console.error('Откройте адрес выше в браузере.');
   }
 } catch (error) {
-  if (desktop) console.log(JSON.stringify({type: 'error', stage: 'start', message: error.message}));
-  console.error(error.message);
+  reportFailure(error);
   await stop(1);
 }

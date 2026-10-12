@@ -22,6 +22,22 @@ internal static class LauncherTests
             if (!value) throw new Exception(message);
             cases++;
         };
+        var diagnostic = new LauncherDiagnostics();
+        diagnostic.RecordFailure("First startup cause");
+        diagnostic.RecordFailure("Later cleanup failure");
+        check(diagnostic.FirstFailure == "First startup cause", "first startup cause survives cleanup failure");
+        for (int i = 0; i < 100; i++) diagnostic.RecordOutput("tail-" + i + new string('x', 1024));
+        check(diagnostic.Tail.Length <= 8192 && diagnostic.Tail.Contains("tail-99") && !diagnostic.Tail.Contains("tail-0"), "bounded tail retains newest actual output");
+        check(LauncherDiagnostics.StartupFailure(true, 7).Contains("7"), "desktop exit code remains visible");
+        check(LauncherDiagnostics.StartupFailure(false, null).Contains("60"), "readiness deadline distinguished from exit");
+        using (var failedForm = new LauncherForm())
+        {
+            var output = typeof(LauncherForm).GetMethod("Output", BindingFlags.Instance | BindingFlags.NonPublic);
+            output.Invoke(failedForm, new object[] {"{\"type\":\"error\",\"message\":\"Fast child first cause\"}"});
+            output.Invoke(failedForm, new object[] {"{\"type\":\"error\",\"message\":\"Later child cause\"}"});
+            var captured = (LauncherDiagnostics)typeof(LauncherForm).GetField("diagnostics", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(failedForm);
+            check(captured.FirstFailure == "Fast child first cause", "reader captures first cause without a UI-dispatch turn");
+        }
         check(WindowsChild.Quote("") == "\"\"", "empty argument");
         check(WindowsChild.Quote("a & b") == "\"a & b\"", "shell metacharacters stay one argument");
         check(WindowsChild.Quote("a\"b") == "\"a\\\"b\"", "embedded quote");

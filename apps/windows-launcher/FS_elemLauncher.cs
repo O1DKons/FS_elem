@@ -14,8 +14,8 @@ using System.Windows.Forms;
 using Microsoft.Win32.SafeHandles;
 
 [assembly: AssemblyTitle("FS_elem")]
-[assembly: AssemblyVersion("0.2.4.0")]
-[assembly: AssemblyFileVersion("0.2.4.0")]
+[assembly: AssemblyVersion("0.2.5.0")]
+[assembly: AssemblyFileVersion("0.2.5.0")]
 
 internal static class Program
 {
@@ -60,31 +60,47 @@ internal sealed class LauncherForm : Form
     private bool mayClose;
     private bool busy;
     private string url;
-    private string error;
+    private volatile string error;
+    private LauncherDiagnostics diagnostics = new LauncherDiagnostics();
+    private readonly Button openLog = new Button();
     private TaskCompletionSource<bool> nodeReady;
     private Task<bool> ownedStop;
 
     public LauncherForm()
     {
         Text = "FS_elem";
-        ClientSize = new Size(510, 230);
+        ClientSize = new Size(600, 310);
         Font = new Font("Segoe UI", 10);
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MaximizeBox = false;
         StartPosition = FormStartPosition.CenterScreen;
         title.SetBounds(24, 20, 462, 35);
         title.Font = new Font("Segoe UI", 17, FontStyle.Bold);
-        title.Text = "FS_elem";
-        status.SetBounds(24, 67, 462, 67);
+        title.Text = "FS_elem " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+        status.SetBounds(24, 67, 550, 145);
         status.Text = "Подготовка приложения…";
-        progress.SetBounds(24, 140, 462, 20);
+        progress.SetBounds(24, 215, 550, 20);
         progress.Style = ProgressBarStyle.Marquee;
-        action.SetBounds(24, 182, 260, 32);
+        action.SetBounds(24, 258, 180, 32);
         action.Text = "Подготовка…";
         action.Enabled = false;
-        close.SetBounds(326, 182, 160, 32);
+        openLog.SetBounds(214, 258, 170, 32);
+        openLog.Text = "Открыть журнал";
+        openLog.Enabled = false;
+        openLog.Click += (sender, args) => {
+            string path = Path.Combine(state, "logs", "launcher.log");
+            try {
+                if (File.Exists(path)) Process.Start(new ProcessStartInfo(Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.System), "notepad.exe"),
+                    WindowsChild.Quote(path)) {UseShellExecute = true});
+            } catch (Exception ex) {
+                status.Text = "Не удалось открыть журнал. Файл: " + path;
+                Log("Opening local log failed: " + ex.Message);
+            }
+        };
+        close.SetBounds(404, 258, 170, 32);
         close.Text = "Завершить";
-        Controls.AddRange(new Control[] {title, status, progress, action, close});
+        Controls.AddRange(new Control[] {title, status, progress, action, openLog, close});
         state = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FS_elem");
         action.Click += async (sender, args) => {
             if (url != null) OpenApplication();
@@ -124,9 +140,28 @@ internal sealed class LauncherForm : Form
         Directory.CreateDirectory(Path.Combine(state, "logs"));
         if (log == null)
         {
-            log = new StreamWriter(Path.Combine(state, "logs", "launcher.log"), false, new UTF8Encoding(false));
+            string path = Path.Combine(state, "logs", "launcher.log");
+            if (File.Exists(path))
+            {
+                // Retain a bounded previous-session tail before opening a new log.
+                using (var previous = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    int size = (int)Math.Min(previous.Length, 65536);
+                    byte[] bytes = new byte[size];
+                    previous.Seek(-size, SeekOrigin.End);
+                    int count = 0, read;
+                    while (count < size && (read = previous.Read(bytes, count, size - count)) > 0) count += read;
+                    File.WriteAllText(Path.Combine(state, "logs", "launcher.previous.log"),
+                        Encoding.UTF8.GetString(bytes, 0, count), new UTF8Encoding(false));
+                }
+            }
+            log = new StreamWriter(path, false, new UTF8Encoding(false));
             log.AutoFlush = true;
+            loggedBytes = 0;
+            logTruncated = false;
         }
+        openLog.Enabled = true;
+        Log("{\"type\":\"launcher-attempt\",\"stage\":\"bootstrap\"}");
         foreach (string name in new[] {"PYTHONHOME", "PYTHONPATH", "VIRTUAL_ENV", "NODE_OPTIONS"})
             Environment.SetEnvironmentVariable(name, null);
         Environment.SetEnvironmentVariable("PYTHONIOENCODING", "utf-8");
@@ -185,6 +220,14 @@ internal sealed class LauncherForm : Form
         lock (logLock)
         {
             if (log == null) return;
+            Dictionary<string, object> entry;
+            var encoder = new JavaScriptSerializer();
+            try {entry = encoder.Deserialize<Dictionary<string, object>>(line);}
+            catch (Exception) {entry = null;}
+            if (entry == null) entry = new Dictionary<string, object> {{"type", "diagnostic"}, {"message", line}};
+            entry["utc"] = DateTime.UtcNow.ToString("o");
+            entry["launcherVersion"] = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            line = encoder.Serialize(entry);
             int bytes = Encoding.UTF8.GetByteCount(line) + 1;
             if (loggedBytes + bytes > 262144)
             {
@@ -199,6 +242,7 @@ internal sealed class LauncherForm : Form
 
     private void Output(string line)
     {
+        diagnostics.RecordOutput(line);
         Log(line);
         Dictionary<string, object> message;
         try {message = json.Deserialize<Dictionary<string, object>>(line.TrimStart('\uFEFF'));}
@@ -206,17 +250,21 @@ internal sealed class LauncherForm : Form
         if (message == null || !message.ContainsKey("type")) return;
         string type = Convert.ToString(message["type"]);
         string text = message.ContainsKey("message") ? Convert.ToString(message["message"]) : null;
+        // Capture the first cause while draining the pipe, before UI dispatch.
+        // A quickly exiting child must not race the queued BeginInvoke callback.
+        if (type == "error")
+        {
+            diagnostics.RecordFailure(text ?? "Не удалось запустить FS_elem.");
+            error = diagnostics.FirstFailure;
+            var pending = nodeReady;
+            if (pending != null) pending.TrySetException(new IOException(error));
+            return;
+        }
         if (closing || IsDisposed) return;
         try
         {
             BeginInvoke((Action)(() => {
                 if (closing || IsDisposed) return;
-                if (type == "error")
-                {
-                    error = text ?? "Не удалось запустить FS_elem.";
-                    if (nodeReady != null) nodeReady.TrySetException(new IOException(error));
-                    return;
-                }
                 if (type == "progress")
                 {
                     status.Text = text ?? "Подготовка FS_elem…";
@@ -262,6 +310,7 @@ internal sealed class LauncherForm : Form
         busy = true;
         action.Enabled = false;
         error = null;
+        diagnostics = new LauncherDiagnostics();
         url = null;
         progress.Style = ProgressBarStyle.Marquee;
         status.Text = "Проверяем компоненты FS_elem…";
@@ -292,7 +341,7 @@ internal sealed class LauncherForm : Form
             child.Dispose();
             child = null;
             if (closing) return;
-            if (code != 0) throw new IOException(error ?? "Не удалось подготовить приложение. Проверьте интернет и нажмите «Повторить».");
+            if (code != 0) throw new IOException(error ?? "Локальная подготовка приложения завершилась с кодом " + code + ". Откройте журнал; при повреждённых компонентах повторно установите FS_elem.");
             status.Text = "Запускаем интерфейс…";
             nodeReady = new TaskCompletionSource<bool>();
             child = WindowsChild.Start(job, Required(".runtime/node/node.exe"),
@@ -301,7 +350,14 @@ internal sealed class LauncherForm : Form
             var startup = await Task.WhenAny(child.Completion, nodeReady.Task, Task.Delay(60000));
             if (startup != nodeReady.Task)
             {
-                throw new IOException(error ?? "Не удалось запустить интерфейс. Журнал: " + Path.Combine(state, "logs", "launcher.log"));
+                int? exitCode = null;
+                if (startup == child.Completion)
+                {
+                    exitCode = await child.Completion;
+                    Log("{\"type\":\"child-exit\",\"role\":\"desktop\",\"pid\":" + child.ProcessId + ",\"exitCode\":" + exitCode + "}");
+                }
+                else Log("{\"type\":\"startup-timeout\",\"stage\":\"desktop-ready\",\"seconds\":60}");
+                throw new IOException(error ?? LauncherDiagnostics.StartupFailure(startup == child.Completion, exitCode));
             }
             await nodeReady.Task;
             busy = false;
@@ -311,7 +367,19 @@ internal sealed class LauncherForm : Form
             child = null;
             if (!closing) ShowError(error ?? "FS_elem остановился (код " + exit + "). Нажмите «Повторить».");
         }
-        catch (Exception ex) {failure = ex;}
+        catch (Exception ex) {
+            diagnostics.RecordFailure(ex.Message);
+            string evidence = new JavaScriptSerializer().Serialize(new Dictionary<string, object> {{"type", "startup-failure"},
+                {"utc", DateTime.UtcNow.ToString("o")}, {"launcherVersion", System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()},
+                {"firstCause", diagnostics.FirstFailure}, {"exceptionType", ex.GetType().FullName}, {"tail", diagnostics.Tail}});
+            Log(evidence);
+            try {
+                if (Encoding.UTF8.GetByteCount(evidence) > 65536) throw new IOException("Diagnostic evidence exceeds64KiB");
+                File.WriteAllText(Path.Combine(state, "logs", "startup-failure.json"), evidence, new UTF8Encoding(false));
+            } catch (IOException) {Log("Cannot save separate startup failure evidence.");}
+              catch (UnauthorizedAccessException) {Log("Cannot save separate startup failure evidence.");}
+            failure = new IOException(diagnostics.FirstFailure + "\nЖурнал: " + Path.Combine(state, "logs", "launcher.log"), ex);
+        }
         // The stock Framework compiler is C#5: await must be outside catch.
         if (failure != null)
         {
@@ -340,6 +408,33 @@ internal sealed class LauncherForm : Form
         if (url == null) return;
         try {Process.Start(new ProcessStartInfo(url) {UseShellExecute = true});}
         catch (Exception ex) {status.Text = "Откройте адрес в браузере: " + url + "\n" + ex.Message;}
+    }
+}
+
+internal sealed class LauncherDiagnostics
+{
+    private readonly object gate = new object();
+    private string firstFailure;
+    private string tail = "";
+    internal string FirstFailure {get {lock (gate) return firstFailure;}}
+    internal string Tail {get {lock (gate) return tail;}}
+    internal void RecordFailure(string message)
+    {
+        lock (gate) if (firstFailure == null)
+            firstFailure = message.Length > 1024 ? message.Substring(0, 1024) : message;
+    }
+    internal void RecordOutput(string line)
+    {
+        lock (gate)
+        {
+            tail += line + "\n";
+            if (tail.Length > 8192) tail = tail.Substring(tail.Length - 8192);
+        }
+    }
+    internal static string StartupFailure(bool exited, int? exitCode)
+    {
+        return exited ? "Процесс интерфейса завершился до готовности (код " + exitCode + ")." :
+            "Интерфейс не сообщил готовность за 60 секунд. Подробности сохранены в журнале.";
     }
 }
 

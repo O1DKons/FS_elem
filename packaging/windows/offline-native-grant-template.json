@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "kind": "ROOT_PROSPECTIVE_OFFLINE_NATIVE_ADMISSION_TEMPLATE",
+  "actualAuthorization": false,
+  "scope": "windows-offline-native-check-v025",
+  "allowInstall": true,
+  "allowGUI": true,
+  "allowNN": true,
+  "publicVideo": true,
+  "allowTemporaryFirewallEnable": true,
+  "nativeCheckSha256": "824a69cc1e6e769f42a6578155dfc6c3c080aef57dbed2afec367c7c8fb31dd3",
+  "videoSha256": "b142e4df68b709475cc016c35b67d2a6999afc8c7644b91722093cd2e4355b5d",
+  "videoBytes": 818120,
+  "publicSourceUrl": "https://o1dkons.github.io/FS_elem/grant-demo/media/example-1a.mp4",
+  "maxInferenceSeconds": 120,
+  "wholeSeconds": 150,
+  "cleanupSeconds": 30,
+  "RSSBytes": 4294967296,
+  "newArtifactBytes": 67108864,
+  "retry": 0,
+  "intraOpThreads": 4,
+  "interOpThreads": 1,
+  "modelSha256": {
+    "flight": "9d6ca74b3de38dab1366c55f55b8de0bca6052ce1aa0c7dedd45ae17cf0140e7",
+    "family": "1f696a6ab8a300320b7cdff5875ec22a6206ff32bd731c81db00f905529d5f72",
+    "nominal": "f4c2e2b70400bd161a3c9bed62e5e892d6712134719a647a0dd53877bce792f1",
+    "yolox": "3dea6513388889f0fff4b77bf7a26013600321b9eb9ceb0e9a400a82572f5f23",
+    "rtmw": "bd033156e5104c4f5d2edfe0453e02661e30a2f3da453ec93c8764d561b83054"
+  },
+  "supervisor": {
+    "workSeconds": 600,
+    "wholeSeconds": 630,
+    "cleanupSeconds": 30,
+    "jobPrivateMemoryBytes": 4294967296,
+    "streamBytes": 262144,
+    "qualification": "Hard Job private-commit limit applies only to actual assigned/inherited members. Application RSS/user-artifact checks are sampled; escaped shell-broker descendants require explicit owned cleanup and are not claimed continuously Job-limited."
+  },
+  "qualification": "ONE familiar public functional offline case; no accuracy/generalization/controlled speed gain. Generated installer exact SHA+size and Root-admitted commit/run are bound after build before native execution.",
+  "supervisorSha256": "487a78896fbd2ea3ee2a15b03779a46bba76699d7e721d5b08fa54b14ad3b5ce",
+  "supervisorWholeSeconds": 630,
+  "supervisorWorkSeconds": 600,
+  "supervisorCleanupSeconds": 30,
+  "supervisorJobCommittedBytes": 4294967296,
+  "supervisorSavedOutputBytes": 262144,
+  "allowedHiddenConsoleCount": 1,
+  "allowedHiddenConsoleParentRoles": [
+    "launcher",
+    "desktop-controller",
+    "analysis-backend",
+    "web-worker"
+  ],
+  "rssEnforcement": "sampled-aggregate-rss-and-stop-check"
+}

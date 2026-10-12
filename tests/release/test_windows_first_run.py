@@ -4,8 +4,6 @@ import importlib.util
 import json
 from pathlib import Path
 import sys
-import threading
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import tempfile
 import unittest
 from unittest import mock
@@ -76,7 +74,7 @@ class FirstRunTests(unittest.TestCase):
                       'sha256': digest(self.files['assets/models/model.bin']), 'url': None}
         put('assets/models/manifest-release-v1.json', json.dumps({
             'schemaVersion': 1, 'models': [self.model], 'platforms': {'windows-x64': self.native}}))
-        self.bundle = {'schemaVersion': 1, 'packageVersion': '0.2.4', 'platformId': 'windows-x64',
+        self.bundle = {'schemaVersion': 1, 'packageVersion': '0.2.5', 'offline': True, 'platformId': 'windows-x64',
                        'nativeProfileSha256': self.profile_sha,
                        'node': {'path': '.runtime/node/node.exe', 'version': '24.15.0'},
                        'interpreters': {n: f'.runtime/venv-{n}/Scripts/python.exe' for n in ('science', 'pose')},
@@ -194,62 +192,29 @@ class FirstRunTests(unittest.TestCase):
         self.assertEqual(receipt['status'], 'complete')
         self.assertEqual(receipt['bundleSha256'], digest((self.root / 'windows-bundle.json').read_bytes()))
 
-    def downloadable(self, bodies):
-        calls = {name: 0 for name in bodies}
-
-        class Handler(BaseHTTPRequestHandler):
-            def do_GET(handler):
-                calls[handler.path] += 1
-                good = bodies[handler.path]
-                body = b'bad' if handler.path == '/second' and calls[handler.path] == 1 else good
-                handler.send_response(200)
-                handler.end_headers()
-                handler.wfile.write(body)
-
-            def log_message(handler, *args):
-                pass
-
-        server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
-        thread = threading.Thread(target=server.serve_forever, daemon=True)
-        thread.start()
-        self.addCleanup(thread.join, 2)
-        self.addCleanup(server.server_close)
-        self.addCleanup(server.shutdown)
-        assets = [dict(id=p[1:], path='assets/models/' + p[1:] + '.bin',
-                       sizeBytes=len(body), sha256=digest(body),
-                       url=f'http://127.0.0.1:{server.server_port}{p}') for p, body in bodies.items()]
+    def test_remote_model_missing_from_installer_is_not_downloaded(self):
+        asset = dict(id='absent', path='assets/models/absent.bin', sizeBytes=3,
+                     sha256=digest(b'one'), url='https://example.invalid/absent.bin')
         self.put('assets/models/manifest-release-v1.json', json.dumps({
-            'schemaVersion': 1, 'models': [self.model] + assets,
+            'schemaVersion': 1, 'models': [self.model, asset],
             'platforms': {'windows-x64': self.native}}))
-        self.bundle['files'] = [{'path': p, 'bytes': len(b), 'sha256': digest(b)}
-                                for p, b in self.files.items() if p != 'windows-bundle.json']
+        self.bundle['files'] = [dict(path=p, bytes=len(b), sha256=digest(b))
+                               for p, b in self.files.items() if p != 'windows-bundle.json']
         self.put('windows-bundle.json', json.dumps(self.bundle))
-        return assets, calls
-
-    # Break: failed download publishes corrupt model, or retry discards a verified model.
-    def test_retry_preserves_verified_download_and_reports_actual_bytes(self):
-        assets, calls = self.downloadable({'/first': b'one', '/second': b'two'})
-        with self.assertRaisesRegex(first.setup.SetupError, 'checksum'):
+        with mock.patch.object(first.setup, 'urlopen', side_effect=AssertionError('Network forbidden')), \
+                self.assertRaisesRegex(first.setup.SetupError, 'неполон'):
             first.bootstrap(self.root, self.events.append)
-        self.assertEqual((self.root / assets[0]['path']).read_bytes(), b'one')
-        self.assertFalse((self.root / assets[1]['path']).exists())
-        self.assertFalse((self.root / '.runtime/windows-ready.json').exists())
-        first.bootstrap(self.root, self.events.append)
-        self.assertEqual(calls, {'/first': 1, '/second': 2})
-        self.assertTrue(any(e.get('stage') == 'download' and e.get('bytes') == 3
-                            and e.get('total') == 3 for e in self.events))
-        self.assertFalse(list((self.root / 'assets/models').glob('*.part')))
+        self.assertEqual((self.root / self.model['path']).read_bytes(), b'verified model')
+        self.assertFalse((self.root / asset['path']).exists())
+        self.assertFalse((self.root / first.RECEIPT).exists())
 
-    # Break: an interrupted callback leaves a falsely ready state or a temporary model.
-    def test_interrupted_download_never_publishes_ready(self):
-        assets, calls = self.downloadable({'/first': b'one'})
-        def interrupted(event):
-            if event.get('stage') == 'download' and event.get('bytes', 0):
-                raise InterruptedError('controlled interruption')
-        with self.assertRaises(InterruptedError):
-            first.bootstrap(self.root, interrupted)
-        self.assertFalse((self.root / assets[0]['path']).exists())
-        self.assertFalse((self.root / '.runtime/windows-ready.json').exists())
+    def test_removed_bundled_model_invalidates_ready_without_online_repair(self):
+        first.bootstrap(self.root, self.events.append)
+        (self.root / self.model['path']).unlink()
+        with mock.patch.object(first.setup, 'urlopen', side_effect=AssertionError('Network forbidden')), \
+                self.assertRaisesRegex(first.setup.SetupError, 'Переустановите'):
+            first.bootstrap(self.root, self.events.append)
+        self.assertFalse((self.root / first.RECEIPT).exists())
         self.assertFalse(list((self.root / 'assets/models').glob('*.part')))
 
     def test_node_accepts_python_receipt_then_rejects_mutation(self):

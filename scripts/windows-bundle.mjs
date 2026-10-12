@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, statSync, lstatSync, realpathSync, mkdirSync, writeFileSync } from 'node:fs';
 import { resolve, relative, isAbsolute, dirname, join } from 'node:path';
 import { createInterface } from 'node:readline';
+const VERSION = '0.2.5';
 
 const sha = file => createHash('sha256').update(readFileSync(file)).digest('hex');
 const read = file => {
@@ -38,12 +39,13 @@ export function requireDesktopReady(root) {
     const state = read(join(root, '.runtime/windows-ready.json'));
     const native = models.platforms?.['windows-x64'];
     const nativeSha = createHash('sha256').update(canonical(native)).digest('hex');
-    if (bundle.schemaVersion !== 1 || bundle.packageVersion !== '0.2.4' || bundle.platformId !== 'windows-x64' ||
+    if (bundle.schemaVersion !== 1 || bundle.packageVersion !== VERSION || bundle.offline !== true || bundle.platformId !== 'windows-x64' ||
         native?.status !== 'ready' || bundle.nativeProfileSha256 !== nativeSha || state.schemaVersion !== 1 ||
-        state.status !== 'complete' || state.bundleSha256 !== sha(bundleFile) ||
+        state.status !== 'complete' || state.packageVersion !== VERSION || state.offline !== true || state.bundleSha256 !== sha(bundleFile) ||
         state.modelManifestSha256 !== sha(modelFile) || state.nativeProfileSha256 !== nativeSha)
       throw Error('Desktop bundle/ready binding changed');
     const expected = new Map();
+    const inventoryBytes = new Map();
     const windowsPaths = new Set();
     if (!Array.isArray(bundle.files) || !bundle.files.length || bundle.files.length > 100000)
       throw Error('Missing bundle inventory');
@@ -53,13 +55,15 @@ export function requireDesktopReady(root) {
         throw Error('Invalid bundle inventory');
       windowsPaths.add(row.path.toLowerCase());
       expected.set(row.path, row.sha256);
+      inventoryBytes.set(row.path, row.bytes);
     }
     for (const row of models.models) {
       relativeName(row.path);
       if (windowsPaths.has(row.path.toLowerCase()) && !expected.has(row.path)) throw Error('Duplicate Windows model path');
       windowsPaths.add(row.path.toLowerCase());
-      if (expected.has(row.path) && expected.get(row.path) !== row.sha256) throw Error('Model/bundle checksum mismatch');
-      expected.set(row.path, row.sha256);
+      if (!expected.has(row.path)) throw Error('Offline model missing from installer inventory: ' + row.path);
+      if (expected.get(row.path) !== row.sha256 || inventoryBytes.get(row.path) !== row.sizeBytes)
+        throw Error('Model/bundle size or checksum mismatch: ' + row.path);
     }
     expected.set('assets/models/manifest-release-v1.json', sha(modelFile));
     if (!Array.isArray(state.files) || state.files.length !== expected.size ||

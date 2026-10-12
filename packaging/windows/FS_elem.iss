@@ -4,10 +4,16 @@
 #ifndef OutputDir
   #error OutputDir is required
 #endif
+#ifndef AppVersion
+  #error Root AppVersion binding is required
+#endif
+#if AppVersion != "0.2.5"
+  #error Offline candidate version must be 0.2.5
+#endif
 [Setup]
 AppId={{1253D5F8-57BA-4DEA-A660-E93AD4B94E39}
 AppName=FS_elem
-AppVersion=0.2.4
+AppVersion={#AppVersion}
 AppPublisher=FS_elem
 DefaultDirName={localappdata}\Programs\FS_elem
 DefaultGroupName=FS_elem
@@ -18,9 +24,11 @@ MinVersion=10.0
 DisableProgramGroupPage=yes
 DisableDirPage=auto
 OutputDir={#OutputDir}
-OutputBaseFilename=FS_elem-Setup-0.2.4-x64
+OutputBaseFilename=FS_elem-Setup-{#AppVersion}-x64
 Compression=lzma2/normal
 SolidCompression=yes
+DiskSpanning=no
+UseSetupLdr=yes
 UninstallDisplayIcon={app}\FS_elem.exe
 CloseApplications=yes
 RestartApplications=no

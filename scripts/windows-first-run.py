@@ -20,6 +20,7 @@ spec.loader.exec_module(setup)
 RECEIPT = '.runtime/windows-ready.json'
 MODEL_MANIFEST = 'assets/models/manifest-release-v1.json'
 BUNDLE = 'windows-bundle.json'
+VERSION = '0.2.5'
 
 
 def read_json(path):
@@ -70,9 +71,11 @@ def binding(root, canonical_root=None, physical_paths=True):
     bundle = read_json(root / BUNDLE)
     manifest = setup.select_profile(setup.read_manifest(root))
     if (manifest['_platformId'] != 'windows-x64' or bundle.get('schemaVersion') != 1
-            or bundle.get('packageVersion') != '0.2.4' or bundle.get('platformId') != 'windows-x64'
+            or bundle.get('packageVersion') != VERSION or bundle.get('platformId') != 'windows-x64'
             or bundle.get('nativeProfileSha256') != manifest['_profileSha256']):
         raise setup.SetupError('Windows bundle/profile binding differs from this release')
+    if bundle.get('offline') is not True:
+        raise setup.SetupError('Требуется полный офлайн-установщик FS_elem (offline=true). Переустановите приложение.')
     interpreters = {n: f'.runtime/venv-{n}/Scripts/python.exe' for n in ('science', 'pose')}
     if (bundle.get('interpreters') != interpreters or bundle.get('node', {}).get('path') != '.runtime/node/node.exe'
             or not re.fullmatch(r'24\.\d+\.\d+', str(bundle.get('node', {}).get('version', '')))):
@@ -81,6 +84,7 @@ def binding(root, canonical_root=None, physical_paths=True):
     if not isinstance(rows, list) or not rows or len(rows) > 100000:
         raise setup.SetupError('Missing Windows bundle inventory')
     expected = {}
+    inventory_bytes = {}
     windows_paths = set()
     for row in rows:
         path = row.get('path')
@@ -94,6 +98,7 @@ def binding(root, canonical_root=None, physical_paths=True):
         if type(row.get('bytes')) is not int or row['bytes'] < 0 or not re.fullmatch(r'[0-9a-f]{64}', row.get('sha256', '')):
             raise setup.SetupError('Invalid bundle size/checksum')
         expected[path] = row['sha256']
+        inventory_bytes[path] = row['bytes']
     required = set(interpreters.values()) | {'.runtime/node/node.exe', MODEL_MANIFEST,
         '.runtime/frontend-install.json', 'apps/web/dist/server/index.js', manifest['ffmpeg']['path']}
     required |= {f'.runtime/venv-{n}/.release-environment.json' for n in interpreters}
@@ -103,9 +108,12 @@ def binding(root, canonical_root=None, physical_paths=True):
         if asset['path'].casefold() in windows_paths and asset['path'] not in expected:
             raise setup.SetupError('Duplicate Windows model path')
         windows_paths.add(asset['path'].casefold())
-        if asset['path'] in expected and expected[asset['path']] != asset['sha256']:
+        if asset['path'] not in expected:
+            raise setup.SetupError('Офлайн-пакет неполон: модель ' + asset['path']
+                                   + ' отсутствует в составе установщика. Переустановите FS_elem.')
+        if (expected[asset['path']] != asset['sha256']
+                or inventory_bytes[asset['path']] != asset['sizeBytes']):
             raise setup.SetupError('Model checksum conflicts with bundle inventory')
-        expected[asset['path']] = asset['sha256']
     expected[MODEL_MANIFEST] = setup.sha256(root / MODEL_MANIFEST)
     return bundle, manifest, expected
 
@@ -117,6 +125,7 @@ def cached_ready(root):
         bundle, manifest, expected = binding(root, canonical_root, physical_paths=False)
         state = read_json(root / RECEIPT)
         if (state.get('schemaVersion') != 1 or state.get('status') != 'complete'
+                or state.get('packageVersion') != VERSION or state.get('offline') is not True
                 or state.get('bundleSha256') != setup.sha256(root / BUNDLE)
                 or state.get('modelManifestSha256') != expected[MODEL_MANIFEST]
                 or state.get('nativeProfileSha256') != manifest['_profileSha256']):
@@ -166,22 +175,35 @@ def bootstrap(root, emit):
     bundle, manifest, expected = binding(root)
     total = sum(row['bytes'] for row in bundle['files'])
     verified = 0
+    models = {asset['path']: asset for asset in manifest['models']}
     for index, row in enumerate(bundle['files']):
-        path = relative_file(root, row['path'])
-        current = fingerprint(path)
+        asset = models.get(row['path'])
+        if asset:
+            emit(dict(type='progress', stage='verify-model', model=asset['id'], bytes=0,
+                      total=asset['sizeBytes'], message='Проверка локальной модели'))
+        try:
+            path = relative_file(root, row['path'])
+            current = fingerprint(path)
+        except OSError as error:
+            raise setup.SetupError('Компонент отсутствует или недоступен: ' + row['path']
+                                   + '. Переустановите полный офлайн-пакет FS_elem.') from error
         if current['sizeBytes'] != row['bytes'] or setup.sha256(path) != row['sha256']:
             raise setup.SetupError('Повреждён компонент: ' + row['path'] + '. Переустановите FS_elem.')
         verified += row['bytes']
+        if asset:
+            emit(dict(type='progress', stage='verify-model', model=asset['id'],
+                      bytes=asset['sizeBytes'], total=asset['sizeBytes'], message='Локальная модель проверена'))
         if index % 100 == 0 or index == len(bundle['files']) - 1:
             emit(dict(type='progress', stage='verify', bytes=verified, total=total,
                       message='Проверка файлов приложения'))
-    for asset in manifest['models']:
-        setup.ensure_asset(root, asset, progress=emit)
+    # Every model is an inventoried local component verified above. Installed
+    # bootstrap never calls the developer setup downloader or repairs via HTTP.
     emit(dict(type='progress', stage='verify', message='Проверка библиотек'))
     issues = setup.check_release(root, manifest)
     if issues:
         raise setup.SetupError('\n'.join(issues))
-    receipt = dict(schemaVersion=1, status='complete', bundleSha256=setup.sha256(root / BUNDLE),
+    receipt = dict(schemaVersion=1, status='complete', packageVersion=VERSION, offline=True,
+                   bundleSha256=setup.sha256(root / BUNDLE),
                    nativeProfileSha256=manifest['_profileSha256'],
                    modelManifestSha256=expected[MODEL_MANIFEST],
                    files=[dict(path=path, sha256=sha, **fingerprint(relative_file(root, path)))

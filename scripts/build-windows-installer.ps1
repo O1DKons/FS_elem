@@ -4,7 +4,10 @@ param(
  [Parameter(Mandatory=$true)][string]$SciencePython,
  [Parameter(Mandatory=$true)][string]$PosePython,
  [string]$Node=(Get-Command node.exe -ErrorAction Stop).Source,
- [switch]$NativeCheck
+ [switch]$NativeCheck,
+ [string]$NativeGrant,
+ [string]$NativeGrantSha256,
+ [string]$OfflineVideo
 )
 $ErrorActionPreference='Stop'
 $ProgressPreference='SilentlyContinue'
@@ -76,6 +79,9 @@ function Copy-Pip([string]$Python,[string]$Site){
 }
 try{
  $inputs=Get-Content -LiteralPath (Join-Path $PackageRoot 'packaging\windows\runtime-inputs.json') -Raw -Encoding UTF8|ConvertFrom-Json
+ $packageVersion=(Get-Content -LiteralPath (Join-Path $PackageRoot 'package.json') -Raw -Encoding UTF8|ConvertFrom-Json).version
+ if($packageVersion -notmatch '^0\.2\.5$'){throw 'Offline installer requires Root candidate version0.2.5'}
+ if($NativeCheck -and (-not $NativeGrant -or -not $NativeGrantSha256 -or -not $OfflineVideo)){throw 'Native offline check needs a distinct Root grant and pinned public video'}
  $iscc='C:\Program Files (x86)\Inno Setup 6\ISCC.exe'
  if(-not(Test-Path -LiteralPath $iscc)){throw 'Inno Setup build compiler missing'}
  $compiler=Get-Item -LiteralPath $iscc
@@ -169,11 +175,16 @@ try{
  Invoke-Tool 'compile-launcher-tests' $csc (@('/nologo','/utf8output','/codepage:65001','/target:exe','/platform:x64','/main:LauncherTests',"/out:$testExe")+$refs+@($cs,(Join-Path $PackageRoot 'tests\windows-launcher\LauncherTests.cs')))
  Invoke-Tool 'launcher-protocol-tests' $testExe @()
  Invoke-Tool 'assembly-tests' $SciencePython @('-I','-B',(Join-Path $PackageRoot 'tests\release\test_windows_bundle_assembly.py'))
+ Invoke-Tool 'offline-model-assembly-tests' $SciencePython @('-I','-B',(Join-Path $PackageRoot 'tests\release\test_windows_offline_models.py'))
  $payload=Join-Path $WorkRoot 'payload'
+ # Acquisition belongs to the build host only. Final bytes are bound to the
+ # existing two manifest checkpoints, never to a user-machine download cache.
+ $models=Join-Path $WorkRoot 'offline-models'
+ Invoke-Tool 'acquire-offline-models-build-host-only' $SciencePython @('-I','-B',(Join-Path $PackageRoot 'scripts\prepare-windows-bundle.py'),'--source',$PackageRoot,'--acquire-models',$models)
  Invoke-Tool 'portable-bundle-assembly' $SciencePython @('-I','-B',(Join-Path $PackageRoot 'scripts\prepare-windows-bundle.py'),
   '--source',$PackageRoot,'--output',$payload,'--node-zip',$nodeZip,'--node-version',$nodeVersion,
   '--science-zip',$scienceZip,'--science-site',$scienceSite,'--pose-zip',$poseZip,'--pose-site',$poseSite,
-  '--web-modules',(Join-Path $web 'node_modules'),'--launcher',$launcher,'--vc-runtime',$vcRuntime)
+  '--web-modules',(Join-Path $web 'node_modules'),'--launcher',$launcher,'--vc-runtime',$vcRuntime,'--models-root',$models)
  # Capture the actual pinned binary's notices inside the installed payload.
  # Refresh its inventory before Inno; these files are part of first-run verification.
  $evidence=Join-Path $payload 'docs\runtime-evidence'
@@ -210,23 +221,32 @@ try{
   $noticeDirectory=Split-Path $noticeDirectory -Parent
  }
  Write-Json (Join-Path $evidence 'notice-inputs.json') $noticeInputs
+ Copy-Item -LiteralPath (Join-Path $models 'offline-models.json') -Destination (Join-Path $evidence 'upstream-model-inputs.json')
+ Write-Json (Join-Path $evidence 'offline-model-distribution.json') @{
+  scope='Only existing public upstream YOLOX and RTMW checkpoints, bundled by explicit owner instruction';
+  evidence='docs/release/third-party.md and upstream-model-inputs.json';
+  qualification='Checkpoint-specific license status is preserved from manifest; code licenses are not asserted as weight clearance';
+  privateDataIncluded=$false
+ }
  Invoke-Tool 'freeze-final-payload-inventory' $SciencePython @('-I','-B','-c',
   'import importlib.util,json,pathlib,sys;spec=importlib.util.spec_from_file_location("assembler",sys.argv[1]);m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m);root=pathlib.Path(sys.argv[2]);p=root/"windows-bundle.json";v=json.loads(p.read_text("utf-8"));v["files"]=m.inventory(root);p.write_text(json.dumps(v,indent=2,ensure_ascii=False)+"\n",encoding="utf-8");print(json.dumps({"files":len(v["files"]),"NN":0}))',
   (Join-Path $PackageRoot 'scripts\prepare-windows-bundle.py'),$payload)
  $out=Join-Path $WorkRoot 'artifacts'
  New-Item -ItemType Directory -Path $out|Out-Null
- Invoke-Tool 'compile-installer' $iscc @('/Q',"/DPayloadDir=$payload","/DOutputDir=$out",(Join-Path $PackageRoot 'packaging\windows\FS_elem.iss'))
- $installer=Join-Path $out 'FS_elem-Setup-0.2.4-x64.exe'
+ Invoke-Tool 'compile-installer' $iscc @('/Q',"/DPayloadDir=$payload","/DOutputDir=$out","/DAppVersion=$packageVersion",(Join-Path $PackageRoot 'packaging\windows\FS_elem.iss'))
+ $installer=Join-Path $out "FS_elem-Setup-$packageVersion-x64.exe"
  if(-not(Test-Path -LiteralPath $installer)){throw 'Installer artifact missing'}
+ if(@(Get-ChildItem -LiteralPath $out -Filter '*.bin').Count -ne 0 -or @(Get-ChildItem -LiteralPath $out -Filter '*.exe').Count -ne 1){throw 'Offline installer must be one embedded Setup.exe, no payload sidecars'}
  $hash=(Get-FileHash -LiteralPath $installer -Algorithm SHA256).Hash.ToLowerInvariant()
- [IO.File]::WriteAllText((Join-Path $out 'SHA256SUMS.txt'),"$hash  FS_elem-Setup-0.2.4-x64.exe"+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
+ [IO.File]::WriteAllText((Join-Path $out 'SHA256SUMS.txt'),"$hash  FS_elem-Setup-$packageVersion-x64.exe"+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
  if($NativeCheck){
-  Invoke-Tool 'native-installer-check' (Join-Path $PSHOME 'pwsh.exe') @('-NoProfile','-File',(Join-Path $PackageRoot 'scripts\check-windows-installer.ps1'),'-Installer',$installer,'-WorkRoot',$WorkRoot,'-Logs',$logs)
+  Invoke-Tool 'native-installer-check' (Join-Path $PSHOME 'pwsh.exe') @('-NoProfile','-File',(Join-Path $PackageRoot 'scripts\check-windows-installer.ps1'),'-Installer',$installer,'-WorkRoot',$WorkRoot,'-Logs',$logs,'-RootGrant',$NativeGrant,'-RootGrantSha256',$NativeGrantSha256,'-OfflineVideo',$OfflineVideo)
  }
  Write-Json (Join-Path $WorkRoot 'build-summary.json') @{
-  status='built';version='0.2.4';installer=$installer;installerBytes=(Get-Item -LiteralPath $installer).Length;
+  status='built';version=$packageVersion;offline=$true;installer=$installer;installerBytes=(Get-Item -LiteralPath $installer).Length;
   installerSha256=$hash;startedUTC=$started.ToString('o');terminalUTC=[DateTime]::UtcNow.ToString('o');
-  commands=$commands;NN=0;nativeCheckRequested=[bool]$NativeCheck
+  commands=$commands;NN=0;nativeCheckRequested=[bool]$NativeCheck;
+  nativeNN=if(Test-Path -LiteralPath (Join-Path $WorkRoot 'native-install-check.json')){(Get-Content -LiteralPath (Join-Path $WorkRoot 'native-install-check.json') -Raw|ConvertFrom-Json).NN}else{0}
  }
 }catch{
  Write-Json (Join-Path $WorkRoot 'build-summary.json') @{status='failed';firstFailure=$_.Exception.Message;

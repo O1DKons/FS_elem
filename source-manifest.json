@@ -1,11 +1,11 @@
 {
   "schemaVersion": 3,
-  "version": "0.2.4",
-  "status": "WINDOWS_INSTALLER_SOURCE_CANDIDATE_NATIVE_CHECK_PENDING",
+  "version": "0.2.5",
+  "status": "OFFLINE_WINDOWS_SOURCE_CANDIDATE_NATIVE_CHECK_PENDING",
   "readyForRelease": false,
   "manifestExcludesItself": true,
-  "baselineCommit": "ff8446adf39eb497a1eee573204c590145362338",
-  "baselineVersion": "0.2.3",
+  "baselineCommit": "b875d54703bd02f3f3edc4cd50e74dd990dc55ef",
+  "baselineVersion": "0.2.4",
   "scientificValidationUnchanged": true,
   "privateUpstreamModelsIncluded": false,
   "files": [
@@ -21,8 +21,8 @@
     },
     {
       "path": ".github/workflows/windows-installer.yml",
-      "bytes": 2849,
-      "sha256": "24e711c48641a6b8afc51651f040ea2e2321aaf99e18c821cd03a871cf1f93c3"
+      "bytes": 6759,
+      "sha256": "7f657977636f567c0c55ecbc6f43412037d9ef9b084ddfeac6f9f49d4546dab4"
     },
     {
       "path": ".github/workflows/windows-release-checks.yml",
@@ -56,8 +56,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 6001,
-      "sha256": "5c5a4f5aeecb612bf8874cb19a8f51b0efbc62623c21b983454a78af532541d9"
+      "bytes": 7021,
+      "sha256": "282d4433db2ae8a0420f7c684b74699d8b0c697c58f7ee2b7e4fcc979a11c719"
     },
     {
       "path": "apps/web/.next/types/routes.d.ts",
@@ -851,8 +851,8 @@
     },
     {
       "path": "apps/windows-launcher/FS_elemLauncher.cs",
-      "bytes": 27203,
-      "sha256": "42c3e9cc523c5620864ec6dc39781eac6aaaf63a0606b9a6e85468a74b409e60"
+      "bytes": 32680,
+      "sha256": "ed924afdf45719d2115f644b786caae32decd3a73da9e76cb4dfd157d541eb40"
     },
     {
       "path": "assets/models/family.joblib",
@@ -976,8 +976,8 @@
     },
     {
       "path": "docs/release/third-party.md",
-      "bytes": 4210,
-      "sha256": "29151c755b1b85086347444414435659d19d0ed60af3f599e89ebc1f6f7e4941"
+      "bytes": 4411,
+      "sha256": "a2f442cae8004ab099ab12452aa28003e482b98234982bf379d6e261c10beefa"
     },
     {
       "path": "docs/release/v0.2.0-notes.md",
@@ -1067,17 +1067,22 @@
     {
       "path": "package.json",
       "bytes": 797,
-      "sha256": "090c8803cbb18500cd51c639408c54e4c1554026da6406bcc23eec585bf02383"
+      "sha256": "c321356fe8af8c803f3ec589775d4de15227f429a8634131d6d7a0e26d49ca50"
     },
     {
       "path": "packaging/windows/FS_elem.iss",
-      "bytes": 1639,
-      "sha256": "b3ff9fada2d3568206361b3e3b4a48404d33605ad766996a33ca652e06318903"
+      "bytes": 1840,
+      "sha256": "aca18d3a9d9774593515c894f60be06fef720452e145b9794dd83c574ae47128"
+    },
+    {
+      "path": "packaging/windows/offline-native-grant-template.json",
+      "bytes": 2364,
+      "sha256": "085a8b54ed22db46db9f56fa7279176b9d252ce4ad4c2086773c9f234f2b4dca"
     },
     {
       "path": "packaging/windows/runtime-inputs.json",
       "bytes": 1325,
-      "sha256": "9c787c5e86e255139b9f0748bd1c4141ab6275fc93359264101a81e7c325ce93"
+      "sha256": "1cae7c7d1f1671542c0e0d137965291011f7bd6a3f9af9a9b6bc259367098ce6"
     },
     {
       "path": "runtime/API.md",
@@ -1176,8 +1181,8 @@
     },
     {
       "path": "scripts/build-windows-installer.ps1",
-      "bytes": 15960,
-      "sha256": "04c6e04da17d3ae81789d08bcbf48084e25b33cdf0da6e72f4cf9da792e28dd2"
+      "bytes": 18136,
+      "sha256": "ccbed8220156d3d328066eb443483a7efd093216fbf576946d306c4f377f36ee"
     },
     {
       "path": "scripts/build.mjs",
@@ -1186,8 +1191,8 @@
     },
     {
       "path": "scripts/check-windows-installer.ps1",
-      "bytes": 20470,
-      "sha256": "2f51bede07d1ef0c54631e1ba9890ee10b4af781f94263ef8b9aa8603b7979ca"
+      "bytes": 41199,
+      "sha256": "824a69cc1e6e769f42a6578155dfc6c3c080aef57dbed2afec367c7c8fb31dd3"
     },
     {
       "path": "scripts/config.mjs",
@@ -1216,8 +1221,8 @@
     },
     {
       "path": "scripts/prepare-windows-bundle.py",
-      "bytes": 10104,
-      "sha256": "ec66e66dd7e2825269d41459abbc5ff77d4231b4198029f00152c7fce427d665"
+      "bytes": 19759,
+      "sha256": "1e74fec646f0367f491cc5ac8c3a1f2ce9479dea5e6269726329587a55c005e6"
     },
     {
       "path": "scripts/release-control.mjs",
@@ -1255,6 +1260,11 @@
       "sha256": "db7e931a9a80d72f16631300ff4b257e341b19a8cf9c653424225259e43cabdd"
     },
     {
+      "path": "scripts/run-windows-offline-check.ps1",
+      "bytes": 23268,
+      "sha256": "487a78896fbd2ea3ee2a15b03779a46bba76699d7e721d5b08fa54b14ad3b5ce"
+    },
+    {
       "path": "scripts/run_rotation_proxy_baseline.py",
       "bytes": 7625,
       "sha256": "b989ca53a9479d10bacfbbed3ddaef90b2c4a54dac1f2d37531cca3c626493b2"
@@ -1281,8 +1291,8 @@
     },
     {
       "path": "scripts/start-release.mjs",
-      "bytes": 8078,
-      "sha256": "d6eff59b1ac0aaa2548a567e677a3e73b407412dcfec93a49670eec39154fc52"
+      "bytes": 9449,
+      "sha256": "e9017000a710287c2bc61647f62f9dd400ff377db6d5fc00c3174199cfc4217d"
     },
     {
       "path": "scripts/start.mjs",
@@ -1291,8 +1301,8 @@
     },
     {
       "path": "scripts/verify-release-payload.mjs",
-      "bytes": 3767,
-      "sha256": "49ac29fe86f338890210330678be1600cd51f997f1f87c72637b71cacfb8346e"
+      "bytes": 3832,
+      "sha256": "e9022033cafc85379df4fb95d5bd997f0ca4e30a259f3335e37fa9ae336a26ee"
     },
     {
       "path": "scripts/video_native_type.py",
@@ -1316,13 +1326,13 @@
     },
     {
       "path": "scripts/windows-bundle.mjs",
-      "bytes": 7297,
-      "sha256": "39ac678e00f73e6a1bb5a71d39416b2a18d880a89d256c81f1ea476a3660697f"
+      "bytes": 7618,
+      "sha256": "c1af4a9d07500a5be245e771aa6491edaa7f3ec04ac7e91571ce3926de0d0a5c"
     },
     {
       "path": "scripts/windows-first-run.py",
-      "bytes": 9863,
-      "sha256": "e18ce26ddd381bc9fcbb50c4b426275e2d999b2dde3de7f800ac85c1fe3ff24a"
+      "bytes": 11536,
+      "sha256": "ffc6b50ef51dd01a49f3bab1f2c93e07b5600936dac2791e8727fc42201126cb"
     },
     {
       "path": "server/api.mjs",
@@ -1496,8 +1506,23 @@
     },
     {
       "path": "tests/release/test_windows_first_run.py",
-      "bytes": 15131,
-      "sha256": "034766f76300f4e05d9867a2850035dac1d226878944def18de2467c946da297"
+      "bytes": 13586,
+      "sha256": "692da62225ca4dbe2c186e15b37e096df162b770229e7a4a9d4d18735bdd5bdb"
+    },
+    {
+      "path": "tests/release/test_windows_offline_bootstrap.py",
+      "bytes": 5195,
+      "sha256": "953faf7a7804f8d220f1810c03208a03b655ceffec4649571b0dba53484d9b53"
+    },
+    {
+      "path": "tests/release/test_windows_offline_models.py",
+      "bytes": 8951,
+      "sha256": "0002b435bb23f7a892fc10e997b085d4309359fa35906934a9473698e596e3db"
+    },
+    {
+      "path": "tests/release/test_windows_offline_upgrade.py",
+      "bytes": 2348,
+      "sha256": "3c921fe8d20cd148dd758f67a94e5c49446cf1ccf58fd9ffe8ddc2314b8f42a9"
     },
     {
       "path": "tests/release/test_windows_one_pass.py",
@@ -1505,9 +1530,19 @@
       "sha256": "b62bde4c26dc59f62f5052b0462a058b3b3af484034f3b941344f98dfe199576"
     },
     {
+      "path": "tests/release/windows-desktop-upgrade.test.mjs",
+      "bytes": 2187,
+      "sha256": "12ea9f728f09202fc48f480cf2fcc3beb0aafe09ee291424bc097ad52b3864fc"
+    },
+    {
       "path": "tests/release/windows-desktop.test.mjs",
-      "bytes": 7082,
-      "sha256": "767a2b863d840598c00b4e69a802bbe67eeb0fcfe9168717bc114c688d0074a9"
+      "bytes": 9987,
+      "sha256": "3027d317191d3eff6d52fc723768016ba76e411551b7a1ad1263779e55ded2d6"
+    },
+    {
+      "path": "tests/release/windows-offline-receipt.test.mjs",
+      "bytes": 3406,
+      "sha256": "c434cceb93de8dcc6c8baff10926d0cb0f3efab17fc4befeed40d3b1974ff460"
     },
     {
       "path": "tests/test_release_bootstrap.py",
@@ -1521,8 +1556,8 @@
     },
     {
       "path": "tests/windows-launcher/LauncherTests.cs",
-      "bytes": 3821,
-      "sha256": "3f6f521844470fe94fb7df3d194a349f829d9269e6d1fd1871e8dcca64d2bc10"
+      "bytes": 5315,
+      "sha256": "2484ae75e82953dbfb7da15c3a61d6c2099f806e227697428f4c7c49a2794a78"
     },
     {
       "path": "tools/release/windows-smoke/admission-template.json",
@@ -1575,7 +1610,10 @@
       "sha256": "545c3b65d1784ad68e6d25b189c0ff5531c3746c77075d35fa976cd94b0ca27a"
     }
   ],
-  "fileCount": 313,
-  "totalBytes": 8351621,
-  "recordedAtUTC": "2026-10-09T01:54:42.276596+00:00"
+  "fileCount": 320,
+  "totalBytes": 8448993,
+  "recordedAtUTC": "2026-10-12T12:43:24.325913+00:00",
+  "sourceUpstreamONNXIncluded": false,
+  "installerUpstreamONNXBundlingAuthorized": true,
+  "privateDataIncluded": false
 }

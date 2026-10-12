@@ -53,7 +53,7 @@ test('shutdown command and parent EOF each invoke one cooperative stop', async (
 });
 
 const hash = body => createHash('sha256').update(body).digest('hex');
-function syntheticDesktop(root) {
+function syntheticDesktop(root, {apiBody, webBody} = {}) {
   const app = path.join(root, 'program');
   const put = (name, body) => {
     const p = path.join(app, name); fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, body); return p;
@@ -62,20 +62,20 @@ function syntheticDesktop(root) {
     put('scripts/' + name, fs.readFileSync(fileURLToPath(new URL('../../scripts/' + name, import.meta.url))));
   // Controlled dependencies exercise the real launcher; no native Windows or inference claim.
   put('scripts/release-platform.mjs', `export const profile=()=>({id:'windows-x64',pythonParts:['Scripts','python.exe']});export const releaseRecipeName=()=> 'test.json';export const requireWindowsRecipe=()=>{};export const browserCommand=()=>[];export const resolveExecutable=(p,root)=>p;`);
-  put('scripts/release-owned-web-worker.mjs', `const held=setInterval(()=>{},1000);process.on('message',m=>{if(m?.type==='shutdown'){clearInterval(held);process.exit(0);}});process.send({ready:true});`);
+  put('scripts/release-owned-web-worker.mjs', webBody ?? `const held=setInterval(()=>{},1000);process.on('message',m=>{if(m?.type==='shutdown'){clearInterval(held);process.exit(0);}});process.send({ready:true});`);
   const python = put('.runtime/venv-science/Scripts/python.exe', '#!/bin/sh\nexec /usr/bin/python3 "$@"\n');
   fs.chmodSync(python, 0o755);
   put('configs/test.json', '{}');
   put('apps/web/dist/server/index.js', '// synthetic compiled UI');
   put('apps/web/dist/client/index.html', 'fixture');
-  put('services/analysis/server.py', `import json,sys,os\nfrom pathlib import Path\nPath('test-api-argv.json').write_text(json.dumps(sys.argv))\nprint('diagnostic before ready',flush=True)\nprint(json.dumps({'port':int(sys.argv[sys.argv.index('--port')+1])}),flush=True)\nfor line in sys.stdin:\n if json.loads(line).get('type')=='shutdown':break\n`);
+  put('services/analysis/server.py', apiBody ?? `import json,sys,os\nfrom pathlib import Path\nPath('test-api-argv.json').write_text(json.dumps(sys.argv))\nprint('diagnostic before ready',flush=True)\nprint(json.dumps({'port':int(sys.argv[sys.argv.index('--port')+1])}),flush=True)\nfor line in sys.stdin:\n if json.loads(line).get('type')=='shutdown':break\n`);
   const native = {status: 'ready'};
   const manifest = put('assets/models/manifest-release-v1.json', JSON.stringify({schemaVersion: 1, models: [], platforms: {'windows-x64': native}}));
   const nativeSha = hash(JSON.stringify(native));
   const files = ['.runtime/venv-science/Scripts/python.exe', 'services/analysis/server.py', 'assets/models/manifest-release-v1.json'];
   const inventory = files.map(name => { const body = fs.readFileSync(path.join(app, name)); return { path: name, bytes: body.length, sha256: hash(body) }; });
-  const bundle = put('windows-bundle.json', JSON.stringify({schemaVersion: 1, packageVersion: '0.2.4', platformId: 'windows-x64', nativeProfileSha256: nativeSha, files: inventory}));
-  put('.runtime/windows-ready.json', JSON.stringify({schemaVersion: 1, status: 'complete', bundleSha256: hash(fs.readFileSync(bundle)), nativeProfileSha256: nativeSha, modelManifestSha256: hash(fs.readFileSync(manifest)), files: inventory.map(row => {
+  const bundle = put('windows-bundle.json', JSON.stringify({schemaVersion: 1, packageVersion: '0.2.5', offline:true, platformId: 'windows-x64', nativeProfileSha256: nativeSha, files: inventory}));
+  put('.runtime/windows-ready.json', JSON.stringify({schemaVersion: 1, status: 'complete', packageVersion:'0.2.5', offline:true, bundleSha256: hash(fs.readFileSync(bundle)), nativeProfileSha256: nativeSha, modelManifestSha256: hash(fs.readFileSync(manifest)), files: inventory.map(row => {
     const s = fs.statSync(path.join(app, row.path), {bigint: true});
     return {path: row.path, sha256: row.sha256, sizeBytes: Number(s.size), dev:s.dev.toString(),ino:s.ino.toString(),mtimeNs:s.mtimeNs.toString(),ctimeNs:s.ctimeNs.toString()};
   })}));
@@ -110,4 +110,52 @@ test('desktop launcher reports own readiness and stops API/UI on stdin shutdown'
     if(child?.exitCode===null) {child.kill();await once(child,'close');}
     fs.rmSync(root,{recursive:true,force:true});
   }
+});
+
+async function failedDesktop(options) {
+  const root=fs.mkdtempSync(path.join(os.tmpdir(),'FS_elem startup failure '));
+  let child;
+  try {
+    const app=syntheticDesktop(root,options),config=path.join(root,'user/release-web.json');
+    child=spawn(process.execPath,[path.join(app,'scripts/start-release.mjs'),'--desktop','--config',config],{stdio:['pipe','pipe','pipe']});
+    let out='',err='';child.stdout.on('data',b=>out+=b);child.stderr.on('data',b=>err+=b);
+    const ended=once(child,'close');
+    const timer=setTimeout(()=>child.kill(),4000);
+    const status=await ended;clearTimeout(timer);
+    const events=out.split('\n').flatMap(line=>{try{return [JSON.parse(line)];}catch{return [];}});
+    assert.equal(status[0],1,'Failed startup must not exit successfully: '+err);
+    assert.equal(events.some(e=>e.type==='ready'),false);
+    return {error:events.find(e=>e.type==='error'),err,events};
+  }finally {
+    if(child?.exitCode===null){child.kill();await once(child,'close');}
+    fs.rmSync(root,{recursive:true,force:true});
+  }
+}
+
+test('API failure before ready exposes service exit code and causal stderr in desktop JSON', {skip:process.platform==='win32'},async()=>{
+  const result=await failedDesktop({apiBody:"import sys\nprint('synthetic DLL load failure',file=sys.stderr,flush=True)\nsys.exit(7)\n"});
+  assert.ok(result.error);
+  assert.match(result.error.message,/analysis|API/i);
+  assert.match(result.error.message,/7/);
+  assert.match(result.error.message,/synthetic DLL load failure/);
+});
+
+test('UI failure before ready exposes distinct service exit code and causal stderr', {skip:process.platform==='win32'},async()=>{
+  const result=await failedDesktop({webBody:"console.error('synthetic EADDRINUSE on UI');process.exit(9);"});
+  assert.ok(result.error);
+  assert.match(result.error.message,/web|UI/i);
+  assert.match(result.error.message,/9/);
+  assert.match(result.error.message,/synthetic EADDRINUSE/);
+});
+
+test('API exit while UI is starting emits the original cause before stopped', {skip:process.platform==='win32'},async()=>{
+  const result=await failedDesktop({
+    apiBody:"import json,sys,time\nprint(json.dumps({'port':int(sys.argv[sys.argv.index('--port')+1])}),flush=True)\ntime.sleep(0.1)\nprint('synthetic API exit during UI startup',file=sys.stderr,flush=True)\nsys.exit(8)\n",
+    webBody:"const held=setInterval(()=>{},1000);process.on('message',m=>{if(m?.type==='shutdown'){clearInterval(held);process.exit(0);}});"
+  });
+  assert.ok(result.error,'A cause must accompany an exit during startup');
+  assert.match(result.error.message,/analysis|API/i);
+  assert.match(result.error.message,/8/);
+  assert.match(result.error.message,/synthetic API exit/);
+  assert.ok(result.events.indexOf(result.error)<result.events.findIndex(e=>e.type==='stopped'));
 });

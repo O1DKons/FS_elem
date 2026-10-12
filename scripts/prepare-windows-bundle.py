@@ -6,9 +6,165 @@ import json
 import pathlib
 import shutil
 import stat
+import tempfile
+import urllib.parse
+import urllib.request
 import zipfile
 
 LIMIT = 1024 * 1024 * 1024
+
+
+def model_assets(manifest):
+    assets = [x for x in manifest['models'] if x.get('url')]
+    if {x['id'] for x in assets} != {'yolox', 'rtmw'} or len(assets) != 2:
+        raise ValueError('Offline release requires exactly the two existing upstream models')
+    for asset in assets:
+        if asset['path'] != 'assets/models/' + asset['id'] + '.onnx':
+            raise ValueError('Unexpected offline model destination')
+        url = urllib.parse.urlsplit(asset['url'])
+        if url.scheme != 'https' or url.hostname != 'download.openmmlab.com' or url.username or url.password:
+            raise ValueError('Offline build requires the existing official upstream HTTPS source')
+        if asset.get('format') != 'zip' or not isinstance(asset['sizeBytes'], int) or not 0 < asset['sizeBytes'] <= LIMIT:
+            raise ValueError('Invalid offline model size/format')
+        if len(asset['sha256']) != 64 or any(c not in '0123456789abcdef' for c in asset['sha256']):
+            raise ValueError('Invalid offline model digest')
+    return assets
+
+
+def safe_member(name):
+    parts = pathlib.PurePosixPath(name).parts
+    return bool(parts) and pathlib.PurePosixPath(name).as_posix() == name and not name.startswith('/') and '\\' not in name and all(
+        p not in ('.', '..') and ':' not in p and p.rstrip(' .') == p for p in parts)
+
+
+def extract_model(archive, asset, target):
+    target = pathlib.Path(target)
+    if target.exists() or target.is_symlink():
+        raise ValueError('Offline model target must be new')
+    with zipfile.ZipFile(archive) as source:
+        members = [m for m in source.infolist() if not m.is_dir() and m.filename.lower().endswith('.onnx')]
+        if len(members) != 1:
+            raise ValueError('Expected exactly one ONNX archive member')
+        member = members[0]
+        if not safe_member(member.filename) or stat.S_ISLNK(member.external_attr >> 16):
+            raise ValueError('Unsafe ONNX archive member')
+        if asset.get('archiveMember') and member.filename != asset['archiveMember']:
+            raise ValueError('Exact ONNX member name mismatch')
+        if member.file_size != asset['sizeBytes']:
+            raise ValueError('ONNX archive member size mismatch')
+        target.parent.mkdir(parents=True, exist_ok=True)
+        fd, name = tempfile.mkstemp(prefix='.model-', suffix='.part', dir=target.parent)
+        partial = pathlib.Path(name)
+        try:
+            count = 0
+            h = hashlib.sha256()
+            with open(fd, 'wb', closefd=True) as outgoing, source.open(member) as incoming:
+                for block in iter(lambda: incoming.read(1024 * 1024), b''):
+                    count += len(block)
+                    if count > asset['sizeBytes']:
+                        raise ValueError('ONNX extraction exceeds exact size')
+                    h.update(block)
+                    outgoing.write(block)
+            if count != asset['sizeBytes'] or h.hexdigest() != asset['sha256']:
+                raise ValueError('ONNX extracted bytes/SHA256 mismatch')
+            partial.replace(target)
+        finally:
+            partial.unlink(missing_ok=True)
+        return member.filename
+
+
+def acquire_models(source, output):
+    """Build-host only. Never imported/called by the installed launcher."""
+    source, output = pathlib.Path(source), pathlib.Path(output)
+    assets = model_assets(json.loads((source / 'assets/models/manifest-release-v1.json').read_text('utf-8')))
+    if output.exists():
+        raise ValueError('Model acquisition output must be new')
+    output.mkdir(parents=True)
+    records = []
+    for asset in assets:
+        expected = asset['downloadSizeBytes']
+        if not isinstance(expected, int) or not 0 < expected <= LIMIT:
+            raise ValueError('Invalid upstream archive size')
+        archive = output / (asset['id'] + '.zip.part')
+        try:
+            request = urllib.request.Request(asset['url'], headers={'User-Agent': 'FS_elem-build/0.2.5'})
+            with urllib.request.urlopen(request, timeout=30) as incoming, archive.open('xb') as outgoing:
+                resolved = urllib.parse.urlsplit(incoming.geturl())
+                if resolved.scheme != 'https' or resolved.hostname != 'download.openmmlab.com':
+                    raise ValueError('Unexpected upstream model redirect')
+                count = 0
+                for block in iter(lambda: incoming.read(1024 * 1024), b''):
+                    count += len(block)
+                    if count > expected:
+                        raise ValueError('Upstream archive exceeds exact download size')
+                    outgoing.write(block)
+            if archive.stat().st_size != expected:
+                raise ValueError('Upstream archive size mismatch')
+            archive_sha = digest(archive)
+            if asset.get('downloadSha256') and archive_sha != asset['downloadSha256']:
+                raise ValueError('Upstream archive SHA256 mismatch')
+            member = extract_model(archive, asset, output / asset['path'])
+            records.append({**asset, 'archiveMember': member, 'archiveBytes': expected,
+                            'archiveSha256': archive_sha})
+        finally:
+            archive.unlink(missing_ok=True)
+    write_json(output / 'offline-models.json', {'schemaVersion': 1, 'models': records,
+               'qualification': 'Build-host acquisition; final ONNX SHA/size bound. Preserve manifest checkpoint-license qualification.'})
+
+
+def verify_offline_models(manifest, models_root):
+    root = pathlib.Path(models_root)
+    receipt_path = root / 'offline-models.json'
+    if root.is_symlink() or receipt_path.is_symlink() or not receipt_path.is_file() or receipt_path.stat().st_size > 65536:
+        raise ValueError('Offline model acquisition receipt missing/unsafe')
+    root = root.resolve()
+    receipt = json.loads(receipt_path.read_text('utf-8'))
+    records = receipt.get('models', [])
+    assets = model_assets(manifest)
+    if len(records) != 2 or {r['id'] for r in records} != {'yolox', 'rtmw'}:
+        raise ValueError('Offline model receipt incomplete')
+    for asset in assets:
+        record = next(r for r in records if r['id'] == asset['id'])
+        if any(record.get(k) != asset.get(k) for k in ('path', 'sizeBytes', 'sha256', 'url', 'licenseEvidence', 'checkpointLicenseStatus')):
+            raise ValueError('Offline model receipt binding mismatch')
+        if not safe_member(record.get('archiveMember', '')) or not record['archiveMember'].lower().endswith('.onnx'):
+            raise ValueError('Offline model member receipt invalid')
+        if not isinstance(record.get('archiveBytes'), int) or record['archiveBytes'] <= 0 or len(record.get('archiveSha256', '')) != 64:
+            raise ValueError('Offline archive receipt identity missing')
+        if any(c not in '0123456789abcdef' for c in record['archiveSha256']):
+            raise ValueError('Offline archive receipt digest invalid')
+        if asset.get('downloadSizeBytes') and record['archiveBytes'] != asset['downloadSizeBytes']:
+            raise ValueError('Offline archive receipt size binding changed')
+        if asset.get('downloadSha256') and record['archiveSha256'] != asset['downloadSha256']:
+            raise ValueError('Offline archive receipt digest binding changed')
+        if asset.get('archiveMember') and record['archiveMember'] != asset['archiveMember']:
+            raise ValueError('Offline exact archive member binding changed')
+        p = root / asset['path']
+        if any(q.is_symlink() for q in [p, *p.parents]) or not p.is_file() or p.stat().st_size != asset['sizeBytes'] or digest(p) != asset['sha256']:
+            raise ValueError('Offline model missing or corrupt: ' + asset['id'])
+    return receipt
+
+
+def stage_offline_models(manifest, models_root, app):
+    app = pathlib.Path(app)
+    if app.is_symlink():
+        raise ValueError('Offline app destination is a symlink')
+    app = app.resolve()
+    receipt = verify_offline_models(manifest, models_root)
+    assets = model_assets(manifest)
+    for asset in assets:
+        evidence = asset['licenseEvidence']
+        if not safe_member(evidence) or (app / evidence).is_symlink() or not (app / evidence).is_file():
+            raise ValueError('Model license evidence missing from payload')
+    for asset in assets:
+        target = app / asset['path']
+        if any(q.is_symlink() for q in [target, *target.parents]):
+            raise ValueError('Unsafe offline model destination')
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(pathlib.Path(models_root) / asset['path'], target)
+        if target.stat().st_size != asset['sizeBytes'] or digest(target) != asset['sha256']:
+            raise ValueError('Copied offline model binding failed')
+    write_json(app / '.runtime/offline-models-receipt.json', receipt)
 
 
 def digest(path):
@@ -133,6 +289,11 @@ def assemble(args):
     if app.exists():
         raise ValueError("Bundle output must be a new directory")
     source = pathlib.Path(args.source)
+    package_version = json.loads((source / 'package.json').read_text('utf-8'))['version']
+    if package_version != '0.2.5':
+        raise ValueError('Offline assembly requires Root candidate version0.2.5')
+    manifest = json.loads((source / 'assets/models/manifest-release-v1.json').read_text('utf-8'))
+    verify_offline_models(manifest, args.models_root)
     copy_tree(source, app, exclude=(".git", ".github", ".runtime", "node_modules",
                                     "tests", "tools", "work", "grant-demo"))
     extract_zip(args.node_zip, app / ".runtime" / "node", strip_first=True)
@@ -177,15 +338,13 @@ def assemble(args):
         "pnpmVersion": "11.19.0"})
     launcher = app / "FS_elem.exe"
     shutil.copy2(args.launcher, launcher)
-    # Only public release manifest models are allowed in the payload.
-    allowed = {x["path"] for x in manifest["models"] if not x.get("url")}
+    # Human-authorized offline installer includes only these existing manifest models.
+    stage_offline_models(manifest, args.models_root, app)
+    allowed = {x["path"] for x in manifest["models"]}
     for asset in manifest["models"]:
-        if asset.get("url") and (app / asset["path"]).exists():
-            raise ValueError("Upstream model must be obtained by first-run downloader")
-        if not asset.get("url"):
-            p = app / asset["path"]
-            if not p.is_file() or p.stat().st_size != asset["sizeBytes"] or digest(p) != asset["sha256"]:
-                raise ValueError("Bundled public model binding failed")
+        p = app / asset["path"]
+        if not p.is_file() or p.stat().st_size != asset["sizeBytes"] or digest(p) != asset["sha256"]:
+            raise ValueError("Bundled public model binding failed")
     for p in (app / "assets/models").iterdir():
         if p.suffix in (".onnx", ".joblib") and p.relative_to(app).as_posix() not in allowed:
             raise ValueError("Unlisted model in payload")
@@ -195,7 +354,8 @@ def assemble(args):
                      for name, path in [("node", args.node_zip), ("science", args.science_zip), ("pose", args.pose_zip)]]})
     files = inventory(app)
     write_json(app / "windows-bundle.json", {
-        "schemaVersion": 1, "packageVersion": "0.2.4", "platformId": "windows-x64",
+        "schemaVersion": 1, "packageVersion": package_version, "platformId": "windows-x64",
+        "offline": True,
         "nativeProfileSha256": profile_sha,
         "node": {"path": ".runtime/node/node.exe", "version": args.node_version},
         "interpreters": {"science": ".runtime/venv-science/Scripts/python.exe",
@@ -207,11 +367,20 @@ def assemble(args):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    for name in ("source", "output", "node-zip", "node-version", "science-zip", "science-site",
-                 "pose-zip", "pose-site", "web-modules", "launcher", "vc-runtime"):
-        p.add_argument("--" + name, required=True)
+    p.add_argument('--acquire-models')
+    p.add_argument('--source', required=True)
+    for name in ("output", "node-zip", "node-version", "science-zip", "science-site",
+                 "pose-zip", "pose-site", "web-modules", "launcher", "vc-runtime", "models-root"):
+        p.add_argument("--" + name)
     try:
-        assemble(p.parse_args())
+        args = p.parse_args()
+        if args.acquire_models:
+            acquire_models(args.source, args.acquire_models)
+        else:
+            for name in ('output', 'node_zip', 'node_version', 'science_zip', 'science_site', 'pose_zip', 'pose_site', 'web_modules', 'launcher', 'vc_runtime', 'models_root'):
+                if not getattr(args, name):
+                    raise ValueError('Missing assembly input: ' + name)
+            assemble(args)
     except (OSError, ValueError, KeyError, zipfile.BadZipFile) as error:
         p.exit(1, "Bundle assembly failed: " + str(error) + "\n")
 

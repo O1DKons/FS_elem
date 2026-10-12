@@ -1,19 +1,18 @@
-name: Windows v0.2.4 installer
+name: Windows v0.2.5 offline installer
 on:
   push:
-    branches: [release/v0.2.4]
-  workflow_dispatch:
+    branches: [release/v0.2.5]
 permissions:
   contents: read
 concurrency:
-  group: fs-elem-v024-windows-installer
+  group: fs-elem-v025-windows-offline-installer
   cancel-in-progress: false
 jobs:
   build-install:
     runs-on: windows-2022
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -36,32 +35,71 @@ jobs:
             if ($LASTEXITCODE -ne 0) { throw 'Inno compiler installation failed' }
           }
           if (-not (Test-Path -LiteralPath $iscc)) { throw 'Inno Setup compiler missing' }
-          # Compatibility/version comes from the bounded CLI engine probe in the builder.
-          # ISCC.exe may have no FileVersion resource; /? only reports its major version.
-          Write-Host "Resolved compiler path=$iscc SHA256=$((Get-FileHash -LiteralPath $iscc -Algorithm SHA256).Hash)"
-      - name: Build self-contained installer and check native installation
+      - name: Check affected offline contracts on native Windows
         shell: pwsh
         run: |
-          ./scripts/build-windows-installer.ps1 -PackageRoot $env:GITHUB_WORKSPACE -WorkRoot (Join-Path $env:RUNNER_TEMP 'fs-elem-v024-installer') -SciencePython '${{ steps.science.outputs.python-path }}' -PosePython '${{ steps.pose.outputs.python-path }}' -NativeCheck
-      - name: Save Setup.exe and checksums
+          $ErrorActionPreference = 'Stop'
+          node scripts/verify-release-payload.mjs .
+          if ($LASTEXITCODE -ne 0) { throw 'Public Source manifest or boundary mismatch' }
+          & '${{ steps.science.outputs.python-path }}' -B -m unittest discover -s tests/release -p test_windows_offline_bootstrap.py
+          if ($LASTEXITCODE -ne 0) { throw 'Offline bootstrap contracts failed' }
+          & '${{ steps.science.outputs.python-path }}' -B -m unittest discover -s tests/release -p test_windows_offline_upgrade.py
+          if ($LASTEXITCODE -ne 0) { throw 'Offline receipt upgrade contract failed' }
+          node --test tests/release/windows-offline-receipt.test.mjs tests/release/windows-desktop-upgrade.test.mjs
+          if ($LASTEXITCODE -ne 0) { throw 'Offline desktop contracts failed' }
+      - name: Build one fully embedded offline Setup.exe
+        shell: pwsh
+        run: |
+          ./scripts/build-windows-installer.ps1 -PackageRoot $env:GITHUB_WORKSPACE -WorkRoot (Join-Path $env:RUNNER_TEMP 'fs-elem-v025-installer') -SciencePython '${{ steps.science.outputs.python-path }}' -PosePython '${{ steps.pose.outputs.python-path }}'
+      - name: Bind the generated artifact and run cold offline installation check
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:GITHUB_REF -ne 'refs/heads/release/v0.2.5' -or $env:GITHUB_SHA -notmatch '^[a-f0-9]{40}$') { throw 'Unadmitted native source ref' }
+          $work = Join-Path $env:RUNNER_TEMP 'fs-elem-v025-installer'
+          $installer = Join-Path $work 'artifacts/FS_elem-Setup-0.2.5-x64.exe'
+          $template = Join-Path $env:GITHUB_WORKSPACE 'packaging/windows/offline-native-grant-template.json'
+          if ((Get-FileHash -LiteralPath $template -Algorithm SHA256).Hash.ToLowerInvariant() -ne '085a8b54ed22db46db9f56fa7279176b9d252ce4ad4c2086773c9f234f2b4dca') { throw 'Root template SHA mismatch' }
+          $grant = Get-Content -LiteralPath $template -Raw -Encoding UTF8 | ConvertFrom-Json
+          if ($grant.actualAuthorization -ne $false) { throw 'Expected prospective Root template' }
+          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts/check-windows-installer.ps1'
+          if ((Get-FileHash -LiteralPath $script -Algorithm SHA256).Hash.ToLowerInvariant() -ne $grant.nativeCheckSha256) { throw 'Native checker SHA mismatch' }
+          $summary = Get-Content -LiteralPath (Join-Path $work 'build-summary.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+          $setupHash = (Get-FileHash -LiteralPath $installer -Algorithm SHA256).Hash.ToLowerInvariant()
+          $setupBytes = (Get-Item -LiteralPath $installer).Length
+          if ($summary.status -ne 'built' -or $summary.offline -ne $true -or $summary.version -ne '0.2.5' -or $summary.installerSha256 -ne $setupHash -or $summary.installerBytes -ne $setupBytes) { throw 'Generated Setup binding mismatch' }
+          $video = Join-Path $env:GITHUB_WORKSPACE 'grant-demo/media/example-1a.mp4'
+          if ((Get-Item -LiteralPath $video).Length -ne $grant.videoBytes -or (Get-FileHash -LiteralPath $video -Algorithm SHA256).Hash.ToLowerInvariant() -ne $grant.videoSha256) { throw 'Public functional-input identity mismatch' }
+          $grant.kind = 'ROOT_ADMITTED_GENERATED_OFFLINE_NATIVE_GRANT'
+          $grant.actualAuthorization = $true
+          $grant | Add-Member -NotePropertyName installerSha256 -NotePropertyValue $setupHash
+          $grant | Add-Member -NotePropertyName installerBytes -NotePropertyValue $setupBytes
+          $grant | Add-Member -NotePropertyName sourceRef -NotePropertyValue $env:GITHUB_REF
+          $grant | Add-Member -NotePropertyName sourceCommit -NotePropertyValue $env:GITHUB_SHA
+          $grant | Add-Member -NotePropertyName runId -NotePropertyValue $env:GITHUB_RUN_ID
+          $grant | Add-Member -NotePropertyName runAttempt -NotePropertyValue $env:GITHUB_RUN_ATTEMPT
+          $grantPath = Join-Path $work 'native-root-grant.json'
+          [IO.File]::WriteAllText($grantPath, ($grant | ConvertTo-Json -Depth 30), [Text.UTF8Encoding]::new($false))
+          $grantSha = (Get-FileHash -LiteralPath $grantPath -Algorithm SHA256).Hash.ToLowerInvariant()
+          # Supervisor/checker are separate from build-host acquisition. Installed app network is denied.
+          ./scripts/run-windows-offline-check.ps1 -NativeCheck $script -Installer $installer -WorkRoot $work -Logs (Join-Path $work 'logs') -RootGrant $grantPath -RootGrantSha256 $grantSha -OfflineVideo $video
+          if ($LASTEXITCODE -ne 0) { throw 'Offline native supervisor failed' }
+      - name: Save single Setup.exe and optional checksum
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: fs-elem-v024-windows-setup-${{ github.run_id }}
-          path: ${{ runner.temp }}/fs-elem-v024-installer/artifacts/*
+          name: fs-elem-v025-windows-setup-${{ github.run_id }}
+          path: ${{ runner.temp }}/fs-elem-v025-installer/artifacts/*
           if-no-files-found: warn
           retention-days: 14
-      - name: Save bounded native build and installation evidence
+      - name: Save bounded new build and offline installation evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: fs-elem-v024-windows-install-evidence-${{ github.run_id }}
+          name: fs-elem-v025-windows-offline-evidence-${{ github.run_id }}
           path: |
-            ${{ runner.temp }}/fs-elem-v024-installer/build-summary.json
-            ${{ runner.temp }}/fs-elem-v024-installer/build-inputs.json
-            ${{ runner.temp }}/fs-elem-v024-installer/compiler-input.json
-            ${{ runner.temp }}/fs-elem-v024-installer/vc-runtime-inputs.json
-            ${{ runner.temp }}/fs-elem-v024-installer/native-install-check.json
-            ${{ runner.temp }}/fs-elem-v024-installer/logs/*
+            ${{ runner.temp }}/fs-elem-v025-installer/*.json
+            ${{ runner.temp }}/fs-elem-v025-installer/logs/*
+            ${{ runner.temp }}/fs-elem-v025-installer/offline-supervisor/*
           if-no-files-found: warn
           retention-days: 14

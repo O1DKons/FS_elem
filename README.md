@@ -1,3 +1,13 @@
+# FS_elem — Windows offline installer v0.2.5
+
+The Windows package is one Setup.exe. It includes the two model checkpoints, three classifiers, internal Python/Node runtimes, locked libraries, FFmpeg and the compiled interface. Install it and launch FS_elem from the shortcut; no terminal, manual dependencies or internet downloads are required on the user computer.
+
+Results are stored outside the installation directory and survive an uninstall. The first launch verifies local components; missing or damaged files produce a local error rather than a network repair. Windows 10/11 x64 is the target. Native Windows Server checks are recorded separately from a user desktop check.
+
+The recognition models are research artifacts; this release makes no new accuracy, physical rotation or speed claim. Model provenance and third-party terms are retained in docs/release/model-card.md and docs/release/third-party.md.
+
+Developer source setup instructions below are for contributors, not the installed Windows application.
+
 # FS_elem v0.2.2 — Windows installer
 
 Windows users: download **FS_elem-Setup.exe** from the versioned GitHub release, install it, and open the FS_elem shortcut. No terminal or separate Python/Node installation is required. First launch prepares the existing models automatically and shows progress; internet is required for the initial model download (about 308 MB). Later launches do not install dependencies.
