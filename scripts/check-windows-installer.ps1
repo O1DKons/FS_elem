@@ -415,7 +415,27 @@ public static class InstallerFilePath {
   if($job.state -in @('succeeded','failed','cancelled')){break}
   Start-Sleep -Milliseconds 500
  }
- if($job.state -ne 'succeeded'){throw 'Real offline analysis did not succeed within Root bound'}
+ if($job.state -ne 'succeeded'){
+  $firstCause=if(-not [string]::IsNullOrEmpty([string]$job.error.message)){Limit-Text ([string]$job.error.message) 4096}else{'Real offline analysis did not succeed within Root bound'}
+  try{
+   $directJobJSON=$job|ConvertTo-Json -Depth 100 -Compress
+   $responseBytes=[Text.Encoding]::UTF8.GetByteCount($directJobJSON)
+   $capture=@{schemaVersion=1;kind='public-offline-test-job-failure';jobId=$job.jobId;state=$job.state;error=$job.error;elapsedSeconds=$analysisWatch.Elapsed.TotalSeconds;directJob=$job;responseBytes=$responseBytes;responseTruncated=$false}
+   $text=$capture|ConvertTo-Json -Depth 100 -Compress
+   if([Text.Encoding]::UTF8.GetByteCount($text) -gt 65536){
+    $capture=@{schemaVersion=1;kind='public-offline-test-job-failure';jobId=(Limit-Text ([string]$job.jobId) 512);state=(Limit-Text ([string]$job.state) 64);error=@{code=(Limit-Text ([string]$job.error.code) 256);message=(Limit-Text ([string]$job.error.message) 4096)};elapsedSeconds=$analysisWatch.Elapsed.TotalSeconds;directJobJSONPrefix=(Limit-Text $directJobJSON 16384);responseBytes=$responseBytes;responseTruncated=$true}
+    $text=$capture|ConvertTo-Json -Depth 100 -Compress
+   }
+   if([Text.Encoding]::UTF8.GetByteCount($text) -gt 65536){throw 'Bounded public job diagnostic exceeds64KiB'}
+   [IO.File]::WriteAllText((Join-Path $Logs 'offline-job-failure.json'),$text,[Text.UTF8Encoding]::new($false))
+   $summary.publicJobFailureDiagnosticSaved=$true
+   $summary.publicJobFailureDiagnosticTruncated=$capture.responseTruncated
+  }catch{
+   $summary.publicJobFailureDiagnosticSaved=$false
+   $summary.publicJobFailureDiagnosticWriteError=Limit-Text $_.Exception.Message 4096
+  }
+  throw $firstCause
+ }
  $result=Invoke-WebRequest ($jobUrl+'/result') -TimeoutSec 3 -NoProxy
  $value=$result.Content|ConvertFrom-Json
  if($value.status -ne 'completed' -or $value.source.sha256 -ne $grant.videoSha256 -or $value.source.frameCount -ne 181 -or [Math]::Abs([double]$value.source.durationSeconds-3.0) -gt 0.1){throw 'Offline result/source/three-second binding failed'}
