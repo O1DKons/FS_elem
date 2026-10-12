@@ -339,7 +339,9 @@ public static class InstallerFilePath {
  $launcher=[Diagnostics.Process]::Start($shortcutLaunch)
  if($null -eq $launcher){throw 'Unicode Shell shortcut launch returned no process handle'}
  $summary.shortcutLaunchedViaShell=$true
- Wait-Ready $launcher
+ # First cold bootstrap includes local verification of the entire offline payload.
+ # Relaunch retains the existing90s default; no product-speed improvement claimed.
+ Wait-Ready $launcher 180
  $summary.desktopReadySeconds=$watch.Elapsed.TotalSeconds
  $launcher.Refresh()
  if($launcher.MainWindowHandle -eq 0){throw 'Native launcher window missing'}
