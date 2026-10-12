@@ -389,3 +389,4 @@ try{
  exit 1
 }
 if($result.status -cne 'passed'){exit 1}
+exit 0
