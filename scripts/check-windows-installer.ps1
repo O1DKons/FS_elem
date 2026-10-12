@@ -396,6 +396,7 @@ public static class InstallerFilePath {
  $summary.NN=1;$summary.acceptedVideoUploads=1
  $job=$created.Content|ConvertFrom-Json
  if([string]::IsNullOrEmpty($job.jobId)){throw 'Accepted offline job identity missing'}
+ $publicJobId=[string]$job.jobId
  $jobUrl='http://127.0.0.1:5174/api/analysis/jobs/'+[Uri]::EscapeDataString($job.jobId)
  $summary.observedAnalysisPeakRSSBytes=0
  while($analysisWatch.Elapsed.TotalSeconds -lt 120){
@@ -417,13 +418,45 @@ public static class InstallerFilePath {
  }
  if($job.state -ne 'succeeded'){
   $firstCause=if(-not [string]::IsNullOrEmpty([string]$job.error.message)){Limit-Text ([string]$job.error.message) 4096}else{'Real offline analysis did not succeed within Root bound'}
+  $runtimeDiagnostic=@{saved=$false;jobId=$publicJobId}
+  try{
+   $parsed=[Guid]::Empty
+   if(-not [Guid]::TryParseExact($publicJobId,'D',[ref]$parsed) -or [string]$job.jobId -cne $publicJobId -or $job.source.sha256 -cne $grant.videoSha256){throw 'Runtime-log capture is not bound to the actual public UUID job'}
+   $jobDirectory=[IO.Path]::GetFullPath((Join-Path (Join-Path $userState 'jobs') $publicJobId))
+   $runtimePath=Join-Path $jobDirectory 'runtime.log'
+   $item=Get-Item -LiteralPath $runtimePath -Force -ErrorAction Stop
+   if($item.PSIsContainer){throw 'Runtime log is not a regular file'}
+   # Hold read-only/no-delete sharing while validating the named file and reading
+   # its prefix, so a path replacement cannot redirect the validated capture.
+   $incoming=[IO.File]::Open($runtimePath,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::Read)
+   try{
+   $cursor=$runtimePath
+   while($cursor){
+    $part=Get-Item -LiteralPath $cursor -Force -ErrorAction Stop
+    if(($part.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0){throw 'Runtime-log path contains a reparse point'}
+    $parent=[IO.Directory]::GetParent($cursor)
+    $cursor=if($parent){$parent.FullName}else{$null}
+   }
+   $canonical=[InstallerFilePath]::Resolve($runtimePath)
+   if($canonical.StartsWith('\\?\')){$canonical=$canonical.Substring(4)}
+   if(-not [string]::Equals($canonical,[IO.Path]::GetFullPath($runtimePath),[StringComparison]::OrdinalIgnoreCase) -or -not $canonical.StartsWith($jobDirectory+'\',[StringComparison]::OrdinalIgnoreCase)){throw 'Runtime log is not canonically contained in the bound public job directory'}
+    $prefix=[byte[]]::new([int][Math]::Min(65536,$incoming.Length));$count=0
+    while($count -lt $prefix.Length){$read=$incoming.Read($prefix,$count,$prefix.Length-$count);if($read -eq 0){break};$count+=$read}
+    $sourceBytes=$incoming.Length
+   }finally{$incoming.Dispose()}
+   $output=Join-Path $Logs 'offline-job-runtime-prefix.log'
+   $outgoing=[IO.File]::Open($output,[IO.FileMode]::Create,[IO.FileAccess]::Write)
+   try{$outgoing.Write($prefix,0,$count)}finally{$outgoing.Dispose()}
+   $runtimeDiagnostic=@{saved=$true;jobId=$publicJobId;source='jobs/<bound-public-UUID>/runtime.log';sourceBytes=$sourceBytes;prefixBytes=$count;truncated=($sourceBytes -gt $count);output='offline-job-runtime-prefix.log';qualification='Raw bounded byte prefix; may end inside UTF8 codepoint; only this public-test job'}
+  }catch{$runtimeDiagnostic.error=Limit-Text $_.Exception.Message 512}
+  $summary.publicJobRuntimeDiagnostic=$runtimeDiagnostic
   try{
    $directJobJSON=$job|ConvertTo-Json -Depth 100 -Compress
    $responseBytes=[Text.Encoding]::UTF8.GetByteCount($directJobJSON)
-   $capture=@{schemaVersion=1;kind='public-offline-test-job-failure';jobId=$job.jobId;state=$job.state;error=$job.error;elapsedSeconds=$analysisWatch.Elapsed.TotalSeconds;directJob=$job;responseBytes=$responseBytes;responseTruncated=$false}
+   $capture=@{schemaVersion=1;kind='public-offline-test-job-failure';jobId=$job.jobId;state=$job.state;error=$job.error;elapsedSeconds=$analysisWatch.Elapsed.TotalSeconds;directJob=$job;responseBytes=$responseBytes;responseTruncated=$false;runtimeLog=$runtimeDiagnostic}
    $text=$capture|ConvertTo-Json -Depth 100 -Compress
    if([Text.Encoding]::UTF8.GetByteCount($text) -gt 65536){
-    $capture=@{schemaVersion=1;kind='public-offline-test-job-failure';jobId=(Limit-Text ([string]$job.jobId) 512);state=(Limit-Text ([string]$job.state) 64);error=@{code=(Limit-Text ([string]$job.error.code) 256);message=(Limit-Text ([string]$job.error.message) 4096)};elapsedSeconds=$analysisWatch.Elapsed.TotalSeconds;directJobJSONPrefix=(Limit-Text $directJobJSON 16384);responseBytes=$responseBytes;responseTruncated=$true}
+    $capture=@{schemaVersion=1;kind='public-offline-test-job-failure';jobId=(Limit-Text ([string]$job.jobId) 512);state=(Limit-Text ([string]$job.state) 64);error=@{code=(Limit-Text ([string]$job.error.code) 256);message=(Limit-Text ([string]$job.error.message) 4096)};elapsedSeconds=$analysisWatch.Elapsed.TotalSeconds;directJobJSONPrefix=(Limit-Text $directJobJSON 12288);responseBytes=$responseBytes;responseTruncated=$true;runtimeLog=$runtimeDiagnostic}
     $text=$capture|ConvertTo-Json -Depth 100 -Compress
    }
    if([Text.Encoding]::UTF8.GetByteCount($text) -gt 65536){throw 'Bounded public job diagnostic exceeds64KiB'}

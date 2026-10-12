@@ -254,7 +254,7 @@ def assemble_python(archive, site, dest, minor):
     # Paths remain valid when the entire app is installed elsewhere.
     (scripts / (stem + "._pth")).write_text(
         stem + ".zip\n.\n../Lib/site-packages\n../../..\n../../../scripts\n"
-        "../../../services/analysis\n../../../runtime/pipeline\nimport site\n",
+        "../../../services/analysis\n../../../runtime\n../../../runtime/pipeline\nimport site\n",
         encoding="utf-8")
 
 

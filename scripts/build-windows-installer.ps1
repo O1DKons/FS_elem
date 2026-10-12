@@ -185,6 +185,9 @@ try{
   '--source',$PackageRoot,'--output',$payload,'--node-zip',$nodeZip,'--node-version',$nodeVersion,
   '--science-zip',$scienceZip,'--science-site',$scienceSite,'--pose-zip',$poseZip,'--pose-site',$poseSite,
   '--web-modules',(Join-Path $web 'node_modules'),'--launcher',$launcher,'--vc-runtime',$vcRuntime,'--models-root',$models)
+ # Prove the real entrypoint's sibling imports using packaged isolated Python,
+ # before Inno packaging. --help exits before inference/model loading.
+ Invoke-Tool 'packaged-analysis-entrypoint-help' (Join-Path $payload '.runtime\venv-science\Scripts\python.exe') @('-I','-B',(Join-Path $payload 'runtime\analyze_job.py'),'--help')
  # Capture the actual pinned binary's notices inside the installed payload.
  # Refresh its inventory before Inno; these files are part of first-run verification.
  $evidence=Join-Path $payload 'docs\runtime-evidence'

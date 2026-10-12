@@ -22,7 +22,7 @@
     {
       "path": ".github/workflows/windows-installer.yml",
       "bytes": 9782,
-      "sha256": "e7a36fa8dc87b917a6222b1e9713e1cf55241c6d9a55ae99f581c4573e401a26"
+      "sha256": "1c6c1b5681688e9b285072958ab4af2043bd54a855a946a7d58cab185b7b9407"
     },
     {
       "path": ".github/workflows/windows-release-checks.yml",
@@ -1077,7 +1077,7 @@
     {
       "path": "packaging/windows/offline-native-grant-template.json",
       "bytes": 2330,
-      "sha256": "04ae1875c043a1c581e213df7396d867ed4757ff563b0390de1630e29996bec0"
+      "sha256": "2091c2365942c54fb2677f40216d74327f06723af980c5febbf72f295b51f005"
     },
     {
       "path": "packaging/windows/runtime-inputs.json",
@@ -1181,8 +1181,8 @@
     },
     {
       "path": "scripts/build-windows-installer.ps1",
-      "bytes": 18148,
-      "sha256": "48015412423e25ac48639ff8960de4cb97ff66968c514ac35b78d0a57fe98413"
+      "bytes": 18479,
+      "sha256": "2eab96048d4577b1d089237d6384dccafc4753d969c952756fd90f5df08bcc67"
     },
     {
       "path": "scripts/build.mjs",
@@ -1191,8 +1191,8 @@
     },
     {
       "path": "scripts/check-windows-installer.ps1",
-      "bytes": 43180,
-      "sha256": "fa00d0bbe236112bdf0cce64cee1264e3da5a7c612a15c80b6145247fe1d08cc"
+      "bytes": 45843,
+      "sha256": "9eba0303ecea92d889355d8d1fb2b727e0b0ca23fefee53671dfcc31e05a10c3"
     },
     {
       "path": "scripts/check-windows-offline-firewall.ps1",
@@ -1226,8 +1226,8 @@
     },
     {
       "path": "scripts/prepare-windows-bundle.py",
-      "bytes": 19759,
-      "sha256": "1e74fec646f0367f491cc5ac8c3a1f2ce9479dea5e6269726329587a55c005e6"
+      "bytes": 19777,
+      "sha256": "3ebf759e728013d567546a452d59f77a9ff536b7c06f80f53bda76d3cfb91868"
     },
     {
       "path": "scripts/release-control.mjs",
@@ -1616,10 +1616,10 @@
     }
   ],
   "fileCount": 321,
-  "totalBytes": 8469849,
-  "recordedAtUTC": "2026-10-12T16:32:29.365675+00:00",
+  "totalBytes": 8472861,
+  "recordedAtUTC": "2026-10-12T17:04:59.536402+00:00",
   "sourceUpstreamONNXIncluded": false,
   "installerUpstreamONNXBundlingAuthorized": true,
   "privateDataIncluded": false,
-  "sourceCorrection": "Only bounded64KiB public-test directjob failure diagnostic beforegenericthrow; originalfirstcause, product/poll/caps unchanged"
+  "sourceCorrection": "Addmissingtrustedruntimepth; realpackagedentry-help gate; boundedpublicjobruntimeLogprefix; algorithm/models/caps unchanged"
 }
