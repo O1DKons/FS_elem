@@ -166,8 +166,8 @@
     },
     {
       "path": "scripts/check-macos-offline-installed.py",
-      "bytes": 51392,
-      "sha256": "25625394de9983898bd695b8f666001d584c041c58c5e686a02d9e366b1b90ad"
+      "bytes": 52181,
+      "sha256": "0885be5aac5aace215b3aae6aca913ffbfeb41f70d51e85eaae23b05880eb0af"
     },
     {
       "path": "packaging/macos/offline-loopback.sb",

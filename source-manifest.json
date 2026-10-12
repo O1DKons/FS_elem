@@ -947,7 +947,7 @@
     {
       "path": "configs/mac-offline-ci-host-template.json",
       "bytes": 10217,
-      "sha256": "6655c8af0b826b6df1649f3f71046d2a6b908990df9f9cc835443e4c766138a7"
+      "sha256": "c5011e8436e3f2a7301c1557196761ca19df77ec6e079f65e697f18f45240084"
     },
     {
       "path": "configs/mac-recipe-binding.json",
@@ -1261,8 +1261,8 @@
     },
     {
       "path": "scripts/check-macos-offline-installed.py",
-      "bytes": 51392,
-      "sha256": "25625394de9983898bd695b8f666001d584c041c58c5e686a02d9e366b1b90ad"
+      "bytes": 52181,
+      "sha256": "0885be5aac5aace215b3aae6aca913ffbfeb41f70d51e85eaae23b05880eb0af"
     },
     {
       "path": "scripts/check-windows-installer.ps1",
@@ -1580,6 +1580,11 @@
       "sha256": "5a196c80250f3a1b3d020fb9356ebed2f51913871b1178714bfc58ca4ac7f80e"
     },
     {
+      "path": "tests/release/fixture_native_uid_snapshot.py",
+      "bytes": 3427,
+      "sha256": "391400fde9142784014fd92b4cc372bfdfcdc9509236380daf708202890fda8a"
+    },
+    {
       "path": "tests/release/launcher-windows.test.mjs",
       "bytes": 1899,
       "sha256": "8e7006b9dcc1fddaf9737739820c68256a245d0ede9636cb3e4847cbcda300c5"
@@ -1740,12 +1745,12 @@
       "sha256": "545c3b65d1784ad68e6d25b189c0ff5531c3746c77075d35fa976cd94b0ca27a"
     }
   ],
-  "fileCount": 346,
-  "totalBytes": 8833512,
+  "fileCount": 347,
+  "totalBytes": 8837728,
   "recordedAtUTC": "2026-10-12T21:33:10.792183+00:00",
   "sourceUpstreamONNXIncluded": false,
   "installerUpstreamONNXBundlingAuthorized": true,
   "privateDataIncluded": false,
-  "sourceCorrection": "Mac offline one DMG app-only all5 models/runtime22/science31215/pose3920, retained native/lifecycle scopes; unchanged Windows7507 baseline preserved",
+  "sourceCorrection": "Native currentUID snapshot and numeric firstcause; existing scientific code/models unchanged",
   "consumerSigningAccepted": false
 }

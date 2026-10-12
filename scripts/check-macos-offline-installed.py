@@ -121,8 +121,8 @@ class Native:
         self.proc.proc_pidinfo.restype = ctypes.c_int
         self.proc.proc_pidpath.argtypes = [ctypes.c_int, ctypes.c_void_p, ctypes.c_uint32]
         self.proc.proc_pidpath.restype = ctypes.c_int
-        self.proc.proc_listallpids.argtypes = [ctypes.c_void_p, ctypes.c_int]
-        self.proc.proc_listallpids.restype = ctypes.c_int
+        self.proc.proc_listpids.argtypes = [ctypes.c_uint32, ctypes.c_uint32, ctypes.c_void_p, ctypes.c_int]
+        self.proc.proc_listpids.restype = ctypes.c_int
         self.cg = ctypes.CDLL("/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics")
         self.cf = ctypes.CDLL("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation")
         self.cg.CGWindowListCopyWindowInfo.argtypes = [ctypes.c_uint32, ctypes.c_uint32]
@@ -149,10 +149,13 @@ class Native:
         info = BSDInfo()
         ctypes.set_errno(0)
         returned = self.proc.proc_pidinfo(pid, 3, 0, ctypes.byref(info), ctypes.sizeof(info))
+        observed_errno = ctypes.get_errno()
+        detail = (f"pid={pid} errno={observed_errno} flavor=3 "
+                  f"requestedBytes={ctypes.sizeof(info)} returned={returned}")
         if returned == 0:
-            require(ctypes.get_errno() in (0, errno.ESRCH, errno.ENOENT), "process identity unreadable")
+            require(observed_errno in (0, errno.ESRCH, errno.ENOENT), "process identity unreadable " + detail)
             return None
-        require(returned == ctypes.sizeof(info) and info.pid == pid, "process identity ABI mismatch")
+        require(returned == ctypes.sizeof(info) and info.pid == pid, "process identity ABI mismatch " + detail)
         if info.uid != os.getuid():
             return None  # Foreign users are neither observation targets nor cleanup targets.
         path = ctypes.create_string_buffer(4096)
@@ -169,14 +172,20 @@ class Native:
 
     def snapshot(self):
         pids = (ctypes.c_int * 4096)()
-        count = self.proc.proc_listallpids(pids, ctypes.sizeof(pids))
-        require(0 < count < len(pids), "process snapshot unknown or truncated")
+        ctypes.set_errno(0)
+        # Official sys/proc_info.h: PROC_UID_ONLY == 4; proc_listpids returns bytes.
+        byte_count = self.proc.proc_listpids(4, os.getuid(), pids, ctypes.sizeof(pids))
+        require(0 < byte_count < ctypes.sizeof(pids) and byte_count % ctypes.sizeof(ctypes.c_int) == 0,
+                f"OWN UID process snapshot unknown or truncated returnedBytes={byte_count} errno={ctypes.get_errno()}")
+        count = byte_count // ctypes.sizeof(ctypes.c_int)
         rows = []
         for pid in pids[:count]:
             if pid > 0:
-                item = self.identity(pid)
+                item = self.identity(pid)  # An unreadable OWN UID identity still fails; no blanket skip.
                 if item is not None:
                     rows.append(item)
+        require(any(row["pid"] == os.getpid() and row["uid"] == os.getuid() for row in rows),
+                "OWN UID snapshot lacks current process identity")
         return rows
 
     def rss(self, identity):
