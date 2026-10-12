@@ -911,8 +911,8 @@
     },
     {
       "path": "configs/axel-release-ort4-windows-x64-v2.json",
-      "bytes": 13368,
-      "sha256": "d1dff249dbcc32d27de7d406144da5f2b9157e4a2d0b08c185a9891506a22f1c"
+      "bytes": 13724,
+      "sha256": "2daa9f351feffe71db999ff9d1b22282b134cbbb9b6e48175587f35dd47877e1"
     },
     {
       "path": "contracts/analysis-result.mjs",
@@ -1621,10 +1621,10 @@
     }
   ],
   "fileCount": 322,
-  "totalBytes": 8479051,
-  "recordedAtUTC": "2026-10-12T17:37:15.342877+00:00",
+  "totalBytes": 8479407,
+  "recordedAtUTC": "2026-10-12T17:57:45.611552+00:00",
   "sourceUpstreamONNXIncluded": false,
   "installerUpstreamONNXBundlingAuthorized": true,
   "privateDataIncluded": false,
-  "sourceCorrection": "Immutable source identity CLI replaces mutable job metadata read during export; meaningful race/mismatch/transport fixtures; algorithms/models/caps unchanged"
+  "sourceCorrection": "RefreshactiveWindowsrecipe immutableexport Source SHA/bytes lineage; addtrustedentry binding; no models/CPU/runtime guard changes"
 }

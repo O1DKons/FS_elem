@@ -153,9 +153,10 @@
     "../scripts/video_type_model.py": "d5c6a7e4f8a67bdd6d142fc1bb623aff118d79b1c11ceca12d12488c0d67e784",
     "../scripts/source_diagnostics.py": "33cb1b1022f17abea07143da65088d825df85fb2fadd9d99edf2c947e3519319",
     "../runtime/process_gate.py": "bdd10b07c12f34ef977a01cfc10e3d339671e91dbc1f1138041edb8b40bda1fd",
-    "../services/analysis/jobs.py": "7e7d6d3fd6b5c2325872bd2011d03365cd06bf3a223d5539c1ee7903070f257c",
+    "../services/analysis/jobs.py": "01c3bf15fa223d53a137bc86631b5c5df6b49a95adfc2e1aa2ebde375f65345f",
     "../services/analysis/process_owner.py": "8fbd5c1651a7ce84a3008d0b1d018ec6309f180a86113aeeed70905d4a8276d9",
-    "../services/analysis/server.py": "2536291b06ead6f80106d4aa2f7abdde3fa590aba8eeeb383f3718225a229fd9"
+    "../services/analysis/server.py": "2536291b06ead6f80106d4aa2f7abdde3fa590aba8eeeb383f3718225a229fd9",
+    "../runtime/analyze_job.py": "e9dd22f346790c9b927b51b120c41be756172d9e02df5597ce9600ff13b34fa3"
   },
   "globalAthleteIndependenceVerified": false,
   "nominalGuard": "usableTorsoFrames>=3 and finiteSpectralFeatures>0",
@@ -201,19 +202,22 @@
     "ffmpegSha256": "2ce797a0f88d7f067180338fb227f7b1928ea727bd9a4d7a1d022f7c52af71a3",
     "backendRuntimeHashes": {
       "../runtime/process_gate.py": "bdd10b07c12f34ef977a01cfc10e3d339671e91dbc1f1138041edb8b40bda1fd",
-      "../services/analysis/jobs.py": "7e7d6d3fd6b5c2325872bd2011d03365cd06bf3a223d5539c1ee7903070f257c",
+      "../services/analysis/jobs.py": "01c3bf15fa223d53a137bc86631b5c5df6b49a95adfc2e1aa2ebde375f65345f",
       "../services/analysis/process_owner.py": "8fbd5c1651a7ce84a3008d0b1d018ec6309f180a86113aeeed70905d4a8276d9",
-      "../services/analysis/server.py": "2536291b06ead6f80106d4aa2f7abdde3fa590aba8eeeb383f3718225a229fd9"
+      "../services/analysis/server.py": "2536291b06ead6f80106d4aa2f7abdde3fa590aba8eeeb383f3718225a229fd9",
+      "../runtime/analyze_job.py": "e9dd22f346790c9b927b51b120c41be756172d9e02df5597ce9600ff13b34fa3"
     },
     "baselineRecipeSha256": "03ac6f9cf28c255c22091218ced6616c648e4359702f5a29658fcc3febb42dd7",
     "ffmpegIdentityAcceptanceSha256": "370bd7987cc5c82a3c1dae703177986f7bea26f72cc33cd12fbd9355a932ba1b",
     "readinessKind": "pinned-source-configuration-for-target-validation",
     "backendRuntimeBytes": {
       "../runtime/process_gate.py": 906,
-      "../services/analysis/jobs.py": 15049,
-      "../services/analysis/process_owner.py": 9015,
-      "../services/analysis/server.py": 8374
+      "../services/analysis/jobs.py": 15364,
+      "../services/analysis/process_owner.py": 9111,
+      "../services/analysis/server.py": 8374,
+      "../runtime/analyze_job.py": 1481
     },
-    "backendSourceAcceptanceSha256": "db126eae5e1261c4c8d779bcbc04206ed1eb2fd53af2d60dce93e0d27acd2a0b"
+    "backendSourceAcceptanceSha256": "92a436946427cce401ee45fce626389164fb94acfcbeafd18b9eaf7439523753",
+    "parentBackendSourceAcceptanceSha256": "db126eae5e1261c4c8d779bcbc04206ed1eb2fd53af2d60dce93e0d27acd2a0b"
   }
 }
