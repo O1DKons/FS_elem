@@ -946,8 +946,8 @@
     },
     {
       "path": "configs/mac-offline-ci-host-template.json",
-      "bytes": 10217,
-      "sha256": "c5011e8436e3f2a7301c1557196761ca19df77ec6e079f65e697f18f45240084"
+      "bytes": 10529,
+      "sha256": "bf1e385f945913245931df32bb1b28944e46d52aa5cc9fe67a9f5a35bd2b2575"
     },
     {
       "path": "configs/mac-recipe-binding.json",
@@ -1246,8 +1246,8 @@
     },
     {
       "path": "scripts/build-macos-dmg.py",
-      "bytes": 37084,
-      "sha256": "e09448228dcec059f5784b3a353a0674158de6a17773ee2e75f456b06d6fac80"
+      "bytes": 37135,
+      "sha256": "05aa3b84c1e6a3d2c43d3ed6a72030a2ab19f933cf59a60baf86b1dd27b75685"
     },
     {
       "path": "scripts/build-windows-installer.ps1",
@@ -1356,8 +1356,8 @@
     },
     {
       "path": "scripts/run-macos-offline-ci-host.py",
-      "bytes": 52817,
-      "sha256": "9f3bc575a2c9b7f6e8268186e7b4d8fe92fe7d7c8f1d226cd062f3fe1662e299"
+      "bytes": 54596,
+      "sha256": "0b08298a849ead745b98a72f1425bd872d4f29f2878eaf040bd32561a63a9a02"
     },
     {
       "path": "scripts/run-windows-offline-check.ps1",
@@ -1585,6 +1585,11 @@
       "sha256": "391400fde9142784014fd92b4cc372bfdfcdc9509236380daf708202890fda8a"
     },
     {
+      "path": "tests/release/fixture_selected_swift_input.py",
+      "bytes": 5452,
+      "sha256": "0c79a46bb85e82e23ce108a21e3ce3f573302f80ad6e7918fec58dbca5de7266"
+    },
+    {
       "path": "tests/release/launcher-windows.test.mjs",
       "bytes": 1899,
       "sha256": "8e7006b9dcc1fddaf9737739820c68256a245d0ede9636cb3e4847cbcda300c5"
@@ -1745,12 +1750,12 @@
       "sha256": "545c3b65d1784ad68e6d25b189c0ff5531c3746c77075d35fa976cd94b0ca27a"
     }
   ],
-  "fileCount": 347,
-  "totalBytes": 8837728,
+  "fileCount": 348,
+  "totalBytes": 8845322,
   "recordedAtUTC": "2026-10-12T21:33:10.792183+00:00",
   "sourceUpstreamONNXIncluded": false,
   "installerUpstreamONNXBundlingAuthorized": true,
   "privateDataIncluded": false,
-  "sourceCorrection": "Native currentUID snapshot and numeric firstcause; existing scientific code/models unchanged",
+  "sourceCorrection": "Preserve selected Swift invocation alias/narrow streamed compiler-input cap; select macOS13 binary wheels with existing versions/hashes/MachO guard",
   "consumerSigningAccepted": false
 }

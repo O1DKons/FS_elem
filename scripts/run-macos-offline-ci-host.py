@@ -109,7 +109,10 @@ def rooted(root, relative):
 def file_pin(path, limit_ns, maximum=256 * 1024**2):
     before(limit_ns)
     info = path.lstat()
-    need(stat.S_ISREG(info.st_mode) and not path.is_symlink() and info.st_size <= maximum, "tool/input size or type rejected")
+    regular, linked = stat.S_ISREG(info.st_mode), path.is_symlink()
+    need(regular and not linked and info.st_size <= maximum,
+         f"tool/input size or type rejected path={path} mode={info.st_mode:#o} "
+         f"regular={regular} symlink={linked} actualBytes={info.st_size} capBytes={maximum}")
     value = hashlib.sha256()
     with path.open("rb") as reader:
         while True:
@@ -122,6 +125,31 @@ def file_pin(path, limit_ns, maximum=256 * 1024**2):
     need((info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns) ==
          (after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns, after.st_ctime_ns), "tool/input changed while hashing")
     return {"path": str(path), "bytes": info.st_size, "sha256": value.hexdigest()}
+
+
+def selected_swift_pin(path, developer, limit_ns):
+    before(limit_ns)
+    subtree = developer / "Toolchains"
+    need(path.is_absolute() and path.is_relative_to(subtree) and ".." not in path.parts,
+         "selected Swift invocation escaped genuine Developer/Toolchains")
+    alias_before = path.lstat()
+    linked = stat.S_ISLNK(alias_before.st_mode)
+    need(linked or stat.S_ISREG(alias_before.st_mode), "selected Swift invocation type rejected")
+    link = os.readlink(path) if linked else None
+    target = path.resolve(strict=True)
+    need(target.is_relative_to(subtree), "selected Swift target escaped genuine Developer/Toolchains")
+    pin = file_pin(target, limit_ns, maximum=1024 * 1024**2)
+    alias_after = path.lstat()
+    fields = ("st_dev", "st_ino", "st_mode", "st_size", "st_mtime_ns", "st_ctime_ns")
+    need(all(getattr(alias_before, field) == getattr(alias_after, field) for field in fields)
+         and path.resolve(strict=True) == target and (not linked or os.readlink(path) == link),
+         "selected Swift invocation alias changed during target hashing")
+    before(limit_ns)
+    return {**pin, "path": str(path), "resolvedTargetPath": str(target),
+            "invocationAlias": {"symbolicLink": linked, "linkTarget": link,
+                "dev": str(alias_before.st_dev), "ino": str(alias_before.st_ino),
+                "mode": alias_before.st_mode, "bytes": alias_before.st_size,
+                "mtimeNs": str(alias_before.st_mtime_ns), "ctimeNs": str(alias_before.st_ctime_ns)}}
 
 
 def tree_bytes(root, end_ns, allowed_links=(), read_only_mounts=()):
@@ -530,7 +558,9 @@ class Host:
         developer = phase.execute("xcode-select", ["/usr/bin/xcode-select", "-p"]).decode().strip()
         sdk = phase.execute("selected-sdk", ["/usr/bin/xcrun", "--sdk", "macosx", "--show-sdk-path"]).decode().strip()
         swift = phase.execute("selected-swiftc", ["/usr/bin/xcrun", "-f", "swiftc"]).decode().strip()
-        developer, sdk, swift = pathlib.Path(developer).resolve(), pathlib.Path(sdk).resolve(), pathlib.Path(swift).resolve()
+        developer, sdk = pathlib.Path(developer).resolve(), pathlib.Path(sdk).resolve()
+        swift_invocation = pathlib.Path(swift)
+        swift = swift_invocation.resolve()
         need(developer.is_dir() and str(developer).endswith(".app/Contents/Developer")
              and "CommandLineTools" not in str(developer), "genuine full selected Xcode required")
         need(sdk.is_dir() and sdk.is_relative_to(developer) and swift.is_file() and swift.is_relative_to(developer), "selected SDK/compiler lineage mismatch")
@@ -538,7 +568,7 @@ class Host:
         libraries = developer / "Platforms/MacOSX.platform/Developer/usr/lib"
         need((frameworks / "XCTest.framework").is_dir() and libraries.is_dir(), "genuine selected-Xcode XCTest unavailable")
         tools = {"python": file_pin(pathlib.Path(sys.executable).resolve(), phase.work_end_ns),
-                 "swiftc": file_pin(swift, phase.work_end_ns)}
+                 "swiftc": selected_swift_pin(swift_invocation, developer, phase.work_end_ns)}
         for name in ("lipo", "otool", "hdiutil"):
             path = pathlib.Path("/usr/bin") / name
             need(path.is_file() and os.access(path, os.X_OK), "required genuine system tool unavailable")

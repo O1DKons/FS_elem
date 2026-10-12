@@ -549,6 +549,7 @@ def main():
                 "import sys;assert '.'.join(map(str,sys.version_info[:3]))=='" + PYTHON_VERSION[name] + "';print(sys.version)"], work)
             site = runtime / ('venv-' + name) / ('lib/python' + minor + '/site-packages')
             build.run(name + '-locked-dependencies', [executable, '-I', '-m', 'pip', 'install',
+                '--platform', 'macosx_13_0_arm64',
                 '--target', site, '--require-hashes', '--only-binary=:all:', '--no-compile',
                 '--no-cache-dir', '-r', source / ('services/analysis/requirements-' + name + '-macos-arm64.lock')], work)
             # Unused generated CLI scripts can contain build-host shebangs.

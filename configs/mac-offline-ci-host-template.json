@@ -6,7 +6,7 @@
   "builderInterfaceAccepted": true,
   "nativeInterfaceAccepted": true,
   "runtimeInputsAccepted": true,
-  "hostSha256": "9f3bc575a2c9b7f6e8268186e7b4d8fe92fe7d7c8f1d226cd062f3fe1662e299",
+  "hostSha256": "0b08298a849ead745b98a72f1425bd872d4f29f2878eaf040bd32561a63a9a02",
   "phaseLimits": {
     "discovery": {
       "wholeSeconds": 30,
@@ -86,8 +86,8 @@
   "sourcePins": [
     {
       "path": "scripts/build-macos-dmg.py",
-      "bytes": 37084,
-      "sha256": "e09448228dcec059f5784b3a353a0674158de6a17773ee2e75f456b06d6fac80"
+      "bytes": 37135,
+      "sha256": "05aa3b84c1e6a3d2c43d3ed6a72030a2ab19f933cf59a60baf86b1dd27b75685"
     },
     {
       "path": "scripts/prepare-macos-bundle.py",
@@ -191,8 +191,8 @@
     },
     {
       "path": "scripts/run-macos-offline-ci-host.py",
-      "bytes": 52817,
-      "sha256": "9f3bc575a2c9b7f6e8268186e7b4d8fe92fe7d7c8f1d226cd062f3fe1662e299"
+      "bytes": 54596,
+      "sha256": "0b08298a849ead745b98a72f1425bd872d4f29f2878eaf040bd32561a63a9a02"
     },
     {
       "path": "configs/mac-desktop-web.json",
@@ -203,8 +203,8 @@
   "builderSourcePins": [
     {
       "path": "scripts/build-macos-dmg.py",
-      "bytes": 37084,
-      "sha256": "e09448228dcec059f5784b3a353a0674158de6a17773ee2e75f456b06d6fac80"
+      "bytes": 37135,
+      "sha256": "05aa3b84c1e6a3d2c43d3ed6a72030a2ab19f933cf59a60baf86b1dd27b75685"
     },
     {
       "path": "scripts/prepare-macos-bundle.py",
@@ -294,5 +294,8 @@
     "04c511269ebbfb7394c38b4267af7d5d3b1f82bcb2701cb74af052a34356f660",
     "a57302d588f6d7519600f987cdd3f19963dca306c80bdee1873e2f1e9967626d"
   ],
-  "RootNewFixtureAcceptance": "98620ddeb0e00bc06c5779dc405a4195c4cdab104d47b3e7b26aec05653ffc1e"
+  "RootNewFixtureAcceptance": "98620ddeb0e00bc06c5779dc405a4195c4cdab104d47b3e7b26aec05653ffc1e",
+  "selectedGenuineCompilerExistingInputCapBytes": 1073741824,
+  "generalOtherExistingInputCapBytes": 268435456,
+  "selectedCompilerInputCapPolicy": "ONLY admitted xcrun swiftc invocation alias and resolved regular target inside genuine selected Developer/Toolchains, streaming under original discovery horizon"
 }
