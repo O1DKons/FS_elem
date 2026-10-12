@@ -1,0 +1,71 @@
+name: FS_elem Mac offline development native check
+
+# Inert Source template. Root must supply reviewed scripts and admitted template;
+# writing this file does not dispatch or authorize a CI run.
+on:
+  push:
+    branches: [release/v0.2.6]
+
+permissions:
+  contents: read
+
+jobs:
+  offline-development:
+    runs-on: macos-15
+    timeout-minutes: 65
+    steps:
+      - name: Checkout exact source commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Materialize explicitly admitted Root host grant
+        shell: bash
+        run: |
+          python3 -I -B - <<'PY'
+          import hashlib,json,os,pathlib
+          source=pathlib.Path(os.environ['GITHUB_WORKSPACE'])
+          template=json.loads((source/'configs/mac-offline-ci-host-template.json').read_text(encoding='utf-8'))
+          if template.pop('executionAdmittedByRoot',None) is not True:
+              raise SystemExit('Source-only or pending Root template: execution not admitted')
+          if os.environ['GITHUB_REF']!='refs/heads/release/v0.2.6':
+              raise SystemExit('Unexpected actual release source ref')
+          if os.environ.get('GITHUB_RUN_ATTEMPT')!='1':
+              raise SystemExit('Only the ONE admitted first attempt may execute')
+          for key,environment in (('sourceCommit','GITHUB_SHA'),('sourceRef','GITHUB_REF'),('runId','GITHUB_RUN_ID'),('runAttempt','GITHUB_RUN_ATTEMPT')):
+              value=os.environ.get(environment,'')
+              if not value: raise SystemExit('Missing actual workflow identity '+environment)
+              template[key]=value
+          ps=pathlib.Path('/bin/ps');psraw=ps.read_bytes()
+          template['systemProcessSnapshotTool']={'path':str(ps),'bytes':len(psraw),'sha256':hashlib.sha256(psraw).hexdigest()}
+          template['kind']='ROOT_ADMITTED_GENERATED_MAC_OFFLINE_CI_HOST_GRANT'
+          template['actualAuthorization']=True
+          base=pathlib.Path(os.environ['RUNNER_TEMP'])/('fs-elem-mac-offline-'+template['runId']+'-'+template['runAttempt'])
+          if base.exists(): raise SystemExit('Fresh host grant/output namespace already exists')
+          base.mkdir()
+          template['outputDir']=str(base/'host-output')
+          raw=json.dumps(template,sort_keys=True,separators=(',',':')).encode()+b'\n'
+          if len(raw)>65536: raise SystemExit('Generated Root host grant exceeds64KiB')
+          grant=base/'root-host-grant.json';grant.write_bytes(raw)
+          values={'FS_ELEM_MAC_HOST_GRANT_FILE':str(grant),'FS_ELEM_MAC_HOST_GRANT_SHA256':hashlib.sha256(raw).hexdigest(),'FS_ELEM_MAC_HOST_OUTPUT':template['outputDir']}
+          with pathlib.Path(os.environ['GITHUB_ENV']).open('a',encoding='utf-8') as f:
+              for key,value in values.items():
+                  if '\n' in value or '\r' in value: raise SystemExit('Invalid environment materialization')
+                  f.write(key+'='+value+'\n')
+          PY
+      - name: One admitted retained host operator
+        shell: bash
+        run: |
+          python3 -I -B scripts/run-macos-offline-ci-host.py \
+            --root-grant "$FS_ELEM_MAC_HOST_GRANT_FILE" \
+            --root-grant-sha256 "$FS_ELEM_MAC_HOST_GRANT_SHA256" \
+            --output-dir "$FS_ELEM_MAC_HOST_OUTPUT"
+      - name: Save development evidence and DMG
+        if: ${{ always() && env.FS_ELEM_MAC_HOST_OUTPUT != '' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: fs-elem-mac-offline-development-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.FS_ELEM_MAC_HOST_OUTPUT }}
+          if-no-files-found: error
+          retention-days: 7
+

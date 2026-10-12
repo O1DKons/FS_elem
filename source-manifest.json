@@ -1,11 +1,11 @@
 {
   "schemaVersion": 3,
-  "version": "0.2.5",
-  "status": "OFFLINE_WINDOWS_SOURCE_CANDIDATE_NATIVE_CHECK_PENDING",
+  "version": "0.2.6",
+  "status": "OFFLINE_MAC_DEVELOPMENT_SOURCE_CANDIDATE_NATIVE_PENDING",
   "readyForRelease": false,
   "manifestExcludesItself": true,
-  "baselineCommit": "b875d54703bd02f3f3edc4cd50e74dd990dc55ef",
-  "baselineVersion": "0.2.4",
+  "baselineCommit": "7507e470d0eed2f204a975bbebfd99e81d4ef565",
+  "baselineVersion": "0.2.5",
   "scientificValidationUnchanged": true,
   "privateUpstreamModelsIncluded": false,
   "files": [
@@ -13,6 +13,11 @@
       "path": ".gitattributes",
       "bytes": 8,
       "sha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da"
+    },
+    {
+      "path": ".github/workflows/macos-offline-installer.yml",
+      "bytes": 3746,
+      "sha256": "6bb3bc9d5a7084987ea9e5c08d27cd7d4a7a965f22c9371505922b53c74de70d"
     },
     {
       "path": ".github/workflows/release-checks.yml",
@@ -58,6 +63,11 @@
       "path": "README.md",
       "bytes": 7021,
       "sha256": "282d4433db2ae8a0420f7c684b74699d8b0c697c58f7ee2b7e4fcc979a11c719"
+    },
+    {
+      "path": "apps/macos-launcher/FS_elemApp.swift",
+      "bytes": 21837,
+      "sha256": "c57c4000f89f57323b4b57a8e72c8be20bd2211baf3847e5486e9ad30026dd37"
     },
     {
       "path": "apps/web/.next/types/routes.d.ts",
@@ -822,7 +832,7 @@
     {
       "path": "apps/web/package.json",
       "bytes": 1342,
-      "sha256": "a1e4ae13ad0c5b85e3419702ac19e385fab403cd77f6c531d473c30ae55dc65d"
+      "sha256": "c26c70eb69484138c618eb9f0e8aecd17db6e49ea1d240727ac810206df3ab42"
     },
     {
       "path": "apps/web/pnpm-lock.yaml",
@@ -865,6 +875,11 @@
       "sha256": "9d6ca74b3de38dab1366c55f55b8de0bca6052ce1aa0c7dedd45ae17cf0140e7"
     },
     {
+      "path": "assets/models/manifest-offline-macos-v026.json",
+      "bytes": 13213,
+      "sha256": "180a38dd961c8bb21edfb711be9c928b38138899570b3352702222bb90669692"
+    },
+    {
       "path": "assets/models/manifest-release-v1.json",
       "bytes": 12142,
       "sha256": "dd5d2c2c0fa39407488830cd45fb56940e59b5bb53145d2fabcf92d6fb89b6ff"
@@ -900,9 +915,19 @@
       "sha256": "d6527c2289490d3d3f954c7356edac5b530de5d9ddf636d361b8315ab6798b1b"
     },
     {
+      "path": "configs/axel-release-offline-macos-arm64-parent-v026.json",
+      "bytes": 13466,
+      "sha256": "25dbf103779cf7f345109e10473da14c13b5b25700a860beef38e2808b6bfb3e"
+    },
+    {
       "path": "configs/axel-release-ort2-v2.json",
       "bytes": 12763,
       "sha256": "43399ba321ccffdda33729061b0dc4716744562eaa22d4cbe86797b2a3cfcb4a"
+    },
+    {
+      "path": "configs/axel-release-ort4-macos-app.json",
+      "bytes": 14716,
+      "sha256": "9c119e9721598859187bb79c5e0c4a37310a3291084de190dba379fdf6ac1d75"
     },
     {
       "path": "configs/axel-release-ort4-v2.json",
@@ -913,6 +938,21 @@
       "path": "configs/axel-release-ort4-windows-x64-v2.json",
       "bytes": 13724,
       "sha256": "2daa9f351feffe71db999ff9d1b22282b134cbbb9b6e48175587f35dd47877e1"
+    },
+    {
+      "path": "configs/mac-desktop-web.json",
+      "bytes": 92,
+      "sha256": "ac1a983463f71a15a621b8a03d5b109cceeb9342032da7d62b6207fb6f2a9ceb"
+    },
+    {
+      "path": "configs/mac-offline-ci-host-template.json",
+      "bytes": 10217,
+      "sha256": "6655c8af0b826b6df1649f3f71046d2a6b908990df9f9cc835443e4c766138a7"
+    },
+    {
+      "path": "configs/mac-recipe-binding.json",
+      "bytes": 1737,
+      "sha256": "c793d642f70800455da3a2ee14441543c5683e392010128198924b2dd39a6ac0"
     },
     {
       "path": "contracts/analysis-result.mjs",
@@ -1067,7 +1107,32 @@
     {
       "path": "package.json",
       "bytes": 797,
-      "sha256": "c321356fe8af8c803f3ec589775d4de15227f429a8634131d6d7a0e26d49ca50"
+      "sha256": "aaa5f8c008b41ed0d73e6c34b1961dae2f2f622dd0b90f0d23cb695ece533580"
+    },
+    {
+      "path": "packaging/macos/Info.plist",
+      "bytes": 888,
+      "sha256": "bfa91d6af0bb6e7b711453e16a6c67b1b0cecfb8de4591c456edec9d28f244b8"
+    },
+    {
+      "path": "packaging/macos/OFFLINE-MAC-CANDIDATE.md",
+      "bytes": 780,
+      "sha256": "b3524b17eb04bc1b5be69e59a11a0a3d4eb6db8690450f0ae0b55c1ed5c21cd3"
+    },
+    {
+      "path": "packaging/macos/desktop-entry-root-binding-v1.json",
+      "bytes": 1046,
+      "sha256": "7ddd83abbca2e9fa5cb55cfde5b9056536efba9c0acc3e10ded783e36c9c7019"
+    },
+    {
+      "path": "packaging/macos/offline-loopback.sb",
+      "bytes": 190,
+      "sha256": "339423f809b977e1c1a1b0ca1d88035fc03f56227d8ae69e844d983b61bc484f"
+    },
+    {
+      "path": "packaging/macos/runtime-inputs.json",
+      "bytes": 4965,
+      "sha256": "cec17fd55b3eded95fc8a5aabdabaf915dcc1105f08b17480e130707e4cdc0f7"
     },
     {
       "path": "packaging/windows/FS_elem.iss",
@@ -1180,6 +1245,11 @@
       "sha256": "e4468e72d28b11da98e39f279f48ff5be53ab3b3c90e3d2470309604b3aa7fc2"
     },
     {
+      "path": "scripts/build-macos-dmg.py",
+      "bytes": 37084,
+      "sha256": "e09448228dcec059f5784b3a353a0674158de6a17773ee2e75f456b06d6fac80"
+    },
+    {
       "path": "scripts/build-windows-installer.ps1",
       "bytes": 18479,
       "sha256": "2eab96048d4577b1d089237d6384dccafc4753d969c952756fd90f5df08bcc67"
@@ -1188,6 +1258,11 @@
       "path": "scripts/build.mjs",
       "bytes": 372,
       "sha256": "07c66bbb834c9e7f051e090216d68ad3e2a4ce4447a3cb80f30e950685c23211"
+    },
+    {
+      "path": "scripts/check-macos-offline-installed.py",
+      "bytes": 51392,
+      "sha256": "25625394de9983898bd695b8f666001d584c041c58c5e686a02d9e366b1b90ad"
     },
     {
       "path": "scripts/check-windows-installer.ps1",
@@ -1215,6 +1290,16 @@
       "sha256": "61490611efb91fe744ea4ca9dea53ed0b33a2a1dbdce1c0253767ccef3dfae9e"
     },
     {
+      "path": "scripts/macos-bundle.mjs",
+      "bytes": 37260,
+      "sha256": "acc3d8ba97a9d7a5d0c2cf593d43e173f15e139e7d8ce9777c50b48172e9ad94"
+    },
+    {
+      "path": "scripts/macos-first-run.py",
+      "bytes": 34057,
+      "sha256": "3632b6f008548b4dc0bda22ff42f9dfa48495f64854d1b484d1fb1e51c363ba2"
+    },
+    {
       "path": "scripts/phase_contact_pilot.py",
       "bytes": 7445,
       "sha256": "16458d28ea69b52bd7846331c891ae580427527e407afb183215aa2a76bb8375"
@@ -1223,6 +1308,11 @@
       "path": "scripts/pose_cache_contract.py",
       "bytes": 3426,
       "sha256": "336d584c1777d369ade2c20d0bf14184a5584f6436c8d93e4ce9c239120da711"
+    },
+    {
+      "path": "scripts/prepare-macos-bundle.py",
+      "bytes": 24150,
+      "sha256": "13ff17c223959e64538a3a315503a5a7ac01603025eacb89a4b3440e96c7df3f"
     },
     {
       "path": "scripts/prepare-windows-bundle.py",
@@ -1265,6 +1355,11 @@
       "sha256": "db7e931a9a80d72f16631300ff4b257e341b19a8cf9c653424225259e43cabdd"
     },
     {
+      "path": "scripts/run-macos-offline-ci-host.py",
+      "bytes": 52817,
+      "sha256": "9f3bc575a2c9b7f6e8268186e7b4d8fe92fe7d7c8f1d226cd062f3fe1662e299"
+    },
+    {
       "path": "scripts/run-windows-offline-check.ps1",
       "bytes": 26915,
       "sha256": "ca15209587a19320ee346e491ea14864d0970d58418e4d1f824620ca51d40472"
@@ -1293,6 +1388,11 @@
       "path": "scripts/sparse_pose_timestamps.py",
       "bytes": 4982,
       "sha256": "8610eee27dcb55805b381d9d7cc43253ebf4e67143e4d4129585d8b97ca96b24"
+    },
+    {
+      "path": "scripts/start-macos-desktop.mjs",
+      "bytes": 10522,
+      "sha256": "664f1a3279b84ee28a5559e26c26be1a0770e220b39d821853be1b23b4ae3732"
     },
     {
       "path": "scripts/start-release.mjs",
@@ -1465,6 +1565,11 @@
       "sha256": "afdfc40cf3282a66a74c54e25b1b3fe24bf0198440e2b74bb07beb45d5d0f063"
     },
     {
+      "path": "tests/release/LauncherContractTests.swift",
+      "bytes": 5703,
+      "sha256": "d6dc6b948e472b091c6f1a9458c92c0201b6356a71c30bccd689f04495e10d78"
+    },
+    {
       "path": "tests/release/api-cooperative-grace.test.mjs",
       "bytes": 1444,
       "sha256": "c66981a210a2a7e286cbbd1bbd31a19a3cd908be99682a68bc7ea68c5e48e55f"
@@ -1480,6 +1585,16 @@
       "sha256": "8e7006b9dcc1fddaf9737739820c68256a245d0ede9636cb3e4847cbcda300c5"
     },
     {
+      "path": "tests/release/macos-offline-bindings.test.mjs",
+      "bytes": 3428,
+      "sha256": "70d4bcb23e0239c174ba02462ed45dc2e5611081f1e7dca9b7e704903db537ed"
+    },
+    {
+      "path": "tests/release/macos-swift-test-runner/main.swift",
+      "bytes": 1291,
+      "sha256": "e59c334d417178fb00c2aa833252c1c0085f13ccf30b3ec81e976692616689cc"
+    },
+    {
       "path": "tests/release/owned-web-worker.test.mjs",
       "bytes": 4918,
       "sha256": "710c3d26567844bed3f32e28e677adbff56d89fe9e2698f159dddadbe9c38a45"
@@ -1493,6 +1608,11 @@
       "path": "tests/release/test_export_identity_transport.py",
       "bytes": 5653,
       "sha256": "cdb11190f0f3b9413e45946a9011925799004e906689f77eab36a8050880cc93"
+    },
+    {
+      "path": "tests/release/test_macos_offline_models.py",
+      "bytes": 5861,
+      "sha256": "6c5c270d53a57e30e3d6cc48bd678a996c0c6050ca6194e24762ce76a088a596"
     },
     {
       "path": "tests/release/test_release_platform.py",
@@ -1620,11 +1740,12 @@
       "sha256": "545c3b65d1784ad68e6d25b189c0ff5531c3746c77075d35fa976cd94b0ca27a"
     }
   ],
-  "fileCount": 322,
-  "totalBytes": 8483054,
-  "recordedAtUTC": "2026-10-12T19:24:11.317379+00:00",
+  "fileCount": 346,
+  "totalBytes": 8833512,
+  "recordedAtUTC": "2026-10-12T21:33:10.792183+00:00",
   "sourceUpstreamONNXIncluded": false,
   "installerUpstreamONNXBundlingAuthorized": true,
   "privateDataIncluded": false,
-  "sourceCorrection": "Explicit supervisor success exit0 after failure gate; preserve existing checker/product/normalOWNteardown/original600/630/resources"
+  "sourceCorrection": "Mac offline one DMG app-only all5 models/runtime22/science31215/pose3920, retained native/lifecycle scopes; unchanged Windows7507 baseline preserved",
+  "consumerSigningAccepted": false
 }

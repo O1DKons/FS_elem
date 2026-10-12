@@ -1,0 +1,47 @@
+{
+  "status": "source-accepted",
+  "version": "0.2.6",
+  "parent": {
+    "path": "configs/axel-release-offline-macos-arm64-parent-v026.json",
+    "bytes": 13466,
+    "sha256": "25dbf103779cf7f345109e10473da14c13b5b25700a860beef38e2808b6bfb3e"
+  },
+  "derived": {
+    "path": "configs/axel-release-ort4-macos-app.json",
+    "bytes": 14716,
+    "sha256": "9c119e9721598859187bb79c5e0c4a37310a3291084de190dba379fdf6ac1d75"
+  },
+  "modelManifest": {
+    "path": "assets/models/manifest-offline-macos-v026.json",
+    "bytes": 13213,
+    "sha256": "180a38dd961c8bb21edfb711be9c928b38138899570b3352702222bb90669692"
+  },
+  "sourceUpdates": [
+    {
+      "path": "scripts/macos-first-run.py",
+      "key": "../scripts/macos-first-run.py",
+      "bytes": 34057,
+      "sha256": "3632b6f008548b4dc0bda22ff42f9dfa48495f64854d1b484d1fb1e51c363ba2"
+    },
+    {
+      "path": "scripts/macos-bundle.mjs",
+      "key": "../scripts/macos-bundle.mjs",
+      "bytes": 37260,
+      "sha256": "acc3d8ba97a9d7a5d0c2cf593d43e173f15e139e7d8ce9777c50b48172e9ad94"
+    },
+    {
+      "path": "scripts/start-macos-desktop.mjs",
+      "key": "../scripts/start-macos-desktop.mjs",
+      "bytes": 10522,
+      "sha256": "664f1a3279b84ee28a5559e26c26be1a0770e220b39d821853be1b23b4ae3732"
+    }
+  ],
+  "packagingProvenance": {
+    "scope": "Macofflinepackaging-only exactacceptedMain3Source bindings",
+    "mainSourceAcceptanceSha256": "7976361d9ac77208dd1171013372a40e876bad1b94baedcefee39e834272b812",
+    "mainSourcePeerSha256": "64d475cfb372757cfe2dc6b9d1f4cde24d59e9af29ff835ce3b26b019e39eac7",
+    "parentSha256": "25dbf103779cf7f345109e10473da14c13b5b25700a860beef38e2808b6bfb3e",
+    "scientificFieldsUnchanged": true,
+    "nativeRuntimeVerified": false
+  }
+}

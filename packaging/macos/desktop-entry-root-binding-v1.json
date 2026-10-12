@@ -1,0 +1,31 @@
+{
+  "status": "source-accepted",
+  "entry": "scripts/start-macos-desktop.mjs",
+  "entryBytes": 10522,
+  "sourceSha256": "664f1a3279b84ee28a5559e26c26be1a0770e220b39d821853be1b23b4ae3732",
+  "argv": [],
+  "recipeEnvironmentVariable": "FS_ELEM_MAC_RECIPE",
+  "userRootEnvironmentVariable": "FS_ELEM_MAC_USER_ROOT",
+  "webConfigEnvironmentVariable": "FS_ELEM_MAC_WEB_CONFIG",
+  "webConfigSourcePath": "configs/mac-desktop-web.json",
+  "webConfigSourceSha256": "ac1a983463f71a15a621b8a03d5b109cceeb9342032da7d62b6207fb6f2a9ceb",
+  "readyEventType": "ready",
+  "healthUrl": "http://127.0.0.1:5174/api/analysis/health",
+  "uiUrl": "http://127.0.0.1:5174/analysis",
+  "control": {
+    "wire": "JSONL",
+    "shutdown": {
+      "type": "shutdown"
+    },
+    "eof": "shutdown"
+  },
+  "healthRequirements": {
+    "status": "ready",
+    "inferenceAvailable": true,
+    "activeJobId": null
+  },
+  "packageVersion": "0.2.6",
+  "nodeMajor": 22,
+  "offline": true,
+  "sourceAcceptanceSha256": "7976361d9ac77208dd1171013372a40e876bad1b94baedcefee39e834272b812"
+}

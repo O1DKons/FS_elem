@@ -1,0 +1,298 @@
+{
+  "executionAdmittedByRoot": true,
+  "actualAuthorization": false,
+  "retry": 0,
+  "unsignedDevelopmentOnly": true,
+  "builderInterfaceAccepted": true,
+  "nativeInterfaceAccepted": true,
+  "runtimeInputsAccepted": true,
+  "hostSha256": "9f3bc575a2c9b7f6e8268186e7b4d8fe92fe7d7c8f1d226cd062f3fe1662e299",
+  "phaseLimits": {
+    "discovery": {
+      "wholeSeconds": 30,
+      "workSeconds": 25,
+      "cleanupSeconds": 5,
+      "sampledRssBytes": 536870912,
+      "outputBytes": 1048576,
+      "tmpBytes": 1048576,
+      "logBytes": 65536
+    },
+    "xctest": {
+      "wholeSeconds": 120,
+      "workSeconds": 100,
+      "cleanupSeconds": 20,
+      "sampledRssBytes": 1610612736,
+      "outputBytes": 268435456,
+      "tmpBytes": 201326592,
+      "logBytes": 262144
+    },
+    "build": {
+      "wholeSeconds": 2700,
+      "workSeconds": 2670,
+      "cleanupSeconds": 30,
+      "sampledRssBytes": 4294967296,
+      "outputBytes": 8589934592,
+      "tmpBytes": 4294967296,
+      "logBytes": 16777216
+    },
+    "native": {
+      "wholeSeconds": 600,
+      "workSeconds": 570,
+      "cleanupSeconds": 30,
+      "sampledRssBytes": 4294967296,
+      "outputBytes": 1610612736,
+      "tmpBytes": 33554432,
+      "newUserAndTmpBytes": 67108864,
+      "logBytes": 262144
+    }
+  },
+  "runtimeArchiveIdentities": [
+    {
+      "id": "node",
+      "version": "22.23.3",
+      "bytes": 49963763,
+      "sha256": "23b25245dcfb9af7262f8ff142e9e2e0af025368117329e7a7458a51e5922f53"
+    },
+    {
+      "id": "sciencePython",
+      "version": "3.12.15",
+      "bytes": 25030095,
+      "sha256": "233f8e15255b3e1d1fd47ea5dd5230dfed803f371138e896e54d98c60ae19f6f"
+    },
+    {
+      "id": "posePython",
+      "version": "3.9.20",
+      "bytes": 16569829,
+      "sha256": "e7551a119bded40bfc268c850110b6a5af1d5fdd63842a56569477490d20e0a6"
+    }
+  ],
+  "runtimeNoticeMappings": [
+    {
+      "runtimeId": "node",
+      "buildRelativePath": "runtime/LICENSE",
+      "appRelativePath": "Contents/Resources/payload/.runtime/LICENSE"
+    },
+    {
+      "runtimeId": "sciencePython",
+      "buildRelativePath": "runtime/venv-science/lib/python3.12/LICENSE.txt",
+      "appRelativePath": "Contents/Resources/payload/.runtime/venv-science/lib/python3.12/LICENSE.txt"
+    },
+    {
+      "runtimeId": "posePython",
+      "buildRelativePath": "runtime/venv-pose/lib/python3.9/LICENSE.txt",
+      "appRelativePath": "Contents/Resources/payload/.runtime/venv-pose/lib/python3.9/LICENSE.txt"
+    }
+  ],
+  "sourcePins": [
+    {
+      "path": "scripts/build-macos-dmg.py",
+      "bytes": 37084,
+      "sha256": "e09448228dcec059f5784b3a353a0674158de6a17773ee2e75f456b06d6fac80"
+    },
+    {
+      "path": "scripts/prepare-macos-bundle.py",
+      "bytes": 24150,
+      "sha256": "13ff17c223959e64538a3a315503a5a7ac01603025eacb89a4b3440e96c7df3f"
+    },
+    {
+      "path": "apps/macos-launcher/FS_elemApp.swift",
+      "bytes": 21837,
+      "sha256": "c57c4000f89f57323b4b57a8e72c8be20bd2211baf3847e5486e9ad30026dd37"
+    },
+    {
+      "path": "scripts/macos-first-run.py",
+      "bytes": 34057,
+      "sha256": "3632b6f008548b4dc0bda22ff42f9dfa48495f64854d1b484d1fb1e51c363ba2"
+    },
+    {
+      "path": "scripts/macos-bundle.mjs",
+      "bytes": 37260,
+      "sha256": "acc3d8ba97a9d7a5d0c2cf593d43e173f15e139e7d8ce9777c50b48172e9ad94"
+    },
+    {
+      "path": "scripts/start-macos-desktop.mjs",
+      "bytes": 10522,
+      "sha256": "664f1a3279b84ee28a5559e26c26be1a0770e220b39d821853be1b23b4ae3732"
+    },
+    {
+      "path": "scripts/prepare-windows-bundle.py",
+      "bytes": 19777,
+      "sha256": "3ebf759e728013d567546a452d59f77a9ff536b7c06f80f53bda76d3cfb91868"
+    },
+    {
+      "path": "packaging/macos/Info.plist",
+      "bytes": 888,
+      "sha256": "bfa91d6af0bb6e7b711453e16a6c67b1b0cecfb8de4591c456edec9d28f244b8"
+    },
+    {
+      "path": "services/analysis/requirements-science-macos-arm64.lock",
+      "bytes": 1357,
+      "sha256": "1e40e7635b80402059c3be3b5e514fcd7812001640b5e426ee2e5c703f98a821"
+    },
+    {
+      "path": "services/analysis/requirements-pose-macos-arm64.lock",
+      "bytes": 2189,
+      "sha256": "4be74d2d4efcd57c700f3e81a4f96e1848338959c1f7f4ada9e33d6a8c7a17dd"
+    },
+    {
+      "path": "assets/models/manifest-offline-macos-v026.json",
+      "bytes": 13213,
+      "sha256": "180a38dd961c8bb21edfb711be9c928b38138899570b3352702222bb90669692"
+    },
+    {
+      "path": "configs/axel-release-offline-macos-arm64-parent-v026.json",
+      "bytes": 13466,
+      "sha256": "25dbf103779cf7f345109e10473da14c13b5b25700a860beef38e2808b6bfb3e"
+    },
+    {
+      "path": "configs/axel-release-ort4-macos-app.json",
+      "bytes": 14716,
+      "sha256": "9c119e9721598859187bb79c5e0c4a37310a3291084de190dba379fdf6ac1d75"
+    },
+    {
+      "path": "configs/mac-recipe-binding.json",
+      "bytes": 1737,
+      "sha256": "c793d642f70800455da3a2ee14441543c5683e392010128198924b2dd39a6ac0"
+    },
+    {
+      "path": "packaging/macos/desktop-entry-root-binding-v1.json",
+      "bytes": 1046,
+      "sha256": "7ddd83abbca2e9fa5cb55cfde5b9056536efba9c0acc3e10ded783e36c9c7019"
+    },
+    {
+      "path": "packaging/macos/runtime-inputs.json",
+      "bytes": 4965,
+      "sha256": "cec17fd55b3eded95fc8a5aabdabaf915dcc1105f08b17480e130707e4cdc0f7"
+    },
+    {
+      "path": "scripts/check-macos-offline-installed.py",
+      "bytes": 51392,
+      "sha256": "25625394de9983898bd695b8f666001d584c041c58c5e686a02d9e366b1b90ad"
+    },
+    {
+      "path": "packaging/macos/offline-loopback.sb",
+      "bytes": 190,
+      "sha256": "339423f809b977e1c1a1b0ca1d88035fc03f56227d8ae69e844d983b61bc484f"
+    },
+    {
+      "path": "grant-demo/media/example-1a.mp4",
+      "bytes": 818120,
+      "sha256": "b142e4df68b709475cc016c35b67d2a6999afc8c7644b91722093cd2e4355b5d"
+    },
+    {
+      "path": "tests/release/LauncherContractTests.swift",
+      "bytes": 5703,
+      "sha256": "d6dc6b948e472b091c6f1a9458c92c0201b6356a71c30bccd689f04495e10d78"
+    },
+    {
+      "path": "tests/release/macos-swift-test-runner/main.swift",
+      "bytes": 1291,
+      "sha256": "e59c334d417178fb00c2aa833252c1c0085f13ccf30b3ec81e976692616689cc"
+    },
+    {
+      "path": "scripts/run-macos-offline-ci-host.py",
+      "bytes": 52817,
+      "sha256": "9f3bc575a2c9b7f6e8268186e7b4d8fe92fe7d7c8f1d226cd062f3fe1662e299"
+    },
+    {
+      "path": "configs/mac-desktop-web.json",
+      "bytes": 92,
+      "sha256": "ac1a983463f71a15a621b8a03d5b109cceeb9342032da7d62b6207fb6f2a9ceb"
+    }
+  ],
+  "builderSourcePins": [
+    {
+      "path": "scripts/build-macos-dmg.py",
+      "bytes": 37084,
+      "sha256": "e09448228dcec059f5784b3a353a0674158de6a17773ee2e75f456b06d6fac80"
+    },
+    {
+      "path": "scripts/prepare-macos-bundle.py",
+      "bytes": 24150,
+      "sha256": "13ff17c223959e64538a3a315503a5a7ac01603025eacb89a4b3440e96c7df3f"
+    },
+    {
+      "path": "apps/macos-launcher/FS_elemApp.swift",
+      "bytes": 21837,
+      "sha256": "c57c4000f89f57323b4b57a8e72c8be20bd2211baf3847e5486e9ad30026dd37"
+    },
+    {
+      "path": "scripts/macos-first-run.py",
+      "bytes": 34057,
+      "sha256": "3632b6f008548b4dc0bda22ff42f9dfa48495f64854d1b484d1fb1e51c363ba2"
+    },
+    {
+      "path": "scripts/macos-bundle.mjs",
+      "bytes": 37260,
+      "sha256": "acc3d8ba97a9d7a5d0c2cf593d43e173f15e139e7d8ce9777c50b48172e9ad94"
+    },
+    {
+      "path": "scripts/start-macos-desktop.mjs",
+      "bytes": 10522,
+      "sha256": "664f1a3279b84ee28a5559e26c26be1a0770e220b39d821853be1b23b4ae3732"
+    },
+    {
+      "path": "scripts/prepare-windows-bundle.py",
+      "bytes": 19777,
+      "sha256": "3ebf759e728013d567546a452d59f77a9ff536b7c06f80f53bda76d3cfb91868"
+    },
+    {
+      "path": "packaging/macos/Info.plist",
+      "bytes": 888,
+      "sha256": "bfa91d6af0bb6e7b711453e16a6c67b1b0cecfb8de4591c456edec9d28f244b8"
+    },
+    {
+      "path": "services/analysis/requirements-science-macos-arm64.lock",
+      "bytes": 1357,
+      "sha256": "1e40e7635b80402059c3be3b5e514fcd7812001640b5e426ee2e5c703f98a821"
+    },
+    {
+      "path": "services/analysis/requirements-pose-macos-arm64.lock",
+      "bytes": 2189,
+      "sha256": "4be74d2d4efcd57c700f3e81a4f96e1848338959c1f7f4ada9e33d6a8c7a17dd"
+    },
+    {
+      "path": "assets/models/manifest-offline-macos-v026.json",
+      "bytes": 13213,
+      "sha256": "180a38dd961c8bb21edfb711be9c928b38138899570b3352702222bb90669692"
+    },
+    {
+      "path": "configs/axel-release-offline-macos-arm64-parent-v026.json",
+      "bytes": 13466,
+      "sha256": "25dbf103779cf7f345109e10473da14c13b5b25700a860beef38e2808b6bfb3e"
+    },
+    {
+      "path": "configs/axel-release-ort4-macos-app.json",
+      "bytes": 14716,
+      "sha256": "9c119e9721598859187bb79c5e0c4a37310a3291084de190dba379fdf6ac1d75"
+    },
+    {
+      "path": "configs/mac-recipe-binding.json",
+      "bytes": 1737,
+      "sha256": "c793d642f70800455da3a2ee14441543c5683e392010128198924b2dd39a6ac0"
+    },
+    {
+      "path": "packaging/macos/desktop-entry-root-binding-v1.json",
+      "bytes": 1046,
+      "sha256": "7ddd83abbca2e9fa5cb55cfde5b9056536efba9c0acc3e10ded783e36c9c7019"
+    }
+  ],
+  "builderPath": "scripts/build-macos-dmg.py",
+  "runtimeInputsPath": "packaging/macos/runtime-inputs.json",
+  "recipeBindingPath": "configs/mac-recipe-binding.json",
+  "desktopEntryDescriptorPath": "packaging/macos/desktop-entry-root-binding-v1.json",
+  "nativeCheckerPath": "scripts/check-macos-offline-installed.py",
+  "sandboxProfilePath": "packaging/macos/offline-loopback.sb",
+  "offlineVideoPath": "grant-demo/media/example-1a.mp4",
+  "swiftAppPath": "apps/macos-launcher/FS_elemApp.swift",
+  "swiftFixturePath": "tests/release/LauncherContractTests.swift",
+  "swiftRunnerPath": "tests/release/macos-swift-test-runner/main.swift",
+  "sciencePythonRelativePath": ".runtime/venv-science/bin/python",
+  "RootSourceAcceptances": [
+    "7976361d9ac77208dd1171013372a40e876bad1b94baedcefee39e834272b812",
+    "b42fde0fac8b2cb91e136b26aecb207fee717afca931b39c66b3a9417581bb94",
+    "04c511269ebbfb7394c38b4267af7d5d3b1f82bcb2701cb74af052a34356f660",
+    "a57302d588f6d7519600f987cdd3f19963dca306c80bdee1873e2f1e9967626d"
+  ],
+  "RootNewFixtureAcceptance": "98620ddeb0e00bc06c5779dc405a4195c4cdab104d47b3e7b26aec05653ffc1e"
+}

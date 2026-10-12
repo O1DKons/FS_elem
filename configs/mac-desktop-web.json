@@ -1,0 +1,6 @@
+{
+  "host": "127.0.0.1",
+  "port": 5174,
+  "analysisPort": 5175,
+  "maxWallSeconds": 5400
+}
