@@ -947,7 +947,7 @@
     {
       "path": "configs/mac-offline-ci-host-template.json",
       "bytes": 10529,
-      "sha256": "680325c7706ebeee9864fdc4bcc2858b39add22d15615559bcb385fab20cb7be"
+      "sha256": "05fd38a967f2d2f3545884f9b470502b8cb9649cd1f58af59c9356ce90faee77"
     },
     {
       "path": "configs/mac-recipe-binding.json",
@@ -1357,7 +1357,7 @@
     {
       "path": "scripts/run-macos-offline-ci-host.py",
       "bytes": 55439,
-      "sha256": "08f12987a90483201e2ea67ca0a71fbc07f8a679f2e46576f30d5b0fb9d6e111"
+      "sha256": "777f837cb65464ec68e61348f3ee9100daa05afa082ae994b7fb723e63b648b9"
     },
     {
       "path": "scripts/run-windows-offline-check.ps1",
@@ -1601,8 +1601,8 @@
     },
     {
       "path": "tests/release/macos-swift-test-runner/main.swift",
-      "bytes": 1951,
-      "sha256": "ad9f8e54696315263b8b58746aef3acab8c3b8c98c368d838957f621731269c2"
+      "bytes": 2026,
+      "sha256": "ba7ba7749231d66147cbfbccb1caecb6919af26eb2066c968de3aec1800713bd"
     },
     {
       "path": "tests/release/owned-web-worker.test.mjs",
@@ -1751,11 +1751,11 @@
     }
   ],
   "fileCount": 348,
-  "totalBytes": 8846867,
-  "recordedAtUTC": "2026-10-12T23:12:09.614526+00:00",
+  "totalBytes": 8846942,
+  "recordedAtUTC": "2026-10-12T23:20:07.961203+00:00",
   "sourceUpstreamONNXIncluded": false,
   "installerUpstreamONNXBundlingAuthorized": true,
   "privateDataIncluded": false,
-  "sourceCorrection": "Genuine native XCTestSuite runs in retained background work item while CLI main dispatch services same lifecycle callbacks; same7assertions/timeouts/no-failure/no-skip guards",
+  "sourceCorrection": "Real native XCTestSuite and observer execute entirely on original main thread via retained one-shot native RunLoop Timer; same7assertions/timeouts/outcome/no-failure/no-skip guards",
   "consumerSigningAccepted": false
 }

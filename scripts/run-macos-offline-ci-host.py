@@ -593,7 +593,7 @@ class Host:
         expected = [
             ("swiftAppPath", 21837, "c57c4000f89f57323b4b57a8e72c8be20bd2211baf3847e5486e9ad30026dd37"),
             ("swiftFixturePath", 5745, "23aafc2779b3665f22f45765fe1f83db5359b0a0fd503f78de10f5514055e418"),
-            ("swiftRunnerPath", 1951, "ad9f8e54696315263b8b58746aef3acab8c3b8c98c368d838957f621731269c2"),
+            ("swiftRunnerPath", 2026, "ba7ba7749231d66147cbfbccb1caecb6919af26eb2066c968de3aec1800713bd"),
         ]
         paths = []
         for field, size, sha in expected:

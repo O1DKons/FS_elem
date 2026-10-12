@@ -2,7 +2,6 @@
 import XCTest
 import Foundation
 import Darwin
-import Dispatch
 
 let expectedNames: Set<String> = [
     "testPrivateWritableShutdownHasRetainedWaitAndBothEOF",
@@ -28,7 +27,8 @@ final class RunObserver: NSObject, XCTestObservation {
         print("Test Case '\(testCase.name)' passed")
     }
 }
-let suiteTask = DispatchWorkItem {
+let suiteTimer = Timer.scheduledTimer(withTimeInterval: 0.01, repeats: false) { _ in
+    precondition(Thread.isMainThread)
     let observer = RunObserver()
     XCTestObservationCenter.shared.addTestObserver(observer)
     let suite = XCTestSuite(forTestCaseClass: LauncherContractTests.self)
@@ -41,5 +41,5 @@ let suiteTask = DispatchWorkItem {
           !observer.invalid, observer.completed == expectedNames else { exit(1) }
     exit(0)
 }
-DispatchQueue.global(qos: .userInitiated).async(execute: suiteTask)
-dispatchMain()
+RunLoop.main.run()
+exit(1) // An unexpected runloop return cannot report a test pass.
