@@ -75,6 +75,11 @@ public sealed class OfflineNativeResult {
  public int jobMemberSamples;
  public uint maximumAssignedProcessSample;
  public bool sampledJobMemberPidsTruncated;
+ public uint? terminalActiveJobProcesses;
+ public int terminalJobDrainPolls;
+ public double terminalJobDrainElapsedSeconds, terminalJobDrainDeadlineOriginalSeconds;
+ public List<uint> terminalLastNonemptySampledJobPids=new List<uint>();
+ public bool terminalLastNonemptySampledJobPidsTruncated;
  public string resourceQualification="4GiB hard aggregate committed memory applies only to checker and actual Job members; app working-set samples/escaped Shell children are separate, continuous whole-app coverage unknown";
 }
 
@@ -147,7 +152,7 @@ public static class OfflineNativeController {
  static double Elapsed(long origin){return (Stopwatch.GetTimestamp()-origin)/(double)Stopwatch.Frequency;}
  static int RemainingMs(long origin,double deadline){return (int)Math.Max(0,Math.Min(1000,(deadline-Elapsed(origin))*1000));}
  static Accounting Account(JobHandle job){Accounting value;uint size;if(!QueryInformationJobObject(job,1,out value,(uint)Marshal.SizeOf<Accounting>(),out size))throw NativeError("Query Job accounting");return value;}
- static void SampleMembers(JobHandle job,OfflineNativeResult result){
+ static void SampleMembers(JobHandle job,OfflineNativeResult result,bool terminalDrain=false){
   // A bounded sampled PID list is evidence of members seen, not process identity,
   // continuous ancestry, or proof that all Shell-brokered app children joined.
   IntPtr buffer=Marshal.AllocHGlobal(8+1024*IntPtr.Size);
@@ -158,11 +163,16 @@ public static class OfflineNativeController {
    result.jobMemberSamples++;
    result.maximumAssignedProcessSample=Math.Max(result.maximumAssignedProcessSample,assigned);
    int count=Marshal.ReadInt32(buffer,4);
+   if(terminalDrain&&count>0){result.terminalLastNonemptySampledJobPids.Clear();result.terminalLastNonemptySampledJobPidsTruncated=false;}
    if(count<0||count>1024)throw new InvalidOperationException("Job member list exceeded1024 entries");
    for(int i=0;i<count;i++){
     long raw=IntPtr.Size==8?Marshal.ReadInt64(buffer,8+i*8):unchecked((uint)Marshal.ReadInt32(buffer,8+i*4));
     if(raw<=0||raw>UInt32.MaxValue)throw new InvalidOperationException("Invalid native Job PID");
     uint pid=(uint)raw;
+    if(terminalDrain){
+     if(result.terminalLastNonemptySampledJobPids.Count<128)result.terminalLastNonemptySampledJobPids.Add(pid);
+     else result.terminalLastNonemptySampledJobPidsTruncated=true;
+    }
     if(!result.sampledJobMemberPids.Contains(pid)){
      if(result.sampledJobMemberPids.Count<128)result.sampledJobMemberPids.Add(pid);
      else result.sampledJobMemberPidsTruncated=true;
@@ -231,7 +241,34 @@ public static class OfflineNativeController {
    if(Elapsed(origin)>600)throw new TimeoutException("Native checker terminal exit arrived after original600s work deadline");
    exited=true;result.retainedWaitCompleted=true;result.checkerExitCode=child.ExitCode;
    if(child.ExitCode!=0)throw new InvalidOperationException("Retained native checker exited "+child.ExitCode);
-   if(Account(job).ActiveProcesses!=0)throw new InvalidOperationException("Native checker exited with own Job members still active");
+   // A signaled checker does not guarantee simultaneous Job-member drain.
+   // Observe natural drain without renewing the original600s work horizon.
+   double terminalStarted=Elapsed(origin);
+   double terminalDeadline=Math.Min(600,terminalStarted+5);
+   result.terminalJobDrainDeadlineOriginalSeconds=terminalDeadline;
+   try{
+   for(;;){
+    if(Elapsed(origin)>terminalDeadline)throw new TimeoutException("Own Job terminal drain exceeded original work/subphase deadline");
+    result.terminalJobDrainPolls++;
+    var terminal=Account(job);
+    result.terminalActiveJobProcesses=terminal.ActiveProcesses;
+    SampleMembers(job,result,terminal.ActiveProcesses!=0);
+    ExtendedLimits terminalLimits;uint terminalBytes;
+    if(!QueryInformationJobObject(job,9,out terminalLimits,(uint)Marshal.SizeOf<ExtendedLimits>(),out terminalBytes))throw NativeError("Read terminal Job committed-memory peak");
+    result.kernelPeakJobCommittedBytes=terminalLimits.PeakJobMemoryUsed.ToUInt64().ToString(CultureInfo.InvariantCulture);
+    if(terminalLimits.PeakJobMemoryUsed.ToUInt64()>4294967296UL)throw new InvalidOperationException("Terminal own Job committed-memory peak exceeded4GiB");
+    lock(capture.Sync){
+     if(capture.Overflow)throw new InvalidOperationException("Combined native child streams exceeded192KiB retention budget during terminal drain");
+     if(capture.ReadFailure!=null)throw new IOException("Native pipe read failed during terminal drain: "+capture.ReadFailure);
+    }
+    result.terminalJobDrainElapsedSeconds=Elapsed(origin)-terminalStarted;
+    if(Elapsed(origin)>terminalDeadline)throw new TimeoutException("Own Job terminal drain exceeded original work/subphase deadline");
+    if(terminal.ActiveProcesses==0)break;
+    int pause=Math.Min(100,RemainingMs(origin,terminalDeadline));
+    if(pause<=0)throw new TimeoutException("Own Job members remain active at original work/subphase deadline");
+    Thread.Sleep(pause);
+   }
+   }finally{result.terminalJobDrainElapsedSeconds=Elapsed(origin)-terminalStarted;}
   }catch(Exception e){Fail(result,e.Message);}
   finally{
    // Cleanup shares the original entry origin: never a renewed30s horizon.

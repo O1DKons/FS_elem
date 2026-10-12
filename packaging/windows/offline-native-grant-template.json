@@ -36,7 +36,7 @@
     "qualification": "Hard Job private-commit limit applies only to actual assigned/inherited members. Application RSS/user-artifact checks are sampled; escaped shell-broker descendants require explicit owned cleanup and are not claimed continuously Job-limited."
   },
   "qualification": "ONE familiar public functional offline case; no accuracy/generalization/controlled speed gain. Generated installer exact SHA+size and Root-admitted commit/run are bound after build before native execution.",
-  "supervisorSha256": "487a78896fbd2ea3ee2a15b03779a46bba76699d7e721d5b08fa54b14ad3b5ce",
+  "supervisorSha256": "c1ac6ccc32de340390dbe6ae8a95d1d4ed8c07f8bdb8ce9480937eba064c82b2",
   "supervisorWholeSeconds": 630,
   "supervisorWorkSeconds": 600,
   "supervisorCleanupSeconds": 30,

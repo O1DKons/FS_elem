@@ -98,7 +98,7 @@ jobs:
           $work = Join-Path $env:RUNNER_TEMP 'fs-elem-v025-installer'
           $installer = Join-Path $work 'artifacts/FS_elem-Setup-0.2.5-x64.exe'
           $template = Join-Path $env:GITHUB_WORKSPACE 'packaging/windows/offline-native-grant-template.json'
-          if ((Get-FileHash -LiteralPath $template -Algorithm SHA256).Hash.ToLowerInvariant() -ne '2091c2365942c54fb2677f40216d74327f06723af980c5febbf72f295b51f005') { throw 'Root template SHA mismatch' }
+          if ((Get-FileHash -LiteralPath $template -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'e6fcd63fdff17ea14ef5ab87929a9e1de79a669af27f8be1eccf4336d49320f4') { throw 'Root template SHA mismatch' }
           $grant = Get-Content -LiteralPath $template -Raw -Encoding UTF8 | ConvertFrom-Json
           if ($grant.actualAuthorization -ne $false) { throw 'Expected prospective Root template' }
           $script = Join-Path $env:GITHUB_WORKSPACE 'scripts/check-windows-installer.ps1'
