@@ -239,9 +239,15 @@ class Phase:
             need(combined <= self.limits["newUserAndTmpBytes"], "sampled new user plus TMP exceeded combined64MiB")
         before(self.work_end_ns)
 
-    def execute(self, name, argv, environment=None):
+    def execute(self, name, argv, environment=None, *, allow_fast_terminal_discovery=False):
         self.sample()
         need(isinstance(argv, list) and argv and all(isinstance(x, str) and "\x00" not in x for x in argv), "invalid exact argv")
+        if allow_fast_terminal_discovery:
+            need(self.name == "discovery" and environment is None and (name, tuple(argv)) in {
+                ("xcode-select", ("/usr/bin/xcode-select", "-p")),
+                ("selected-sdk", ("/usr/bin/xcrun", "--sdk", "macosx", "--show-sdk-path")),
+                ("selected-swiftc", ("/usr/bin/xcrun", "-f", "swiftc")),
+            }, "fast terminal allowance restricted to three fixed discovery queries")
         child = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                  start_new_session=True, env=environment)
         item = {"name": name, "argv": argv, "handle": child, "identity": None, "readers": [],
@@ -271,6 +277,34 @@ class Phase:
             item["readers"].append(thread)
             thread.start()
         item["identity"] = self.host.native.identity(child.pid)
+        if item["identity"] is None and allow_fast_terminal_discovery:
+            terminal = child.poll()
+            proof = {"terminalPollExitCode": terminal, "accepted": False,
+                     "freshPidAbsent": False, "freshPgidEmpty": False, "freshNativePidAbsent": False,
+                     "originalIdentityUnknown": True, "creationIdentityUnknown": True,
+                     "continuousLifetimeAuditProven": False, "signalAuthorityGranted": False}
+            item["fastTerminalDiscovery"] = proof
+            need(terminal == 0, "unbound discovery child is not already terminal/successful")
+            before(self.work_end_ns)
+            self.wait_and_save(item, self.work_end_ns)
+            self.sample()
+            before(self.work_end_ns)
+            need(self.host.native.identity(child.pid) is None, "fast discovery PID reused or remains live")
+            proof["freshNativePidAbsent"] = True
+            import errno
+            for label, probe in (("PID", os.kill), ("PGID", os.killpg)):
+                before(self.work_end_ns)
+                try:
+                    probe(child.pid, 0)  # Existence only; no signal is delivered.
+                except OSError as error:
+                    need(error.errno == errno.ESRCH,
+                         "fast discovery " + label + " absence unknown: errno=" + str(error.errno))
+                else:
+                    need(False, "fast discovery " + label + " nonempty/reused; no signal authority")
+                proof["freshPidAbsent" if label == "PID" else "freshPgidEmpty"] = True
+            before(self.work_end_ns)
+            proof["accepted"] = True
+            return bytes(item["buffers"][0])
         need(item["identity"] and item["identity"]["pgid"] == child.pid, "new retained phase group identity unknown")
         self.observe(item["identity"])
         while child.poll() is None:
@@ -337,7 +371,8 @@ class Phase:
         children = [{"name": item["name"], "argv": item["argv"], "originalIdentity": item["identity"],
                      "retainedWaitExitCode": item["handle"].returncode if item["closed"] else None,
                      "readersStopped": all(not value.is_alive() for value in item["readers"]),
-                     "pipesClosed": item["closed"], "readerErrors": item["errors"]} for item in self.children]
+                     "pipesClosed": item["closed"], "readerErrors": item["errors"],
+                     "fastTerminalDiscovery": item.get("fastTerminalDiscovery")} for item in self.children]
         return {"name": self.name, "originalOriginMonotonicNs": str(self.origin_ns),
                 "originalWorkDeadlineNs": str(self.work_end_ns), "originalWholeDeadlineNs": str(self.whole_end_ns),
                 "limits": self.limits, "firstFailure": self.first_failure, "cleanupErrors": self.cleanup_errors[:16],
@@ -555,9 +590,9 @@ class Host:
         return phase.result
 
     def discovery(self, phase):
-        developer = phase.execute("xcode-select", ["/usr/bin/xcode-select", "-p"]).decode().strip()
-        sdk = phase.execute("selected-sdk", ["/usr/bin/xcrun", "--sdk", "macosx", "--show-sdk-path"]).decode().strip()
-        swift = phase.execute("selected-swiftc", ["/usr/bin/xcrun", "-f", "swiftc"]).decode().strip()
+        developer = phase.execute("xcode-select", ["/usr/bin/xcode-select", "-p"], allow_fast_terminal_discovery=True).decode().strip()
+        sdk = phase.execute("selected-sdk", ["/usr/bin/xcrun", "--sdk", "macosx", "--show-sdk-path"], allow_fast_terminal_discovery=True).decode().strip()
+        swift = phase.execute("selected-swiftc", ["/usr/bin/xcrun", "-f", "swiftc"], allow_fast_terminal_discovery=True).decode().strip()
         developer, sdk = pathlib.Path(developer).resolve(), pathlib.Path(sdk).resolve()
         swift_invocation = pathlib.Path(swift)
         swift = swift_invocation.resolve()
