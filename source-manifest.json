@@ -947,7 +947,7 @@
     {
       "path": "configs/mac-offline-ci-host-template.json",
       "bytes": 10529,
-      "sha256": "bf1e385f945913245931df32bb1b28944e46d52aa5cc9fe67a9f5a35bd2b2575"
+      "sha256": "537952dedcce204c362eedab24af158db4a11a01eae085a70db6b759b0ba84df"
     },
     {
       "path": "configs/mac-recipe-binding.json",
@@ -1356,8 +1356,8 @@
     },
     {
       "path": "scripts/run-macos-offline-ci-host.py",
-      "bytes": 54596,
-      "sha256": "0b08298a849ead745b98a72f1425bd872d4f29f2878eaf040bd32561a63a9a02"
+      "bytes": 55439,
+      "sha256": "033dae218a534ebc8c2cdfedfa68c4ca94d4477827236545815d8f9f97008984"
     },
     {
       "path": "scripts/run-windows-offline-check.ps1",
@@ -1751,11 +1751,11 @@
     }
   ],
   "fileCount": 348,
-  "totalBytes": 8845322,
+  "totalBytes": 8846165,
   "recordedAtUTC": "2026-10-12T21:33:10.792183+00:00",
   "sourceUpstreamONNXIncluded": false,
   "installerUpstreamONNXBundlingAuthorized": true,
   "privateDataIncluded": false,
-  "sourceCorrection": "Preserve selected Swift invocation alias/narrow streamed compiler-input cap; select macOS13 binary wheels with existing versions/hashes/MachO guard",
+  "sourceCorrection": "Add genuine selected XCTest Swift overlay import for unchanged seven fixtures",
   "consumerSigningAccepted": false
 }

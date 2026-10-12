@@ -567,6 +567,16 @@ class Host:
         frameworks = developer / "Platforms/MacOSX.platform/Developer/Library/Frameworks"
         libraries = developer / "Platforms/MacOSX.platform/Developer/usr/lib"
         need((frameworks / "XCTest.framework").is_dir() and libraries.is_dir(), "genuine selected-Xcode XCTest unavailable")
+        overlay_candidates = [
+            libraries / "XCTest.swiftmodule",
+            libraries / "swift/XCTest.swiftmodule",
+            frameworks / "XCTest.framework/Modules/XCTest.swiftmodule",
+            frameworks / "XCTest.framework/Versions/A/Modules/XCTest.swiftmodule",
+            swift.parent.parent / "lib/swift/macosx/XCTest.swiftmodule",
+        ]
+        overlay = next((path for path in overlay_candidates if path.exists()
+                        and path.resolve().is_relative_to(developer) and (path.is_dir() or path.is_file())), None)
+        need(overlay is not None, "selected-Xcode Swift XCTest overlay unavailable; checked five bounded paths")
         tools = {"python": file_pin(pathlib.Path(sys.executable).resolve(), phase.work_end_ns),
                  "swiftc": selected_swift_pin(swift_invocation, developer, phase.work_end_ns)}
         for name in ("lipo", "otool", "hdiutil"):
@@ -575,7 +585,9 @@ class Host:
             tools[name] = file_pin(path.resolve(), phase.work_end_ns)
         need(len(phase.children) == 3, "discovery query bound exceeded")
         return {"developer": str(developer), "sdkPath": str(sdk), "frameworks": str(frameworks),
-                "libraries": str(libraries), "tools": tools, "toolQueries": 3, "maximumToolQueries": 8}
+                "libraries": str(libraries), "xctestSwiftImport": str(overlay.parent),
+                "xctestSwiftOverlay": str(overlay.resolve()), "tools": tools,
+                "toolQueries": 3, "maximumToolQueries": 8}
 
     def xctest(self, phase):
         expected = [
@@ -591,7 +603,8 @@ class Host:
         binary = phase.root / "LauncherContractTests"
         compiler = self.tools["tools"]["swiftc"]["path"]
         phase.execute("compile-existing-seven", [compiler, "-D", "FS_ELEM_TESTING", "-sdk", self.tools["sdkPath"],
-            "-F", self.tools["frameworks"], "-L", self.tools["libraries"], "-framework", "XCTest",
+            "-F", self.tools["frameworks"], "-I", self.tools["xctestSwiftImport"],
+            "-L", self.tools["libraries"], "-framework", "XCTest",
             "-Xlinker", "-rpath", "-Xlinker", self.tools["frameworks"],
             "-Xlinker", "-rpath", "-Xlinker", self.tools["libraries"], "-o", str(binary), *paths],
             self.environment(phase))
