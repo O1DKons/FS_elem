@@ -8,7 +8,7 @@
   "allowNN": true,
   "publicVideo": true,
   "allowTemporaryFirewallEnable": true,
-  "nativeCheckSha256": "aeaf1aace2eacf2f2f3025233b7eb51689a1fc12ae3df0fbdcb9755b9df3e638",
+  "nativeCheckSha256": "9139ba4b2d242b0c4db2755fc7d31fefeae892a54b54df0748de62efaaa2826b",
   "videoSha256": "b142e4df68b709475cc016c35b67d2a6999afc8c7644b91722093cd2e4355b5d",
   "videoBytes": 818120,
   "publicSourceUrl": "https://o1dkons.github.io/FS_elem/grant-demo/media/example-1a.mp4",
@@ -42,12 +42,10 @@
   "supervisorCleanupSeconds": 30,
   "supervisorJobCommittedBytes": 4294967296,
   "supervisorSavedOutputBytes": 262144,
-  "allowedHiddenConsoleCount": 1,
+  "allowedHiddenConsoleCount": 2,
   "allowedHiddenConsoleParentRoles": [
-    "launcher",
     "desktop-controller",
-    "analysis-backend",
-    "web-worker"
+    "analysis-backend"
   ],
   "rssEnforcement": "sampled-aggregate-rss-and-stop-check"
 }

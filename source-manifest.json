@@ -22,7 +22,7 @@
     {
       "path": ".github/workflows/windows-installer.yml",
       "bytes": 9782,
-      "sha256": "edc35adc54209b04d670cb6aa6c42aa5f9981c6bbd51e9aed1f03f66a13253f3"
+      "sha256": "e61c400990c6fc0c7b95a3acadd618f6c6111554f5c6ce4339861c6cb59d5e29"
     },
     {
       "path": ".github/workflows/windows-release-checks.yml",
@@ -1076,8 +1076,8 @@
     },
     {
       "path": "packaging/windows/offline-native-grant-template.json",
-      "bytes": 2364,
-      "sha256": "fb762865962ee3e90a87eb4f622dd4773343cdf28cf2b9ea5cc41c67bf02d99c"
+      "bytes": 2330,
+      "sha256": "8603bb23675fdbd1d825e2804e12de55aa2c67fea9254ac02f337d1d38c90018"
     },
     {
       "path": "packaging/windows/runtime-inputs.json",
@@ -1191,8 +1191,8 @@
     },
     {
       "path": "scripts/check-windows-installer.ps1",
-      "bytes": 41067,
-      "sha256": "aeaf1aace2eacf2f2f3025233b7eb51689a1fc12ae3df0fbdcb9755b9df3e638"
+      "bytes": 41390,
+      "sha256": "9139ba4b2d242b0c4db2755fc7d31fefeae892a54b54df0748de62efaaa2826b"
     },
     {
       "path": "scripts/check-windows-offline-firewall.ps1",
@@ -1616,10 +1616,10 @@
     }
   ],
   "fileCount": 321,
-  "totalBytes": 8467770,
-  "recordedAtUTC": "2026-10-12T15:20:50.592926+00:00",
+  "totalBytes": 8468059,
+  "recordedAtUTC": "2026-10-12T15:50:40.220840+00:00",
   "sourceUpstreamONNXIncluded": false,
   "installerUpstreamONNXBundlingAuthorized": true,
   "privateDataIncluded": false,
-  "sourceCorrection": "CI1 fixture closed; canonicalAny denial plusmandatory realTCP-loopback preflight BEFOREbuilder; nativeacceptancepending"
+  "sourceCorrection": "CI4 cold offline GUI accepted with zero visible terminals; exact two distinct hidden controller/backend role identity gates then functional inference pending"
 }

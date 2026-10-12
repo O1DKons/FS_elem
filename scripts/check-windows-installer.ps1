@@ -121,7 +121,7 @@ function Controller-Pid($Process){
 function Confirm-ConsoleTopology($Owned,[int]$Controller){
  $brokers=@($Owned|Where-Object{$_.Name -eq 'conhost.exe'})
  $summary.lastConsoleTopologySnapshot=$Owned
- if($brokers.Count -gt 1){throw 'Unexpected additional owned console broker'}
+ $summary.lastConsoleBrokerIdentityFacts=@()
  $windows=@([InstallerFilePath]::OwnedWindows([uint[]]@($Owned|ForEach-Object{$_.ProcessId})))
  if(@($windows|Where-Object{[string]::IsNullOrEmpty($_.ClassName)}).Count -gt 0){throw 'Cannot classify an owned console-topology window'}
  if(@($windows|Where-Object{$_.Visible -and ($_.ClassName -eq 'ConsoleWindowClass' -or $_.ProcessId -in @($brokers.ProcessId))}).Count -gt 0){throw 'Visible owned console window is forbidden'}
@@ -138,13 +138,17 @@ function Confirm-ConsoleTopology($Owned,[int]$Controller){
   $role=$null
   $image=[IO.Path]::GetFullPath($currentParent[0].ExecutablePath)
   $line=([string]$currentParent[0].CommandLine).Replace('/','\')
-  if($parent[0].ProcessId -eq $launcher.Id -and [string]::Equals($image,(Join-Path $installed 'FS_elem.exe'),[StringComparison]::OrdinalIgnoreCase)){$role='launcher'}
-  elseif($parent[0].ProcessId -eq $Controller -and [string]::Equals($image,(Join-Path $installed '.runtime\node\node.exe'),[StringComparison]::OrdinalIgnoreCase)){$role='desktop-controller'}
+  if($parent[0].ProcessId -eq $Controller -and [string]::Equals($image,(Join-Path $installed '.runtime\node\node.exe'),[StringComparison]::OrdinalIgnoreCase) -and $line.IndexOf((Join-Path $installed 'scripts\start-release.mjs'),[StringComparison]::OrdinalIgnoreCase) -ge 0 -and $line -match '(?:^|\s)"?--desktop"?(?:\s|$)'){$role='desktop-controller'}
   elseif([string]::Equals($image,(Join-Path $installed '.runtime\venv-science\Scripts\python.exe'),[StringComparison]::OrdinalIgnoreCase) -and $line.IndexOf((Join-Path $installed 'services\analysis\server.py'),[StringComparison]::OrdinalIgnoreCase) -ge 0){$role='analysis-backend'}
-  elseif([string]::Equals($image,(Join-Path $installed '.runtime\node\node.exe'),[StringComparison]::OrdinalIgnoreCase) -and ($line.IndexOf((Join-Path $installed 'scripts\release-web-worker.mjs'),[StringComparison]::OrdinalIgnoreCase) -ge 0 -or $line.IndexOf((Join-Path $installed 'scripts\release-owned-web-worker.mjs'),[StringComparison]::OrdinalIgnoreCase) -ge 0)){$role='web-worker'}
+  $parentProgram=if($role -eq 'desktop-controller'){'.runtime/node/node.exe'}elseif($role -eq 'analysis-backend'){'.runtime/venv-science/Scripts/python.exe'}else{$null}
+  $fact=@{pid=$broker.ProcessId;creationDate=$broker.CreationDate;parentPid=$parent[0].ProcessId;parentCreationDate=$parent[0].CreationDate;parentRole=$role;canonicalSystemConhost=$true;canonicalConhostImage=$canonical;parentInstalledProgram=$parentProgram;acceptedInstalledParentImage=($null -ne $role);acceptedCommandLine=($null -ne $role);visible=$false}
+  $summary.lastConsoleBrokerIdentityFacts+=$fact
   if(-not $role -or $role -notin $grant.allowedHiddenConsoleParentRoles){throw 'Hidden broker has an unadmitted parent role'}
-  $facts+=@{pid=$broker.ProcessId;creationDate=$broker.CreationDate;parentPid=$parent[0].ProcessId;parentCreationDate=$parent[0].CreationDate;parentRole=$role;canonicalSystemConhost=$true;visible=$false}
+  $facts+=$fact
  }
+ # Cold startup has one desktop-controller broker and one API broker. Each
+ # must prove its identity/role before aggregate policy is evaluated.
+ if($brokers.Count -gt 2 -or @($facts.parentRole|Sort-Object -Unique).Count -ne $facts.Count){throw 'Additional/duplicate-role hidden console broker is forbidden'}
  return $facts
 }
 try{
@@ -167,7 +171,7 @@ try{
   rtmw='bd033156e5104c4f5d2edfe0453e02661e30a2f3da453ec93c8764d561b83054'
  }
  foreach($key in $expectedModels.Keys){if($grant.modelSha256.$key -cne $expectedModels[$key]){throw 'Root native model digest scope missing/changed'}}
- if($grant.allowedHiddenConsoleCount -ne 1 -or @($grant.allowedHiddenConsoleParentRoles).Count -lt 1 -or @($grant.allowedHiddenConsoleParentRoles|Where-Object{$_ -notin @('launcher','desktop-controller','analysis-backend','web-worker')}).Count -gt 0){throw 'Root known hidden-console topology admission missing/overbroad'}
+ if($grant.allowedHiddenConsoleCount -ne 2 -or @($grant.allowedHiddenConsoleParentRoles).Count -ne 2 -or @($grant.allowedHiddenConsoleParentRoles|Sort-Object -Unique).Count -ne 2 -or @($grant.allowedHiddenConsoleParentRoles|Where-Object{$_ -notin @('desktop-controller','analysis-backend')}).Count -gt 0){throw 'Root cold hidden-console topology admission missing/overbroad'}
  if(Test-Path -LiteralPath $userState){throw 'Native cold-first-launch requires a genuinely new Windows user state; never erase existing user data'}
  $identity=[Security.Principal.WindowsPrincipal]::new([Security.Principal.WindowsIdentity]::GetCurrent())
  if(-not $identity.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)){throw 'Root native offline check requires administrative firewall admission'}
