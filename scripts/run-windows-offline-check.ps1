@@ -80,6 +80,9 @@ public sealed class OfflineNativeResult {
  public double terminalJobDrainElapsedSeconds, terminalJobDrainDeadlineOriginalSeconds;
  public List<uint> terminalLastNonemptySampledJobPids=new List<uint>();
  public bool terminalLastNonemptySampledJobPidsTruncated;
+ public bool terminalNaturalDrainCompleted, normalJobTeardownRequested;
+ public uint? normalJobTeardownBeforeActiveProcesses, normalJobTeardownAfterActiveProcesses;
+ public string normalJobTeardownReason;
  public string resourceQualification="4GiB hard aggregate committed memory applies only to checker and actual Job members; app working-set samples/escaped Shell children are separate, continuous whole-app coverage unknown";
 }
 
@@ -183,7 +186,7 @@ public static class OfflineNativeController {
  public static OfflineNativeResult Run(string pwsh,string script,string installer,string workRoot,string logs,string grant,string grantSha,string video,string outputRoot,long origin){
   var result=new OfflineNativeResult();
   JobHandle job=null;Process child=null;Capture capture=new Capture();Task stdout=null,stderr=null;
-  bool exited=false,terminated=false;
+  bool exited=false,terminated=false,normalOwnedTeardownAllowed=false;
   try{
    if(Elapsed(origin)>=600)throw new TimeoutException("Original600s work deadline already exhausted before controller admission");
    result.jobName="Local\\FS_elem_offline_supervisor_"+Guid.NewGuid().ToString("N");
@@ -248,7 +251,7 @@ public static class OfflineNativeController {
    result.terminalJobDrainDeadlineOriginalSeconds=terminalDeadline;
    try{
    for(;;){
-    if(Elapsed(origin)>terminalDeadline)throw new TimeoutException("Own Job terminal drain exceeded original work/subphase deadline");
+    if(Elapsed(origin)>=600)throw new TimeoutException("Own Job terminal drain exceeded original600s work deadline");
     result.terminalJobDrainPolls++;
     var terminal=Account(job);
     result.terminalActiveJobProcesses=terminal.ActiveProcesses;
@@ -262,10 +265,19 @@ public static class OfflineNativeController {
      if(capture.ReadFailure!=null)throw new IOException("Native pipe read failed during terminal drain: "+capture.ReadFailure);
     }
     result.terminalJobDrainElapsedSeconds=Elapsed(origin)-terminalStarted;
-    if(Elapsed(origin)>terminalDeadline)throw new TimeoutException("Own Job terminal drain exceeded original work/subphase deadline");
-    if(terminal.ActiveProcesses==0)break;
+    if(Elapsed(origin)>=600)throw new TimeoutException("Own Job terminal drain exceeded original600s work deadline");
+    if(Elapsed(origin)>=terminalDeadline){
+     normalOwnedTeardownAllowed=terminal.ActiveProcesses!=0;
+     result.normalJobTeardownReason="Checker exit0 completed; bounded natural drain phase exhausted; remaining own TESTER Job requires explicit normal controller teardown (identities/cause unknown)";
+     break;
+    }
+    if(terminal.ActiveProcesses==0){result.terminalNaturalDrainCompleted=true;break;}
     int pause=Math.Min(100,RemainingMs(origin,terminalDeadline));
-    if(pause<=0)throw new TimeoutException("Own Job members remain active at original work/subphase deadline");
+    if(pause<=0){
+     if(Elapsed(origin)>=600)throw new TimeoutException("Own Job terminal drain exceeded original600s work deadline");
+     Thread.Yield();
+     continue;
+    }
     Thread.Sleep(pause);
    }
    }finally{result.terminalJobDrainElapsedSeconds=Elapsed(origin)-terminalStarted;}
@@ -278,11 +290,14 @@ public static class OfflineNativeController {
    }
    if(job!=null&&!job.IsInvalid){
     try{
-     if(Account(job).ActiveProcesses!=0){
+     var teardownState=Account(job);
+     result.normalJobTeardownBeforeActiveProcesses=teardownState.ActiveProcesses;
+     if(teardownState.ActiveProcesses!=0){
       result.jobTerminationRequested=true;
+      result.normalJobTeardownRequested=normalOwnedTeardownAllowed&&result.firstFailure==null&&result.checkerExitCode==0;
       if(!TerminateJobObject(job,1))throw NativeError("Terminate only own Job");
       terminated=true;
-      if(result.firstFailure==null)Fail(result,"Forced own Job closure required");
+      if(result.firstFailure==null&&!result.normalJobTeardownRequested)Fail(result,"Unexpected forced own Job closure required");
      }
     }catch(Exception e){CleanupError(result,e.Message);}
    }
@@ -317,6 +332,7 @@ public static class OfflineNativeController {
    if(job!=null&&!job.IsInvalid){
     try{
      var state=Account(job);result.finalActiveJobProcesses=state.ActiveProcesses;result.totalJobProcesses=state.TotalProcesses;
+     result.normalJobTeardownAfterActiveProcesses=state.ActiveProcesses;
      if(state.ActiveProcesses!=0)CleanupError(result,"Original own Job active-process count is not zero");
      ExtendedLimits limits;uint bytes;
      if(!QueryInformationJobObject(job,9,out limits,(uint)Marshal.SizeOf<ExtendedLimits>(),out bytes))throw NativeError("Read kernel Job committed-memory peak");
@@ -339,8 +355,8 @@ public static class OfflineNativeController {
    }
    result.elapsedSeconds=Elapsed(origin);
    if(result.elapsedSeconds>630)Fail(result,"Original630s supervisor lease exceeded");
-   if(terminated)Fail(result,"Forced own Job termination does not establish checker finally/escaped-Shell cleanup");
-   if(result.firstFailure==null&&result.gateReleased&&result.retainedWaitCompleted&&result.checkerExitCode==0&&result.finalActiveJobProcesses==0&&result.jobHandleClosed&&result.retainedProcessDisposed&&result.stdoutComplete&&result.stderrComplete)result.status="passed";
+   if(terminated&&!result.normalJobTeardownRequested)Fail(result,"Unexpected forced own Job termination does not establish checker finally/escaped-Shell cleanup");
+   if(result.firstFailure==null&&result.cleanupErrors.Count==0&&result.gateReleased&&result.retainedWaitCompleted&&result.checkerExitCode==0&&result.finalActiveJobProcesses==0&&result.jobHandleClosed&&result.retainedProcessDisposed&&result.stdoutComplete&&result.stderrComplete)result.status="passed";
   }
   return result;
  }

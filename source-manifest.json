@@ -22,7 +22,7 @@
     {
       "path": ".github/workflows/windows-installer.yml",
       "bytes": 9782,
-      "sha256": "dcf815034bb1c45659bcad346b77ee0d8ca471a9c1c4985dc1cb63503070063a"
+      "sha256": "6ed08364da9b01265b88a11343d79bc8aaeba0c2eed44c1fcb99166219998e95"
     },
     {
       "path": ".github/workflows/windows-release-checks.yml",
@@ -1077,7 +1077,7 @@
     {
       "path": "packaging/windows/offline-native-grant-template.json",
       "bytes": 2330,
-      "sha256": "e6fcd63fdff17ea14ef5ab87929a9e1de79a669af27f8be1eccf4336d49320f4"
+      "sha256": "1fd938ad768940698f40d10f6e0ee30927ffa1c2adb9476401738fc200a86310"
     },
     {
       "path": "packaging/windows/runtime-inputs.json",
@@ -1266,8 +1266,8 @@
     },
     {
       "path": "scripts/run-windows-offline-check.ps1",
-      "bytes": 25831,
-      "sha256": "c1ac6ccc32de340390dbe6ae8a95d1d4ed8c07f8bdb8ce9480937eba064c82b2"
+      "bytes": 26908,
+      "sha256": "c332a29da600af1086d1b21c3137a5866f035014da1b3787b6aceb53d4140883"
     },
     {
       "path": "scripts/run_rotation_proxy_baseline.py",
@@ -1621,10 +1621,10 @@
     }
   ],
   "fileCount": 322,
-  "totalBytes": 8481970,
-  "recordedAtUTC": "2026-10-12T17:57:45.611552+00:00",
+  "totalBytes": 8483047,
+  "recordedAtUTC": "2026-10-12T19:02:23.995537+00:00",
   "sourceUpstreamONNXIncluded": false,
   "installerUpstreamONNXBundlingAuthorized": true,
   "privateDataIncluded": false,
-  "sourceCorrection": "BoundednaturalterminalJobdrain preserving original deadlines/resource/all0guards; exact supervisor-template-workflowbinding only; no product/model/CPU change"
+  "sourceCorrection": "Explicit normal OWN TESTER Job teardown after exact checker PASS; fractional remaining deadline branch yields until actual phase expiry; final zero/waits/handles/errors/original600/630 required; product/modelCPU unchanged"
 }
