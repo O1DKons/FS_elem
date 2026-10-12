@@ -204,7 +204,10 @@ try{
  $activeProfiles=@(Get-NetFirewallProfile -PolicyStore ActiveStore)
  if(@($activeProfiles|Where-Object{$_.Enabled -ne 'True'}).Count -ne 0){throw 'Application deny policy cannot be enforced on this hosted runner'}
  $firewallPrograms=@('FS_elem.exe','.runtime\node\node.exe','.runtime\venv-science\Scripts\python.exe','.runtime\venv-pose\Scripts\python.exe','.runtime\bin\ffmpeg.exe')|ForEach-Object{Join-Path $installed $_}
- $deny=@('0.0.0.0-126.255.255.255','128.0.0.0-255.255.255.255','::2-ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff')
+ # Keep the original IPv6 unicast interval; ff00::/8 is multicast and rejected.
+ # :: and ::1 remain outside the interval; NAT64/site-local remain denied.
+ # Native NetSecurity acceptance of this corrected endpoint awaits CI3.
+ $deny=@('0.0.0.0-126.255.255.255','128.0.0.0-255.255.255.255','::2-feff:ffff:ffff:ffff:ffff:ffff:ffff:ffff')
  foreach($program in $firewallPrograms){
   if(-not(Test-Path -LiteralPath $program -PathType Leaf)){throw 'Offline runtime executable missing before first GUI'}
   $firewallStarted=$true

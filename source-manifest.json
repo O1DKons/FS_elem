@@ -22,7 +22,7 @@
     {
       "path": ".github/workflows/windows-installer.yml",
       "bytes": 6759,
-      "sha256": "7f657977636f567c0c55ecbc6f43412037d9ef9b084ddfeac6f9f49d4546dab4"
+      "sha256": "b0fb6b4cdd0c54b87b901dc1c830cc6246c4b5dd611037a20c1cefb304e61cd8"
     },
     {
       "path": ".github/workflows/windows-release-checks.yml",
@@ -1077,7 +1077,7 @@
     {
       "path": "packaging/windows/offline-native-grant-template.json",
       "bytes": 2364,
-      "sha256": "085a8b54ed22db46db9f56fa7279176b9d252ce4ad4c2086773c9f234f2b4dca"
+      "sha256": "ca51a4462f69957b2ebe50acdf0eab1c82c76e098fa9c435df90e96e64b501a0"
     },
     {
       "path": "packaging/windows/runtime-inputs.json",
@@ -1191,8 +1191,8 @@
     },
     {
       "path": "scripts/check-windows-installer.ps1",
-      "bytes": 41199,
-      "sha256": "824a69cc1e6e769f42a6578155dfc6c3c080aef57dbed2afec367c7c8fb31dd3"
+      "bytes": 41426,
+      "sha256": "e058c065ff5a9cfd1f24e08766686735eef6bcc3dbc8cd59cfdb62d25cf9871d"
     },
     {
       "path": "scripts/config.mjs",
@@ -1611,10 +1611,10 @@
     }
   ],
   "fileCount": 320,
-  "totalBytes": 8453825,
-  "recordedAtUTC": "2026-10-12T14:04:30.082701+00:00",
+  "totalBytes": 8454052,
+  "recordedAtUTC": "2026-10-12T14:30:25.999037+00:00",
   "sourceUpstreamONNXIncluded": false,
   "installerUpstreamONNXBundlingAuthorized": true,
   "privateDataIncluded": false,
-  "sourceCorrection": "CI1 launcher fixture STA/native-handle continuation scheduling; boundedtest watchdog; nativeacceptance pending"
+  "sourceCorrection": "CI1 launcher original-horizon fixture closed; CI2 minimal firewall multicast upperendpoint repaired, nativeacceptance pending"
 }
