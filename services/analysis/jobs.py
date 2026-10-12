@@ -3,6 +3,7 @@ import hashlib
 import json
 import os
 import queue
+import re
 import signal
 import subprocess
 import sys
@@ -169,10 +170,15 @@ class JobManager:
 
     def _command(self,directory):
         if self.runner_command:return self.runner_command(directory)
+        with self.lock:
+            source_sha256=self.jobs[directory.name]['source']['sha256']
+        if not isinstance(source_sha256,str) or not re.fullmatch(r'[0-9a-f]{64}',source_sha256):
+            raise ValueError('Invalid trusted upload SHA-256')
         recipe=json.loads(self.config.read_text());base=self.config.parent
         video=next(directory.glob('video.*'))
         return [str((base/recipe['sciencePython']).absolute()),str(ROOT/'runtime/analyze_job.py'),
-                '--job',str(directory),'--video',str(video),'--config',str(self.config)]
+                '--job',str(directory),'--video',str(video),'--config',str(self.config),
+                '--source-sha256',source_sha256]
 
     def _cleanup(self,process):
         """Stop only the retained owner: Windows JobObject or original POSIX session."""

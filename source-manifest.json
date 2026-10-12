@@ -1091,8 +1091,8 @@
     },
     {
       "path": "runtime/analyze_job.py",
-      "bytes": 1259,
-      "sha256": "1620ff5c41ac203725ad0d7fc87c410ca9dda6789430f151aacef97460d8ac15"
+      "bytes": 1481,
+      "sha256": "e9dd22f346790c9b927b51b120c41be756172d9e02df5597ce9600ff13b34fa3"
     },
     {
       "path": "runtime/pipeline/events.py",
@@ -1361,8 +1361,8 @@
     },
     {
       "path": "services/analysis/jobs.py",
-      "bytes": 15049,
-      "sha256": "7e7d6d3fd6b5c2325872bd2011d03365cd06bf3a223d5539c1ee7903070f257c"
+      "bytes": 15364,
+      "sha256": "01c3bf15fa223d53a137bc86631b5c5df6b49a95adfc2e1aa2ebde375f65345f"
     },
     {
       "path": "services/analysis/process_owner.py",
@@ -1490,6 +1490,11 @@
       "sha256": "439333643b0cf8d537606960279975586ffaf1afcf0f3d779307735f13a476cb"
     },
     {
+      "path": "tests/release/test_export_identity_transport.py",
+      "bytes": 5653,
+      "sha256": "cdb11190f0f3b9413e45946a9011925799004e906689f77eab36a8050880cc93"
+    },
+    {
       "path": "tests/release/test_release_platform.py",
       "bytes": 2550,
       "sha256": "15688d844cdbfe0249fc22e2d1117098669b1ed81f9a39111568d86bdb9595d2"
@@ -1615,11 +1620,11 @@
       "sha256": "545c3b65d1784ad68e6d25b189c0ff5531c3746c77075d35fa976cd94b0ca27a"
     }
   ],
-  "fileCount": 321,
-  "totalBytes": 8472861,
-  "recordedAtUTC": "2026-10-12T17:04:59.536402+00:00",
+  "fileCount": 322,
+  "totalBytes": 8479051,
+  "recordedAtUTC": "2026-10-12T17:37:15.342877+00:00",
   "sourceUpstreamONNXIncluded": false,
   "installerUpstreamONNXBundlingAuthorized": true,
   "privateDataIncluded": false,
-  "sourceCorrection": "Addmissingtrustedruntimepth; realpackagedentry-help gate; boundedpublicjobruntimeLogprefix; algorithm/models/caps unchanged"
+  "sourceCorrection": "Immutable source identity CLI replaces mutable job metadata read during export; meaningful race/mismatch/transport fixtures; algorithms/models/caps unchanged"
 }
