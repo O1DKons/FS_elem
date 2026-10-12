@@ -6,7 +6,7 @@
   "builderInterfaceAccepted": true,
   "nativeInterfaceAccepted": true,
   "runtimeInputsAccepted": true,
-  "hostSha256": "777f837cb65464ec68e61348f3ee9100daa05afa082ae994b7fb723e63b648b9",
+  "hostSha256": "6d6ab0c9512859d01facd535ee1513eb91f0b9d718c033ef5f353ca211c6777e",
   "phaseLimits": {
     "discovery": {
       "wholeSeconds": 30,
@@ -96,8 +96,8 @@
     },
     {
       "path": "apps/macos-launcher/FS_elemApp.swift",
-      "bytes": 21837,
-      "sha256": "c57c4000f89f57323b4b57a8e72c8be20bd2211baf3847e5486e9ad30026dd37"
+      "bytes": 22469,
+      "sha256": "48fa07b7285268c120c2bf358980bfb4afef0e54ef521a60bb3e089fc6a386f0"
     },
     {
       "path": "scripts/macos-first-run.py",
@@ -192,7 +192,7 @@
     {
       "path": "scripts/run-macos-offline-ci-host.py",
       "bytes": 55439,
-      "sha256": "777f837cb65464ec68e61348f3ee9100daa05afa082ae994b7fb723e63b648b9"
+      "sha256": "6d6ab0c9512859d01facd535ee1513eb91f0b9d718c033ef5f353ca211c6777e"
     },
     {
       "path": "configs/mac-desktop-web.json",
@@ -213,8 +213,8 @@
     },
     {
       "path": "apps/macos-launcher/FS_elemApp.swift",
-      "bytes": 21837,
-      "sha256": "c57c4000f89f57323b4b57a8e72c8be20bd2211baf3847e5486e9ad30026dd37"
+      "bytes": 22469,
+      "sha256": "48fa07b7285268c120c2bf358980bfb4afef0e54ef521a60bb3e089fc6a386f0"
     },
     {
       "path": "scripts/macos-first-run.py",

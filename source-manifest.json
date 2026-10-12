@@ -66,8 +66,8 @@
     },
     {
       "path": "apps/macos-launcher/FS_elemApp.swift",
-      "bytes": 21837,
-      "sha256": "c57c4000f89f57323b4b57a8e72c8be20bd2211baf3847e5486e9ad30026dd37"
+      "bytes": 22469,
+      "sha256": "48fa07b7285268c120c2bf358980bfb4afef0e54ef521a60bb3e089fc6a386f0"
     },
     {
       "path": "apps/web/.next/types/routes.d.ts",
@@ -947,7 +947,7 @@
     {
       "path": "configs/mac-offline-ci-host-template.json",
       "bytes": 10529,
-      "sha256": "05fd38a967f2d2f3545884f9b470502b8cb9649cd1f58af59c9356ce90faee77"
+      "sha256": "1ecf68c22ee9627c00e5d2747511a64b2b5d5b0fab3de7b4c5242e1c4f5ad28d"
     },
     {
       "path": "configs/mac-recipe-binding.json",
@@ -1357,7 +1357,7 @@
     {
       "path": "scripts/run-macos-offline-ci-host.py",
       "bytes": 55439,
-      "sha256": "777f837cb65464ec68e61348f3ee9100daa05afa082ae994b7fb723e63b648b9"
+      "sha256": "6d6ab0c9512859d01facd535ee1513eb91f0b9d718c033ef5f353ca211c6777e"
     },
     {
       "path": "scripts/run-windows-offline-check.ps1",
@@ -1751,11 +1751,11 @@
     }
   ],
   "fileCount": 348,
-  "totalBytes": 8846942,
-  "recordedAtUTC": "2026-10-12T23:20:07.961203+00:00",
+  "totalBytes": 8847574,
+  "recordedAtUTC": "2026-10-12T23:30:59.464419+00:00",
   "sourceUpstreamONNXIncluded": false,
   "installerUpstreamONNXBundlingAuthorized": true,
   "privateDataIncluded": false,
-  "sourceCorrection": "Real native XCTestSuite and observer execute entirely on original main thread via retained one-shot native RunLoop Timer; same7assertions/timeouts/outcome/no-failure/no-skip guards",
+  "sourceCorrection": "ONE bounded POSIX pipe read delivers short protocol frames without Foundation read fill dependency; same7nativeassertions/timeouts/EOF+wait+PGID guards/modelsCPU unchanged",
   "consumerSigningAccepted": false
 }

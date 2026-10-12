@@ -591,7 +591,7 @@ class Host:
 
     def xctest(self, phase):
         expected = [
-            ("swiftAppPath", 21837, "c57c4000f89f57323b4b57a8e72c8be20bd2211baf3847e5486e9ad30026dd37"),
+            ("swiftAppPath", 22469, "48fa07b7285268c120c2bf358980bfb4afef0e54ef521a60bb3e089fc6a386f0"),
             ("swiftFixturePath", 5745, "23aafc2779b3665f22f45765fe1f83db5359b0a0fd503f78de10f5514055e418"),
             ("swiftRunnerPath", 2026, "ba7ba7749231d66147cbfbccb1caecb6919af26eb2066c968de3aec1800713bd"),
         ]

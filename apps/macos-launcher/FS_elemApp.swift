@@ -177,6 +177,7 @@ final class ControllerOwner {
     }
     private func pump(_ handle: FileHandle, json: Bool) {
         var pending = Data()
+        var buffer = [UInt8](repeating: 0, count: 4096)
         var ended = false
         var discard = false
         defer {
@@ -188,8 +189,17 @@ final class ControllerOwner {
         }
         do {
             while true {
-                let block = try handle.read(upToCount: 4096) ?? Data()
-                if block.isEmpty { ended = true; break }
+                // A short protocol frame must not need to fill a 4096-byte read.
+                let readResult: (count: Int, error: Int32) = buffer.withUnsafeMutableBytes { bytes in
+                    let count = Darwin.read(handle.fileDescriptor, bytes.baseAddress!, bytes.count)
+                    return (count, count < 0 ? errno : 0)
+                }
+                if readResult.count < 0 {
+                    if readResult.error == EINTR { continue }
+                    throw NSError(domain: NSPOSIXErrorDomain, code: Int(readResult.error))
+                }
+                if readResult.count == 0 { ended = true; break }
+                let block = Data(buffer.prefix(readResult.count))
                 lock.lock()
                 if totalBytes <= Self.streamLimit { totalBytes += block.count }
                 let exceeds = totalBytes > Self.streamLimit
