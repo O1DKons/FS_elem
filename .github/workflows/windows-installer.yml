@@ -13,6 +13,45 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Verify real firewall Any and classic loopback before payload build
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts/check-windows-offline-firewall.ps1'
+          if ((Get-FileHash -LiteralPath $script -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'b1f2b5b66741988e550f5e3a92ce40dbb40d6d28e9eb2e26e12bc2d62fd33079') { throw 'Preflight Source SHA mismatch' }
+          $work = Join-Path $env:RUNNER_TEMP 'fs-elem-v025-firewall-preflight'
+          New-Item -ItemType Directory -Path $work -Force | Out-Null
+          $output = Join-Path $work 'firewall-preflight.json'
+          $parentOutput = Join-Path $work 'firewall-preflight-parent.json'
+          if ((Test-Path -LiteralPath $output) -or (Test-Path -LiteralPath $parentOutput)) { throw 'Fresh preflight receipts required' }
+          $child = [Diagnostics.Process]::new()
+          $child.StartInfo.FileName = (Get-Process -Id $PID).Path
+          $child.StartInfo.UseShellExecute = $false
+          $child.StartInfo.CreateNoWindow = $true
+          foreach ($arg in @('-NoLogo','-NoProfile','-NonInteractive','-File',$script,'-Output',$output)) { $child.StartInfo.ArgumentList.Add($arg) }
+          $started = $false
+          $waited = $false
+          $childId = $null
+          $creation = $null
+          $exitCode = $null
+          try {
+            if (-not $child.Start()) { throw 'Preflight child did not start' }
+            $started = $true
+            $childId = $child.Id
+            try { $creation = $child.StartTime.ToFileTimeUtc().ToString() } catch { $creation = $null }
+            # Retain and wait on this exact process. Sync NetSecurity calls have
+            # no independent watchdog; child late-success gates and CI45 differ.
+            $child.WaitForExit()
+            $waited = $true
+            $exitCode = $child.ExitCode
+          } finally {
+            if ($started -and -not $waited) { $child.WaitForExit(); $waited = $true; $exitCode = $child.ExitCode }
+            $child.Dispose()
+            @{ parentPID=$PID; childPID=$childId; childCreationFileTime=$creation; retainedWaitCompleted=$waited; exitCode=$exitCode; processHandleDisposed=$true; qualification='No independent Root remote parent-reap/syscall or hard20s interruption proof' } | ConvertTo-Json -Compress | Set-Content -LiteralPath $parentOutput -Encoding utf8NoBOM
+          }
+          if ($exitCode -ne 0) { throw 'Real firewall/loopback prerequisite failed before payload build' }
+          $receipt = Get-Content -LiteralPath $output -Raw | ConvertFrom-Json
+          if ($receipt.status -cne 'passed' -or $receipt.processId -ne $childId -or $receipt.effectiveProgramBlockAny -ne $true -or $receipt.classicWin32TcpLoopbackHandshake -ne $true -or $receipt.ownRuleGone -ne $true -or $receipt.socketsClosed -ne $true) { throw 'Preflight receipt did not bind the successful child and cleanup' }
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -59,7 +98,7 @@ jobs:
           $work = Join-Path $env:RUNNER_TEMP 'fs-elem-v025-installer'
           $installer = Join-Path $work 'artifacts/FS_elem-Setup-0.2.5-x64.exe'
           $template = Join-Path $env:GITHUB_WORKSPACE 'packaging/windows/offline-native-grant-template.json'
-          if ((Get-FileHash -LiteralPath $template -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'ca51a4462f69957b2ebe50acdf0eab1c82c76e098fa9c435df90e96e64b501a0') { throw 'Root template SHA mismatch' }
+          if ((Get-FileHash -LiteralPath $template -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'fb762865962ee3e90a87eb4f622dd4773343cdf28cf2b9ea5cc41c67bf02d99c') { throw 'Root template SHA mismatch' }
           $grant = Get-Content -LiteralPath $template -Raw -Encoding UTF8 | ConvertFrom-Json
           if ($grant.actualAuthorization -ne $false) { throw 'Expected prospective Root template' }
           $script = Join-Path $env:GITHUB_WORKSPACE 'scripts/check-windows-installer.ps1'
@@ -98,6 +137,7 @@ jobs:
         with:
           name: fs-elem-v025-windows-offline-evidence-${{ github.run_id }}
           path: |
+            ${{ runner.temp }}/fs-elem-v025-firewall-preflight/*.json
             ${{ runner.temp }}/fs-elem-v025-installer/*.json
             ${{ runner.temp }}/fs-elem-v025-installer/logs/*
             ${{ runner.temp }}/fs-elem-v025-installer/offline-supervisor/*

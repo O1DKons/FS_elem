@@ -8,7 +8,7 @@
   "allowNN": true,
   "publicVideo": true,
   "allowTemporaryFirewallEnable": true,
-  "nativeCheckSha256": "e058c065ff5a9cfd1f24e08766686735eef6bcc3dbc8cd59cfdb62d25cf9871d",
+  "nativeCheckSha256": "aeaf1aace2eacf2f2f3025233b7eb51689a1fc12ae3df0fbdcb9755b9df3e638",
   "videoSha256": "b142e4df68b709475cc016c35b67d2a6999afc8c7644b91722093cd2e4355b5d",
   "videoBytes": 818120,
   "publicSourceUrl": "https://o1dkons.github.io/FS_elem/grant-demo/media/example-1a.mp4",

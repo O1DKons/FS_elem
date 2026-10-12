@@ -21,8 +21,8 @@
     },
     {
       "path": ".github/workflows/windows-installer.yml",
-      "bytes": 6759,
-      "sha256": "b0fb6b4cdd0c54b87b901dc1c830cc6246c4b5dd611037a20c1cefb304e61cd8"
+      "bytes": 9782,
+      "sha256": "edc35adc54209b04d670cb6aa6c42aa5f9981c6bbd51e9aed1f03f66a13253f3"
     },
     {
       "path": ".github/workflows/windows-release-checks.yml",
@@ -1077,7 +1077,7 @@
     {
       "path": "packaging/windows/offline-native-grant-template.json",
       "bytes": 2364,
-      "sha256": "ca51a4462f69957b2ebe50acdf0eab1c82c76e098fa9c435df90e96e64b501a0"
+      "sha256": "fb762865962ee3e90a87eb4f622dd4773343cdf28cf2b9ea5cc41c67bf02d99c"
     },
     {
       "path": "packaging/windows/runtime-inputs.json",
@@ -1191,8 +1191,13 @@
     },
     {
       "path": "scripts/check-windows-installer.ps1",
-      "bytes": 41426,
-      "sha256": "e058c065ff5a9cfd1f24e08766686735eef6bcc3dbc8cd59cfdb62d25cf9871d"
+      "bytes": 41067,
+      "sha256": "aeaf1aace2eacf2f2f3025233b7eb51689a1fc12ae3df0fbdcb9755b9df3e638"
+    },
+    {
+      "path": "scripts/check-windows-offline-firewall.ps1",
+      "bytes": 11054,
+      "sha256": "b1f2b5b66741988e550f5e3a92ce40dbb40d6d28e9eb2e26e12bc2d62fd33079"
     },
     {
       "path": "scripts/config.mjs",
@@ -1610,11 +1615,11 @@
       "sha256": "545c3b65d1784ad68e6d25b189c0ff5531c3746c77075d35fa976cd94b0ca27a"
     }
   ],
-  "fileCount": 320,
-  "totalBytes": 8454052,
-  "recordedAtUTC": "2026-10-12T14:30:25.999037+00:00",
+  "fileCount": 321,
+  "totalBytes": 8467770,
+  "recordedAtUTC": "2026-10-12T15:20:50.592926+00:00",
   "sourceUpstreamONNXIncluded": false,
   "installerUpstreamONNXBundlingAuthorized": true,
   "privateDataIncluded": false,
-  "sourceCorrection": "CI1 launcher original-horizon fixture closed; CI2 minimal firewall multicast upperendpoint repaired, nativeacceptance pending"
+  "sourceCorrection": "CI1 fixture closed; canonicalAny denial plusmandatory realTCP-loopback preflight BEFOREbuilder; nativeacceptancepending"
 }

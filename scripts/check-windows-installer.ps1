@@ -204,23 +204,20 @@ try{
  $activeProfiles=@(Get-NetFirewallProfile -PolicyStore ActiveStore)
  if(@($activeProfiles|Where-Object{$_.Enabled -ne 'True'}).Count -ne 0){throw 'Application deny policy cannot be enforced on this hosted runner'}
  $firewallPrograms=@('FS_elem.exe','.runtime\node\node.exe','.runtime\venv-science\Scripts\python.exe','.runtime\venv-pose\Scripts\python.exe','.runtime\bin\ffmpeg.exe')|ForEach-Object{Join-Path $installed $_}
- # Keep the original IPv6 unicast interval; ff00::/8 is multicast and rejected.
- # :: and ::1 remain outside the interval; NAT64/site-local remain denied.
- # Native NetSecurity acceptance of this corrected endpoint awaits CI3.
- $deny=@('0.0.0.0-126.255.255.255','128.0.0.0-255.255.255.255','::2-feff:ffff:ffff:ffff:ffff:ffff:ffff:ffff')
+ # Any covers both IP families for only these exact installed executables.
+ # Classic Win32 loopback behavior is NOT assumed: Root prerequisite and
+ # strict local health/public functional native gate must prove it.
+ $deny='Any'
  foreach($program in $firewallPrograms){
   if(-not(Test-Path -LiteralPath $program -PathType Leaf)){throw 'Offline runtime executable missing before first GUI'}
   $firewallStarted=$true
   New-NetFirewallRule -DisplayName ('FS_elem offline deny '+[IO.Path]::GetFileName($program)) -Group $firewallGroup -Direction Outbound -Action Block -Program $program -RemoteAddress $deny -Profile Any -Enabled True -ErrorAction Stop|Out-Null
-  foreach($direction in 'Inbound','Outbound'){
-   New-NetFirewallRule -DisplayName ('FS_elem loopback '+$direction) -Group $firewallGroup -Direction $direction -Action Allow -Program $program -RemoteAddress @('127.0.0.0/8','::1') -Profile Any -Enabled True -ErrorAction Stop|Out-Null
-  }
  }
  $effective=@(Get-NetFirewallRule -PolicyStore ActiveStore|Where-Object{$_.Group -eq $firewallGroup -and $_.Enabled -eq 'True' -and $_.Direction -eq 'Outbound' -and $_.Action -eq 'Block'})
  if($effective.Count -ne $firewallPrograms.Count){throw 'Non-loopback deny policy did not become active'}
  $summary.offlineNetworkPolicy=@($effective|ForEach-Object{@{name=$_.Name;program=(Get-NetFirewallApplicationFilter -AssociatedNetFirewallRule $_).Program;remoteAddresses=@((Get-NetFirewallAddressFilter -AssociatedNetFirewallRule $_).RemoteAddress)}})
  foreach($program in $firewallPrograms){
-  if(@($summary.offlineNetworkPolicy|Where-Object{$_.program -eq $program -and $_.remoteAddresses.Count -eq 3}).Count -ne 1){throw 'Effective per-program non-loopback deny binding unresolved'}
+  if(@($summary.offlineNetworkPolicy|Where-Object{$_.program -eq $program -and $_.remoteAddresses.Count -eq 1 -and $_.remoteAddresses[0] -eq 'Any'}).Count -ne 1){throw 'Effective per-program Any outbound deny binding unresolved'}
  }
  $summary.nonLoopbackNetworkPhysicallyDenied=$true
 
