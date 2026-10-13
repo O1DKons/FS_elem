@@ -271,8 +271,7 @@ class Phase:
                     producer_token = item["identity"]
                     break  # This sample only; completion mid-walk does not renew its authority.
         work = self.root / "builder-work"
-        mutable_roots = tuple(root for root in (self.tmp, self.additional_tmp,
-            work / "node-extracted", work / "runtime") if root is not None)
+        mutable_roots = tuple(root for root in (self.tmp, self.additional_tmp, work) if root is not None)
         def walk(root, links=(), mounts=()):
             on_missing = None
             if producer_token is not None and root in (self.root, *mutable_roots):

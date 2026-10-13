@@ -947,7 +947,7 @@
     {
       "path": "configs/mac-offline-ci-host-template.json",
       "bytes": 10529,
-      "sha256": "12283af9afc46b773e81017b167274190cad15d610774bf820a5b3aa64613315"
+      "sha256": "86b940f4e9cbcf4c2998621f0b1db9393a1b7b1b1d3b0f849d7cf8975376c740"
     },
     {
       "path": "configs/mac-recipe-binding.json",
@@ -1356,8 +1356,8 @@
     },
     {
       "path": "scripts/run-macos-offline-ci-host.py",
-      "bytes": 62714,
-      "sha256": "b592fec91c6c3d74e296f1c2398b79e3f4b27c137c9b9ec6b599f4c4d1ed13c5"
+      "bytes": 62665,
+      "sha256": "6fc3ec93142bf18b08763b9e1a05040130d821d82703043dcee0765e4de138aa"
     },
     {
       "path": "scripts/run-windows-offline-check.ps1",
@@ -1751,11 +1751,11 @@
     }
   ],
   "fileCount": 348,
-  "totalBytes": 8854849,
+  "totalBytes": 8854800,
   "recordedAtUTC": "2026-10-13T00:11:45.918571+00:00",
   "sourceUpstreamONNXIncluded": false,
   "installerUpstreamONNXBundlingAuthorized": true,
   "privateDataIncluded": false,
-  "sourceCorrection": "V12 final2 mutable staging sampling and generation-safe executable ledger; original caps/models unchanged",
+  "sourceCorrection": "V13 exact live OWN builder-work mutable resource snapshot; post-reap integrity strict",
   "consumerSigningAccepted": false
 }
