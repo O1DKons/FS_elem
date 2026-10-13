@@ -152,18 +152,31 @@ def selected_swift_pin(path, developer, limit_ns):
                 "mtimeNs": str(alias_before.st_mtime_ns), "ctimeNs": str(alias_before.st_ctime_ns)}}
 
 
-def tree_bytes(root, end_ns, allowed_links=(), read_only_mounts=()):
+def tree_bytes(root, end_ns, allowed_links=(), read_only_mounts=(), *, on_missing=None):
+    import errno
     total = 0
+    def missing(error, item):
+        if (isinstance(error, FileNotFoundError) and error.errno == errno.ENOENT
+                and item is not None and on_missing is not None and on_missing(item)):
+            return
+        raise error
+    def walk_error(error):
+        missing(error, pathlib.Path(error.filename) if error.filename else None)
     if root.exists():
-        for parent, dirs, files in os.walk(root, followlinks=False):
+        for parent, dirs, files in os.walk(root, followlinks=False, onerror=walk_error):
             before(end_ns)
             dirs[:] = [name for name in dirs if pathlib.Path(parent) / name not in read_only_mounts]
             for name in dirs + files:
                 item = pathlib.Path(parent) / name
-                if item.is_symlink():
-                    need(item in allowed_links and os.readlink(item) == "/Applications", "unexpected link in owned output namespace")
-                    continue  # Intentional DMG drag-link is not followed or app inventory.
-                info = item.lstat()
+                try:
+                    info = item.lstat()
+                    if stat.S_ISLNK(info.st_mode):
+                        need(item in allowed_links and os.readlink(item) == "/Applications",
+                             "unexpected link in owned output namespace")
+                        continue  # Intentional drag-link is not followed.
+                except FileNotFoundError as error:
+                    missing(error, item)
+                    continue
                 if stat.S_ISREG(info.st_mode):
                     total += info.st_size
                 else:
@@ -188,6 +201,9 @@ class Phase:
         self.first_failure = None
         self.cleanup_errors = []
         self.sample_count = 0
+        self.incomplete_resource_sample_count = self.disappeared_mutable_path_count = 0
+        self.strict_after_reap_sample_count = 0
+        self.last_resource_sample_incomplete = self.last_sample_strict_after_reap = False
         self.rss_max = self.output_max = self.tmp_max = 0
         self.external_app = None
         self.additional_outputs = []
@@ -203,7 +219,8 @@ class Phase:
         need(len(self.known) < 1024 or self.host.native.key(row) in self.known, "OWN phase process ledger cap")
         self.known[self.host.native.key(row)] = row
 
-    def sample(self):
+    def sample(self, *, strict_after_reap=False):
+        self.last_resource_sample_incomplete = self.last_sample_strict_after_reap = False
         before(self.work_end_ns)
         need(self.pipe_failure is None, self.pipe_failure or "pipe failure")
         rows = self.host.native.snapshot()
@@ -224,11 +241,36 @@ class Phase:
         rss = self.host.native.rss(self.host.native.identity(os.getpid()))
         rss += sum(self.host.native.rss(row) for row in self.known.values()
                    if self.host.native.same(row, current.get(row["pid"])))
-        output = tree_bytes(self.root, self.work_end_ns, self.allowed_links, self.read_only_mounts)
+        if strict_after_reap:
+            need(all(item["closed"] and item["handle"].returncode is not None for item in self.children),
+                 "strict resource sample requires retained waits and closed readers/pipes")
+        producer_token = None
+        if self.name == "build" and not strict_after_reap:
+            for item in self.children:
+                if (item["name"] == "build-offline-development-dmg" and not item["closed"]
+                        and item["identity"] and item["handle"].poll() is None
+                        and self.host.native.same(item["identity"], current.get(item["handle"].pid))):
+                    producer_token = item["identity"]
+                    break  # This sample only; completion mid-walk does not renew its authority.
+        mutable_roots = tuple(root for root in (self.tmp, self.additional_tmp) if root is not None)
+        def walk(root, links=(), mounts=()):
+            on_missing = None
+            if producer_token is not None and root in (self.root, *mutable_roots):
+                def on_missing(item):
+                    before(self.work_end_ns)
+                    if not item.is_relative_to(root) or not any(item.is_relative_to(value) for value in mutable_roots):
+                        return False
+                    self.disappeared_mutable_path_count += 1
+                    if not self.last_resource_sample_incomplete:
+                        self.incomplete_resource_sample_count += 1
+                        self.last_resource_sample_incomplete = True
+                    return True  # Counted lower-bound sample; no missing file is assigned size zero.
+            return tree_bytes(root, self.work_end_ns, links, mounts, on_missing=on_missing)
+        output = walk(self.root, self.allowed_links, self.read_only_mounts)
         output += sum(tree_bytes(root, self.work_end_ns) for root in self.additional_outputs)
-        temporary = tree_bytes(self.tmp, self.work_end_ns)
+        temporary = walk(self.tmp)
         if self.additional_tmp:
-            temporary += tree_bytes(self.additional_tmp, self.work_end_ns)
+            temporary += walk(self.additional_tmp)
         self.rss_max, self.output_max, self.tmp_max = max(self.rss_max, rss), max(self.output_max, output), max(self.tmp_max, temporary)
         self.sample_count += 1
         need(rss <= self.limits["sampledRssBytes"], "sampled phase OWN RSS cap exceeded")
@@ -238,6 +280,10 @@ class Phase:
             self.new_user_tmp_max = max(self.new_user_tmp_max, combined)
             need(combined <= self.limits["newUserAndTmpBytes"], "sampled new user plus TMP exceeded combined64MiB")
         before(self.work_end_ns)
+        if strict_after_reap:
+            need(not self.last_resource_sample_incomplete, "strict post-reap resource sample incomplete")
+            self.strict_after_reap_sample_count += 1
+            self.last_sample_strict_after_reap = True
 
     def execute(self, name, argv, environment=None, *, allow_fast_terminal_discovery=False):
         self.sample()
@@ -287,7 +333,7 @@ class Phase:
             need(terminal == 0, "unbound discovery child is not already terminal/successful")
             before(self.work_end_ns)
             self.wait_and_save(item, self.work_end_ns)
-            self.sample()
+            self.sample(strict_after_reap=True)
             before(self.work_end_ns)
             need(self.host.native.identity(child.pid) is None, "fast discovery PID reused or remains live")
             proof["freshNativePidAbsent"] = True
@@ -311,7 +357,7 @@ class Phase:
             self.sample()
             time.sleep(min(0.1, max(0, self.work_end_ns - time.monotonic_ns()) / 1e9))
         self.wait_and_save(item, self.work_end_ns)
-        self.sample()
+        self.sample(strict_after_reap=True)
         need(child.returncode == 0, "retained phase child failed: " + name + " exit=" + str(child.returncode))
         return bytes(item["buffers"][0])
 
@@ -382,6 +428,12 @@ class Phase:
                 "sampledRssMaxBytes": self.rss_max, "sampledOutputMaxBytes": self.output_max,
                 "sampledTmpMaxBytes": self.tmp_max, "observedStreamBytes": self.log_count,
                 "sampledNewUserAndTmpMaxBytes": self.new_user_tmp_max,
+                "incompleteResourceSampleCount": self.incomplete_resource_sample_count,
+                "disappearedMutablePathEventCount": self.disappeared_mutable_path_count,
+                "strictAfterReapSampleCount": self.strict_after_reap_sample_count,
+                "lastSampleStrictAfterReap": self.last_sample_strict_after_reap,
+                "resourceByteTotalsQualification": ("includes observed lower bounds from transient ENOENT samples"
+                    if self.incomplete_resource_sample_count else "strict walks; no continuous peak proof"),
                 "actualDmgMount": self.mount,
                 "independentParentReapOrContinuousResourceProof": False, "result": self.result}
 
