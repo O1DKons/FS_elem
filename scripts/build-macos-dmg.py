@@ -481,6 +481,32 @@ def inventory(root):
     return rows
 
 
+def macho_macos_versions(output):
+    versions = []
+    blocks = re.split(r'(?m)^\s*Load command\s+\d+\s*$', output)
+    for block in blocks:
+        commands = re.findall(r'(?m)^\s*cmd\s+(\S+)\s*$', block)
+        target_commands = [value for value in commands
+                           if value == 'LC_BUILD_VERSION' or value.startswith('LC_VERSION_MIN_')]
+        if not target_commands:
+            continue
+        need(len(commands) == 1 and len(target_commands) == 1, 'Malformed Mach-O target command')
+        command = target_commands[0]
+        if command == 'LC_BUILD_VERSION':
+            platforms = re.findall(r'(?m)^\s*platform(?:\s+(.*))?$', block)
+            need(len(platforms) == 1 and platforms[0].strip().upper() in ('1', 'MACOS'),
+                 'Mach-O target platform is absent, duplicated or not macOS')
+            values = re.findall(r'(?m)^\s*minos(?:\s+(.*))?$', block)
+        else:
+            need(command == 'LC_VERSION_MIN_MACOSX', 'Mach-O legacy target is not macOS')
+            values = re.findall(r'(?m)^\s*version(?:\s+(.*))?$', block)
+        need(len(values) == 1 and re.fullmatch(r'\d+\.\d+(?:\.\d+)?', values[0].strip()),
+             'Mach-O target version absent, malformed or duplicated')
+        versions.append(values[0].strip())
+        need(len(versions) == 1, 'Duplicate Mach-O deployment target commands')
+    return versions
+
+
 def macho_checks(build, root, tools, namespace):
     magics = {bytes.fromhex(s) for s in ('cffaedfe', 'feedfacf', 'cafebabe',
                                           'bebafeca', 'cafebabf', 'bfbafeca')}
@@ -496,7 +522,7 @@ def macho_checks(build, root, tools, namespace):
         arch = build.run(namespace + '-macho-' + str(count) + '-arch', [tools['lipo'], '-archs', path], root).read_text()
         need('arm64' in arch.split(), 'Mach-O lacks arm64')
         output = build.run(namespace + '-macho-' + str(count) + '-load', [tools['otool'], '-arch', 'arm64', '-l', path], root).read_text()
-        versions = re.findall(r'(?m)^\s*(?:minos|version)\s+(\d+\.\d+(?:\.\d+)?)\s*$', output)
+        versions = macho_macos_versions(output)
         need(versions and all(tuple(int(p) for p in v.split('.'))[:2] <= (13, 0) for v in versions),
              'Mach-O deployment target absent or above macOS13')
         need(not re.search(r'(?m)^\s*name\s+(?:/Users/|/private/|/var/folders/|/opt/homebrew/)', output),

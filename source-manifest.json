@@ -947,7 +947,7 @@
     {
       "path": "configs/mac-offline-ci-host-template.json",
       "bytes": 10529,
-      "sha256": "12cf14fff5d078135397ef65d689f1b0b315a70bc0020747be68266aab49ce94"
+      "sha256": "76d99d89f1dd0f21b5554a003aaf4f1fdaf72f1940c1c020b59098a037ad38a7"
     },
     {
       "path": "configs/mac-recipe-binding.json",
@@ -1246,8 +1246,8 @@
     },
     {
       "path": "scripts/build-macos-dmg.py",
-      "bytes": 40214,
-      "sha256": "4ae273b0accb33209fd90faf86f8fe70d13fd61a88031c579cacbcea21544de7"
+      "bytes": 41551,
+      "sha256": "c4a2ab35461f47f6f487e96adeb077229fbee1ad1cbd66e189d4542c8eb979ee"
     },
     {
       "path": "scripts/build-windows-installer.ps1",
@@ -1751,11 +1751,11 @@
     }
   ],
   "fileCount": 348,
-  "totalBytes": 8861612,
+  "totalBytes": 8862949,
   "recordedAtUTC": "2026-10-13T00:11:45.918571+00:00",
   "sourceUpstreamONNXIncluded": false,
   "installerUpstreamONNXBundlingAuthorized": true,
   "privateDataIncluded": false,
-  "sourceCorrection": "V15 resource-only confined stagingalias resolver; finalappintegrity unchanged",
+  "sourceCorrection": "V16 command-aware Mach-O macOS minos parser; exact13.0threshold preserved",
   "consumerSigningAccepted": false
 }

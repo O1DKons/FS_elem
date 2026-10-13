@@ -86,8 +86,8 @@
   "sourcePins": [
     {
       "path": "scripts/build-macos-dmg.py",
-      "bytes": 40214,
-      "sha256": "4ae273b0accb33209fd90faf86f8fe70d13fd61a88031c579cacbcea21544de7"
+      "bytes": 41551,
+      "sha256": "c4a2ab35461f47f6f487e96adeb077229fbee1ad1cbd66e189d4542c8eb979ee"
     },
     {
       "path": "scripts/prepare-macos-bundle.py",
@@ -203,8 +203,8 @@
   "builderSourcePins": [
     {
       "path": "scripts/build-macos-dmg.py",
-      "bytes": 40214,
-      "sha256": "4ae273b0accb33209fd90faf86f8fe70d13fd61a88031c579cacbcea21544de7"
+      "bytes": 41551,
+      "sha256": "c4a2ab35461f47f6f487e96adeb077229fbee1ad1cbd66e189d4542c8eb979ee"
     },
     {
       "path": "scripts/prepare-macos-bundle.py",
