@@ -947,7 +947,7 @@
     {
       "path": "configs/mac-offline-ci-host-template.json",
       "bytes": 10529,
-      "sha256": "86b940f4e9cbcf4c2998621f0b1db9393a1b7b1b1d3b0f849d7cf8975376c740"
+      "sha256": "06e7612cdb0a7e80111f991452fa2ef7acb1b0a19dea2a3b14972a5ea01512e7"
     },
     {
       "path": "configs/mac-recipe-binding.json",
@@ -1246,8 +1246,8 @@
     },
     {
       "path": "scripts/build-macos-dmg.py",
-      "bytes": 37135,
-      "sha256": "05aa3b84c1e6a3d2c43d3ed6a72030a2ab19f933cf59a60baf86b1dd27b75685"
+      "bytes": 40214,
+      "sha256": "4ae273b0accb33209fd90faf86f8fe70d13fd61a88031c579cacbcea21544de7"
     },
     {
       "path": "scripts/build-windows-installer.ps1",
@@ -1751,11 +1751,11 @@
     }
   ],
   "fileCount": 348,
-  "totalBytes": 8854800,
+  "totalBytes": 8857879,
   "recordedAtUTC": "2026-10-13T00:11:45.918571+00:00",
   "sourceUpstreamONNXIncluded": false,
   "installerUpstreamONNXBundlingAuthorized": true,
   "privateDataIncluded": false,
-  "sourceCorrection": "V13 exact live OWN builder-work mutable resource snapshot; post-reap integrity strict",
+  "sourceCorrection": "V14 final2 innerBuilder live snapshots + strictpostwait and originalPS cleanupdeadline; HostV13",
   "consumerSigningAccepted": false
 }

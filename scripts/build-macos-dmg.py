@@ -58,14 +58,39 @@ def rel(name):
     return p
 
 
-def disk_bytes(root):
+def disk_bytes(root, deadline, on_missing=None):
+    import errno
+    import stat
     total = 0
-    for base, dirs, files in os.walk(root, followlinks=False):
-        dirs[:] = [n for n in dirs if not Path(base, n).is_symlink()]
-        for name in files:
+    def missing(error, path):
+        if (isinstance(error, FileNotFoundError) and error.errno == errno.ENOENT
+                and on_missing is not None and path is not None and path.is_relative_to(root)):
+            on_missing(path)
+            return True
+        return False
+    def walk_error(error):
+        path = Path(error.filename) if error.filename else None
+        if not missing(error, path):
+            raise error
+    for base, dirs, files in os.walk(root, followlinks=False, onerror=walk_error):
+        need(time.monotonic() < deadline, 'Original resource-walk horizon exhausted')
+        for name in list(dirs) + files:
             p = Path(base, name)
-            if p.is_file() and not p.is_symlink():
-                total += p.stat().st_size
+            try:
+                mode = p.lstat()
+            except OSError as error:
+                if missing(error, p):
+                    if name in dirs:
+                        dirs.remove(name)
+                    continue
+                raise
+            if stat.S_ISLNK(mode.st_mode):
+                if name in dirs:
+                    dirs.remove(name)  # Existing resource accounting excludes links; payload admission remains separate.
+            elif stat.S_ISREG(mode.st_mode):
+                total += mode.st_size
+            need(time.monotonic() < deadline, 'Original resource-walk horizon exhausted')
+    need(time.monotonic() < deadline, 'Original resource-walk horizon exhausted')
     return total
 
 
@@ -83,6 +108,9 @@ class Build:
         self.stream_lock = threading.Lock()
         self.commands = []
         self.last_disk_check = 0
+        self.incomplete_resource_samples = self.missing_resource_events = 0
+        self.strict_resource_samples = 0
+        self.last_resource_sample_incomplete = False
         self.env = dict(os.environ)
         for key in ('PYTHONHOME', 'PYTHONPATH', 'VIRTUAL_ENV', 'NODE_OPTIONS'):
             self.env.pop(key, None)
@@ -90,13 +118,30 @@ class Build:
                         PIP_DISABLE_PIP_VERSION_CHECK='1', PIP_NO_CACHE_DIR='1',
                         TMPDIR=str(self.tmp), npm_config_cache=str(self.tmp / 'npm-cache'))
 
-    def check(self):
+    def check(self, producer=None, strict=False):
         need(time.monotonic() < self.work_end, 'Original 45min work horizon exhausted')
         need(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss <= 4294967296,
              'Sampled own RSS exceeds4GiB; no hard/aggregate RSS claim')
-        if time.monotonic() - self.last_disk_check >= 1:
-            need(disk_bytes(self.root) <= 8589934592 and disk_bytes(self.tmp) <= 4294967296,
+        if strict or time.monotonic() - self.last_disk_check >= 1:
+            # Retained unreaped OWN child: this sample only, including completion mid-walk.
+            live_token = not strict and producer is not None and producer.poll() is None
+            incomplete = False
+            def missing(path):
+                nonlocal incomplete
+                need(time.monotonic() < self.work_end, 'Original resource-walk horizon exhausted')
+                self.missing_resource_events += 1
+                incomplete = True
+            callback = missing if live_token else None
+            output = disk_bytes(self.root, self.work_end, callback)
+            temporary = disk_bytes(self.tmp, self.work_end, callback)
+            if incomplete:
+                self.incomplete_resource_samples += 1
+            self.last_resource_sample_incomplete = incomplete
+            need(output <= 8589934592 and temporary <= 4294967296,
                  'Build output/TMP budget exceeded')
+            if strict:
+                need(not incomplete, 'Strict post-reap resource sample incomplete')
+                self.strict_resource_samples += 1
             self.last_disk_check = time.monotonic()
 
     def observe_group(self, pgid, cleanup_end, label):
@@ -187,7 +232,7 @@ class Build:
                     path = self.logs / (label + '-group-observation.' + suffix + '.log')
                     with path.open('xb') as outgoing:
                         outgoing.write(chunks[index])
-                need(disk_bytes(self.root) <= 8589934592 and disk_bytes(self.tmp) <= 4294967296,
+                need(disk_bytes(self.root, cleanup_end) <= 8589934592 and disk_bytes(self.tmp, cleanup_end) <= 4294967296,
                      'Build output/TMP budget exceeded during ps snapshot')
                 need(time.monotonic() < cleanup_end, 'Original cleanup deadline exhausted after ps snapshot output')
             except Exception as error:
@@ -240,7 +285,7 @@ class Build:
                 if failures:
                     raise RuntimeError(failures[0])
                 need(time.monotonic() < end, 'Original command deadline exceeded: ' + label)
-                self.check()
+                self.check(producer=child)
                 time.sleep(0.05)
             code = child.wait(timeout=max(0.001, self.deadline - time.monotonic()))
             need(code == 0, 'Command failed: ' + label + ' exit=' + str(code))
@@ -327,6 +372,8 @@ class Build:
             self.commands.append(record)
         need(first is None and not failures and not cleanup_errors,
              first or (cleanup_errors[0] if cleanup_errors else 'Command failed'))
+        need(waited and readers_joined and group_gone, 'Strict resource sample requires retained reap/EOF/group closure')
+        self.check(strict=True)
         return self.logs / (label + '.stdout.log')
 
     def fetch(self, item, target):
@@ -638,7 +685,7 @@ def main():
         build.run('create-development-dmg', [paths['hdiutil'], 'create', '-ov', '-fs', 'HFS+',
                   '-format', 'UDZO', '-volname', 'FS_elem', '-srcfolder', image_folder, dmg], work)
         dmg_sha = sha(dmg)
-        build.check()
+        build.check(strict=True)
         summary.update(status='development-artifact-built-not-native-release-accepted',
                        app=str(app), dmg=str(dmg), dmgBytes=dmg.stat().st_size, dmgSha256=dmg_sha,
                        signingPolicyKind=POLICY, readyForRelease=False,
@@ -650,6 +697,12 @@ def main():
             summary['commands'] = build.commands
             summary['combinedStreamBytes'] = build.stream_bytes
             summary['elapsedSeconds'] = time.monotonic() - original
+            summary['incompleteResourceSampleCount'] = build.incomplete_resource_samples
+            summary['disappearedMutablePathEventCount'] = build.missing_resource_events
+            summary['strictAfterReapSampleCount'] = build.strict_resource_samples
+            summary['lastResourceSampleIncomplete'] = build.last_resource_sample_incomplete
+            summary['resourceByteTotalsQualification'] = ('Includes counted live-output lower bounds; no continuous peak proof'
+                if build.incomplete_resource_samples else 'Strict walks; no continuous peak proof')
         try:
             if build:
                 (work / 'build-summary.json').write_text(json.dumps(summary, indent=2) + '\n')
