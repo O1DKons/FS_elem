@@ -222,18 +222,30 @@ class Phase:
         self.read_only_mounts = []
         self.result = None
 
-    def observe(self, row):
+    def observe(self, row, *, known_generation=False):
         key = self.host.native.key(row)
         need(len(self.known) < 1024 or key in self.known, "OWN phase process ledger cap")
-        need(row["uid"] == os.getuid(), "OWN phase UID mismatch")
         origin = self.ownership_origins.get(key)
+        def identity_view(value):
+            return None if value is None else {field: value[field] for field in
+                ("pid", "creationSeconds", "creationMicroseconds", "uid", "ppid", "pgid")}
+        witness_origin = origin or next((value for value in self.ownership_origins.values()
+                                        if value["pid"] == row["pid"]), None)
+        witness = json.dumps({"original": identity_view(witness_origin), "current": identity_view(row)},
+                             separators=(",", ":"))[:1024]
+        need(row["uid"] == os.getuid(), "OWN phase UID mismatch " + witness)
+        need(not known_generation or origin is not None, "OWN refresh generation not admitted " + witness)
         if origin is None:
-            self.ownership_origins[key] = dict(row)  # Immutable captured ancestry/group.
+            self.ownership_origins[key] = dict(row)  # Immutable initial ancestry/group provenance.
         else:
             need(self.host.native.same(origin, row)
-                 and all(origin[field] == row[field] for field in ("ppid", "pgid", "uid")),
-                 "OWN phase generation ancestry/group changed")
+                 and all(origin[field] == row[field] for field in ("pgid", "uid")),
+                 "OWN phase generation/UID/group changed " + witness)
         previous = self.known.get(key)
+        if previous is not None and previous["ppid"] != row["ppid"]:
+            self.owned_ppid_transition_count = getattr(self, "owned_ppid_transition_count", 0) + 1
+            self.last_owned_ppid_transition = {"original": identity_view(origin),
+                                              "previous": identity_view(previous), "current": identity_view(row)}
         if previous is not None and previous["executable"] != row["executable"]:
             self.owned_executable_refresh_count += 1
         self.known[key] = row
@@ -247,7 +259,7 @@ class Phase:
         for known in list(self.known.values()):
             fresh = current.get(known["pid"])
             if self.host.native.same(known, fresh):
-                self.observe(fresh)  # Only a proven original generation may refresh executable metadata.
+                self.observe(fresh, known_generation=True)  # Only a proven original generation may refresh executable metadata.
         if self.external_app:
             for row in rows:
                 if row["executable"] == str(self.external_app) and row["uid"] == os.getuid():
@@ -470,7 +482,7 @@ class Phase:
                 fresh = self.host.native.identity(row["pid"])
                 if fresh is not None:
                     need(self.host.native.same(row, fresh), "OWN PID generation changed before cleanup")
-                    self.observe(fresh)
+                    self.observe(fresh, known_generation=True)
                     self.host.native.signal_owned(fresh, signal.SIGKILL)
             except Exception as error:
                 self.cleanup_errors.append(str(error)[:256])
@@ -518,6 +530,8 @@ class Phase:
                 "sampledTmpMaxBytes": self.tmp_max, "observedStreamBytes": self.log_count,
                 "sampledNewUserAndTmpMaxBytes": self.new_user_tmp_max,
                 "ownedExecutableRefreshCount": self.owned_executable_refresh_count,
+                "ownedPpidTransitionCount": getattr(self, "owned_ppid_transition_count", 0),
+                "lastOwnedPpidTransition": getattr(self, "last_owned_ppid_transition", None),
                 "knownOwnedOriginalIdentityCount": len(self.ownership_origins),
                 "incompleteResourceSampleCount": self.incomplete_resource_sample_count,
                 "disappearedMutablePathEventCount": self.disappeared_mutable_path_count,
