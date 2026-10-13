@@ -195,6 +195,8 @@ class Phase:
         self.root.mkdir()
         self.tmp.mkdir()
         self.known, self.children = {}, []
+        self.ownership_origins = {}
+        self.owned_executable_refresh_count = 0
         self.lock = threading.Lock()
         self.log_count = 0
         self.pipe_failure = None
@@ -216,8 +218,20 @@ class Phase:
         self.result = None
 
     def observe(self, row):
-        need(len(self.known) < 1024 or self.host.native.key(row) in self.known, "OWN phase process ledger cap")
-        self.known[self.host.native.key(row)] = row
+        key = self.host.native.key(row)
+        need(len(self.known) < 1024 or key in self.known, "OWN phase process ledger cap")
+        need(row["uid"] == os.getuid(), "OWN phase UID mismatch")
+        origin = self.ownership_origins.get(key)
+        if origin is None:
+            self.ownership_origins[key] = dict(row)  # Immutable captured ancestry/group.
+        else:
+            need(self.host.native.same(origin, row)
+                 and all(origin[field] == row[field] for field in ("ppid", "pgid", "uid")),
+                 "OWN phase generation ancestry/group changed")
+        previous = self.known.get(key)
+        if previous is not None and previous["executable"] != row["executable"]:
+            self.owned_executable_refresh_count += 1
+        self.known[key] = row
 
     def sample(self, *, strict_after_reap=False):
         self.last_resource_sample_incomplete = self.last_sample_strict_after_reap = False
@@ -225,6 +239,10 @@ class Phase:
         need(self.pipe_failure is None, self.pipe_failure or "pipe failure")
         rows = self.host.native.snapshot()
         current = {row["pid"]: row for row in rows}
+        for known in list(self.known.values()):
+            fresh = current.get(known["pid"])
+            if self.host.native.same(known, fresh):
+                self.observe(fresh)  # Only a proven original generation may refresh executable metadata.
         if self.external_app:
             for row in rows:
                 if row["executable"] == str(self.external_app) and row["uid"] == os.getuid():
@@ -252,7 +270,9 @@ class Phase:
                         and self.host.native.same(item["identity"], current.get(item["handle"].pid))):
                     producer_token = item["identity"]
                     break  # This sample only; completion mid-walk does not renew its authority.
-        mutable_roots = tuple(root for root in (self.tmp, self.additional_tmp) if root is not None)
+        work = self.root / "builder-work"
+        mutable_roots = tuple(root for root in (self.tmp, self.additional_tmp,
+            work / "node-extracted", work / "runtime") if root is not None)
         def walk(root, links=(), mounts=()):
             on_missing = None
             if producer_token is not None and root in (self.root, *mutable_roots):
@@ -382,7 +402,11 @@ class Phase:
         for row in reversed(list(self.known.values())):
             try:
                 before(end)
-                self.host.native.signal_owned(row, signal.SIGKILL)
+                fresh = self.host.native.identity(row["pid"])
+                if fresh is not None:
+                    need(self.host.native.same(row, fresh), "OWN PID generation changed before cleanup")
+                    self.observe(fresh)
+                    self.host.native.signal_owned(fresh, signal.SIGKILL)
             except Exception as error:
                 self.cleanup_errors.append(str(error)[:256])
         for item in self.children:
@@ -428,6 +452,8 @@ class Phase:
                 "sampledRssMaxBytes": self.rss_max, "sampledOutputMaxBytes": self.output_max,
                 "sampledTmpMaxBytes": self.tmp_max, "observedStreamBytes": self.log_count,
                 "sampledNewUserAndTmpMaxBytes": self.new_user_tmp_max,
+                "ownedExecutableRefreshCount": self.owned_executable_refresh_count,
+                "knownOwnedOriginalIdentityCount": len(self.ownership_origins),
                 "incompleteResourceSampleCount": self.incomplete_resource_sample_count,
                 "disappearedMutablePathEventCount": self.disappeared_mutable_path_count,
                 "strictAfterReapSampleCount": self.strict_after_reap_sample_count,
