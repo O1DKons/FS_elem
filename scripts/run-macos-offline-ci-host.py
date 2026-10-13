@@ -152,7 +152,7 @@ def selected_swift_pin(path, developer, limit_ns):
                 "mtimeNs": str(alias_before.st_mtime_ns), "ctimeNs": str(alias_before.st_ctime_ns)}}
 
 
-def tree_bytes(root, end_ns, allowed_links=(), read_only_mounts=(), *, on_missing=None):
+def tree_bytes(root, end_ns, allowed_links=(), read_only_mounts=(), *, on_missing=None, on_link=None):
     import errno
     total = 0
     def missing(error, item):
@@ -171,9 +171,14 @@ def tree_bytes(root, end_ns, allowed_links=(), read_only_mounts=(), *, on_missin
                 try:
                     info = item.lstat()
                     if stat.S_ISLNK(info.st_mode):
-                        need(item in allowed_links and os.readlink(item) == "/Applications",
-                             "unexpected link in owned output namespace")
-                        continue  # Intentional drag-link is not followed.
+                        if item in allowed_links and os.readlink(item) == "/Applications":
+                            continue  # Intentional drag-link is not followed.
+                        amount = on_link(item) if on_link is not None else None
+                        if amount is None:
+                            need(False, "unexpected link in owned output namespace path=" + str(item)[:512]
+                                 + " target=" + repr(os.readlink(item)[:256]) + " mode=" + oct(info.st_mode))
+                        total += amount
+                        continue
                 except FileNotFoundError as error:
                     missing(error, item)
                     continue
@@ -272,6 +277,66 @@ class Phase:
                     break  # This sample only; completion mid-walk does not renew its authority.
         work = self.root / "builder-work"
         mutable_roots = tuple(root for root in (self.tmp, self.additional_tmp, work) if root is not None)
+        closed_builder = strict_after_reap and any(
+            item["name"] == "build-offline-development-dmg" and item["identity"]
+            and item["identity"]["uid"] == os.getuid()
+            and item["identity"]["pgid"] == item["handle"].pid
+            and item["closed"] and item["handle"].returncode is not None for item in self.children)
+        permit_staging_links = self.name == "build" and (producer_token is not None or closed_builder)
+        def staging_link(item):
+            if not item.is_relative_to(work) or item == work:
+                return None
+            before(self.work_end_ns)
+            need(stat.S_ISDIR(work.lstat().st_mode), "builder-work resource root is not a regular directory")
+            pending = list(item.relative_to(work).parts)
+            current, hops, steps, target, mode = work, 0, 0, "", 0
+            def reject(ok, reason):
+                need(ok, "staging alias rejected " + reason + " path=" + str(item.relative_to(work))[:512]
+                     + " target=" + repr(target[:256]) + " mode=" + oct(mode))
+            while pending:
+                before(self.work_end_ns)
+                steps += 1
+                reject(steps <= 256, "resolution step cap")
+                part = pending.pop(0)
+                if part == ".":
+                    continue
+                if part == "..":
+                    reject(current != work, "external target")
+                    current = current.parent
+                    continue
+                candidate = current / part
+                reject(candidate.is_relative_to(work), "external target")
+                try:
+                    info = candidate.lstat()
+                except FileNotFoundError:
+                    raise
+                except OSError as error:
+                    reject(False, "metadata errno=" + str(error.errno))
+                mode = info.st_mode
+                if stat.S_ISLNK(mode):
+                    try:
+                        target = os.readlink(candidate)
+                    except FileNotFoundError:
+                        raise
+                    except OSError as error:
+                        reject(False, "readlink errno=" + str(error.errno))
+                    hops += 1
+                    reject(hops <= 32 and 0 < len(os.fsencode(target)) <= 4096, "target/hop cap")
+                    reject(not target.startswith("/") and "\\x00" not in target, "absolute/malformed target")
+                    pending = list(pathlib.PurePosixPath(target).parts) + pending
+                    continue
+                if pending:
+                    reject(stat.S_ISDIR(mode), "non-directory ancestor")
+                else:
+                    reject(stat.S_ISREG(mode) or stat.S_ISDIR(mode), "special target type")
+                current = candidate
+            before(self.work_end_ns)
+            reject(current.is_relative_to(work), "external target")
+            info = current.lstat()
+            mode = info.st_mode
+            reject(stat.S_ISREG(mode) or stat.S_ISDIR(mode), "final special/unresolved target type")
+            before(self.work_end_ns)
+            return info.st_size if stat.S_ISREG(mode) else 0  # Directory target's physical tree is counted normally.
         def walk(root, links=(), mounts=()):
             on_missing = None
             if producer_token is not None and root in (self.root, *mutable_roots):
@@ -284,7 +349,8 @@ class Phase:
                         self.incomplete_resource_sample_count += 1
                         self.last_resource_sample_incomplete = True
                     return True  # Counted lower-bound sample; no missing file is assigned size zero.
-            return tree_bytes(root, self.work_end_ns, links, mounts, on_missing=on_missing)
+            on_link = staging_link if permit_staging_links and (root == self.root or root.is_relative_to(work)) else None
+            return tree_bytes(root, self.work_end_ns, links, mounts, on_missing=on_missing, on_link=on_link)
         output = walk(self.root, self.allowed_links, self.read_only_mounts)
         output += sum(tree_bytes(root, self.work_end_ns) for root in self.additional_outputs)
         temporary = walk(self.tmp)
