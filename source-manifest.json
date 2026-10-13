@@ -947,7 +947,7 @@
     {
       "path": "configs/mac-offline-ci-host-template.json",
       "bytes": 10529,
-      "sha256": "76d99d89f1dd0f21b5554a003aaf4f1fdaf72f1940c1c020b59098a037ad38a7"
+      "sha256": "e028b572702db13f87d0d434d019e6999ceb8519573f086abab0355eddd8fde9"
     },
     {
       "path": "configs/mac-recipe-binding.json",
@@ -1132,7 +1132,7 @@
     {
       "path": "packaging/macos/runtime-inputs.json",
       "bytes": 4965,
-      "sha256": "cec17fd55b3eded95fc8a5aabdabaf915dcc1105f08b17480e130707e4cdc0f7"
+      "sha256": "01b845ea1d8924c73b57fe6c46e18a368f414356b858218bd778af1e8623b379"
     },
     {
       "path": "packaging/windows/FS_elem.iss",

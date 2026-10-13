@@ -162,7 +162,7 @@
     {
       "path": "packaging/macos/runtime-inputs.json",
       "bytes": 4965,
-      "sha256": "cec17fd55b3eded95fc8a5aabdabaf915dcc1105f08b17480e130707e4cdc0f7"
+      "sha256": "01b845ea1d8924c73b57fe6c46e18a368f414356b858218bd778af1e8623b379"
     },
     {
       "path": "scripts/check-macos-offline-installed.py",

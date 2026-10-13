@@ -53,7 +53,7 @@
     "notarization": null,
     "stapling": null
   },
-  "recipeConsumerCompatibility": null,
+  "recipeConsumerCompatibility": true,
   "qualification": "Root-authorized unsigned development preparation only. Candidate archive identities are metadata; actual tar/native/ABI/minOS/notices unverified. Root exact build grant, byte/notices/source/recipe/entry/staging/launcher bindings required; no downloads/native now. No Gatekeeper/quarantine bypass or distribution acceptance. Runtime notice paths are proposed admission paths; builder must require actual file presence and retain originals; no license-clearance claim.",
   "assetReferencePolicy": "config-relative-posix-with-explicit-origin-validation",
   "offline": true,
