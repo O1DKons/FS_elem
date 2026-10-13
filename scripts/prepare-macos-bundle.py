@@ -144,7 +144,8 @@ def validate_staging(runtime, receipt, inputs):
                 'Invalid staging identity')
         names.append(row['path'])
     require(len(names) == len(set(n.casefold() for n in names)), 'Duplicate staging path')
-    require(rows(runtime) == sorted(expected, key=lambda r: r['path']), 'Staged runtime differs from accepted receipt')
+    require(sorted(rows(runtime), key=lambda r: r['path']) == sorted(expected, key=lambda r: r['path']),
+            'Staged runtime differs from accepted receipt')
     require(receipt.get('artifactSha256') == {n: inputs['runtimes'][n]['sha256'] for n in RUNTIME_PATHS},
             'Staging receipt is not bound to accepted artifacts')
     for name, rel in RUNTIME_PATHS.items():

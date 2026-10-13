@@ -947,7 +947,7 @@
     {
       "path": "configs/mac-offline-ci-host-template.json",
       "bytes": 10529,
-      "sha256": "d3227836b1be56935a6b3f4a9dfa2a757a9c2e7095075a9074b78173fa766b43"
+      "sha256": "6796dc624c84d8d167beb4113fad1e1d8d321284b29cdc7e6dab58522848a6f6"
     },
     {
       "path": "configs/mac-recipe-binding.json",
@@ -1311,8 +1311,8 @@
     },
     {
       "path": "scripts/prepare-macos-bundle.py",
-      "bytes": 24150,
-      "sha256": "13ff17c223959e64538a3a315503a5a7ac01603025eacb89a4b3440e96c7df3f"
+      "bytes": 24195,
+      "sha256": "03a9d1f20802962ae794df3f522529621618eb1a74ea72b36934178ac96ff638"
     },
     {
       "path": "scripts/prepare-windows-bundle.py",
@@ -1751,11 +1751,11 @@
     }
   ],
   "fileCount": 348,
-  "totalBytes": 8864811,
+  "totalBytes": 8864856,
   "recordedAtUTC": "2026-10-13T00:11:45.918571+00:00",
   "sourceUpstreamONNXIncluded": false,
   "installerUpstreamONNXBundlingAuthorized": true,
   "privateDataIncluded": false,
-  "sourceCorrection": "V19 admitted self-PGID transition; prior Source recipe admission. Native pending.",
+  "sourceCorrection": "V20 canonical staging-inventory ordering; prior lifecycle and recipe Source fixes retained.",
   "consumerSigningAccepted": false
 }

@@ -91,8 +91,8 @@
     },
     {
       "path": "scripts/prepare-macos-bundle.py",
-      "bytes": 24150,
-      "sha256": "13ff17c223959e64538a3a315503a5a7ac01603025eacb89a4b3440e96c7df3f"
+      "bytes": 24195,
+      "sha256": "03a9d1f20802962ae794df3f522529621618eb1a74ea72b36934178ac96ff638"
     },
     {
       "path": "apps/macos-launcher/FS_elemApp.swift",
@@ -208,8 +208,8 @@
     },
     {
       "path": "scripts/prepare-macos-bundle.py",
-      "bytes": 24150,
-      "sha256": "13ff17c223959e64538a3a315503a5a7ac01603025eacb89a4b3440e96c7df3f"
+      "bytes": 24195,
+      "sha256": "03a9d1f20802962ae794df3f522529621618eb1a74ea72b36934178ac96ff638"
     },
     {
       "path": "apps/macos-launcher/FS_elemApp.swift",
