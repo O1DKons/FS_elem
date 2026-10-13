@@ -6,7 +6,7 @@
   "builderInterfaceAccepted": true,
   "nativeInterfaceAccepted": true,
   "runtimeInputsAccepted": true,
-  "hostSha256": "cd9a2d4feb9828197e885e1a95463034fc8850b17e4d9b9a98807cb7575846ca",
+  "hostSha256": "3bdc4da2aab8644bc7e97d1d76f2148e8f5f75249c9eafcc91ee84bb8f09da42",
   "phaseLimits": {
     "discovery": {
       "wholeSeconds": 30,
@@ -191,8 +191,8 @@
     },
     {
       "path": "scripts/run-macos-offline-ci-host.py",
-      "bytes": 68260,
-      "sha256": "cd9a2d4feb9828197e885e1a95463034fc8850b17e4d9b9a98807cb7575846ca"
+      "bytes": 71948,
+      "sha256": "3bdc4da2aab8644bc7e97d1d76f2148e8f5f75249c9eafcc91ee84bb8f09da42"
     },
     {
       "path": "configs/mac-desktop-web.json",

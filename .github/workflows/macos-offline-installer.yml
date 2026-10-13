@@ -65,7 +65,29 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: fs-elem-mac-offline-development-${{ github.run_id }}-${{ github.run_attempt }}
-          path: ${{ env.FS_ELEM_MAC_HOST_OUTPUT }}
+          path: |
+            ${{ env.FS_ELEM_MAC_HOST_OUTPUT }}/host-result.json
+            ${{ env.FS_ELEM_MAC_HOST_OUTPUT }}/discovery/*.json
+            ${{ env.FS_ELEM_MAC_HOST_OUTPUT }}/discovery/*.stdout.log
+            ${{ env.FS_ELEM_MAC_HOST_OUTPUT }}/discovery/*.stderr.log
+            ${{ env.FS_ELEM_MAC_HOST_OUTPUT }}/xctest/*.json
+            ${{ env.FS_ELEM_MAC_HOST_OUTPUT }}/xctest/*.stdout.log
+            ${{ env.FS_ELEM_MAC_HOST_OUTPUT }}/xctest/*.stderr.log
+            ${{ env.FS_ELEM_MAC_HOST_OUTPUT }}/build/generated-builder-grant.json
+            ${{ env.FS_ELEM_MAC_HOST_OUTPUT }}/build/build-offline-development-dmg.stdout.log
+            ${{ env.FS_ELEM_MAC_HOST_OUTPUT }}/build/build-offline-development-dmg.stderr.log
+            ${{ env.FS_ELEM_MAC_HOST_OUTPUT }}/build/builder-work/build-summary.json
+            ${{ env.FS_ELEM_MAC_HOST_OUTPUT }}/build/builder-work/resolved-runtime-inputs.json
+            ${{ env.FS_ELEM_MAC_HOST_OUTPUT }}/build/builder-work/staging-receipt.json
+            ${{ env.FS_ELEM_MAC_HOST_OUTPUT }}/build/builder-work/logs/*.stdout.log
+            ${{ env.FS_ELEM_MAC_HOST_OUTPUT }}/build/builder-work/logs/*.stderr.log
+            ${{ env.FS_ELEM_MAC_HOST_OUTPUT }}/native/*.json
+            ${{ env.FS_ELEM_MAC_HOST_OUTPUT }}/native/*.stdout.log
+            ${{ env.FS_ELEM_MAC_HOST_OUTPUT }}/native/*.stderr.log
+            ${{ env.FS_ELEM_MAC_HOST_OUTPUT }}/native/checker-output/native-check.json
+            ${{ env.FS_ELEM_MAC_HOST_OUTPUT }}/native/checker-output/*.stdout.log
+            ${{ env.FS_ELEM_MAC_HOST_OUTPUT }}/native/checker-output/*.stderr.log
+            ${{ env.FS_ELEM_MAC_HOST_OUTPUT }}/build/builder-work/FS_elem-0.2.6-arm64-DEVELOPMENT.dmg
           if-no-files-found: error
           retention-days: 7
 

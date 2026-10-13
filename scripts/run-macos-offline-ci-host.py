@@ -871,9 +871,55 @@ class Host:
             need(licence.strip() and licence == app_licence, "actual extracted/app runtime licence missing, empty or different")
             licences.append({**row, "bytes": len(licence), "sha256": digest(licence)})
         self.licences = licences
+        inventory_verification = {"mode": "read-only OWN completed-producer verification",
+            "originalWorkDeadlineNs": str(phase.work_end_ns), "originalWholeDeadlineNs": str(phase.whole_end_ns),
+            "entryObservedMonotonicNs": str(time.monotonic_ns()), "ownRssCheckpoints": 0,
+            "continuousResourceProof": False}
+        phase.result = {"status": "verifying-read-only-inventory", "inventoryVerification": inventory_verification}
+        def begin_readonly_inventory():
+            before(phase.work_end_ns)
+            need(phase.first_failure is None and not phase.cleanup_errors and phase.pipe_failure is None,
+                 "prior phase failure remains before read-only inventory")
+            builders = [item for item in phase.children if item["name"] == "build-offline-development-dmg"]
+            need(len(builders) == 1 and builders[0]["identity"]
+                 and builders[0]["identity"]["pgid"] == builders[0]["handle"].pid,
+                 "read-only inventory lacks exact retained builder")
+            need(all(item["closed"] and item["handle"].returncode == 0 and not item["errors"]
+                     and len(item["readers"]) == 2 and all(not reader.is_alive() for reader in item["readers"])
+                     and item["handle"].stdout.closed and item["handle"].stderr.closed for item in phase.children),
+                 "read-only inventory lacks successful retained wait/readers/pipe closure")
+            need(any(self.native.same(row, builders[0]["identity"]) for row in phase.known.values()),
+                 "retained builder absent from OWN ledger")
+            current = {row["pid"]: row for row in self.native.snapshot()}
+            need(not any(self.native.same(row, current.get(row["pid"])) for row in phase.known.values()),
+                 "OWN generation remains before read-only inventory")
+            import errno
+            try:
+                os.killpg(builders[0]["identity"]["pgid"], 0)  # Read-only existence probe; never a group signal.
+            except OSError as error:
+                need(error.errno == errno.ESRCH, "original builder group absence unknown errno=" + str(error.errno))
+            else:
+                need(False, "original builder group remains before read-only inventory")
+            before(phase.work_end_ns)
+            inventory_verification["retainedBuilderWait"] = 0
+            inventory_verification["closureObservedMonotonicNs"] = str(time.monotonic_ns())
+            inventory_verification["freshKnownGenerationsAbsent"] = True
+            inventory_verification["originalBuilderGroupAbsent"] = True
+        def readonly_inventory_checkpoint():
+            before(phase.work_end_ns)
+            need(phase.first_failure is None and phase.pipe_failure is None,
+                 "phase deadline/pipe failure during read-only inventory")
+            rss = self.native.rss(self.native.identity(os.getpid()))
+            need(rss <= phase.limits["sampledRssBytes"], "sampled OWN inventory RSS cap exceeded")
+            phase.rss_max = max(phase.rss_max, rss)
+            inventory_verification["ownRssCheckpoints"] += 1
+            before(phase.work_end_ns)
+        begin_readonly_inventory()
+        phase.sample(strict_after_reap=True)
+        inventory_verification["strictBeforeInventoryMonotonicNs"] = str(time.monotonic_ns())
         app_inventory, app_read_bytes = {}, 0
         for base, dirs, files in os.walk(app, followlinks=False):
-            phase.sample()
+            readonly_inventory_checkpoint()
             for name in dirs:
                 need(not (pathlib.Path(base) / name).is_symlink(), "built app contains directory link")
             for name in files:
@@ -885,11 +931,15 @@ class Host:
                 app_inventory[relative] = {"bytes": pin["bytes"], "sha256": pin["sha256"],
                                            "mode": stat.S_IMODE(path.lstat().st_mode)}
         need(app_inventory, "built app closed inventory empty")
+        phase.sample(strict_after_reap=True)
+        inventory_verification["strictAfterInventoryMonotonicNs"] = str(time.monotonic_ns())
+        inventory_verification["resourceQualification"] = "sampled/final strict; no continuous/global filesystem claim"
         self.app_inventory = app_inventory
         return {"status": summary["status"], "summarySha256": digest(summary_raw), "app": str(app), "dmg": dmg_pin,
                 "builderGrantSha256": digest(encoded), "archiveDownloadsBy": "accepted builder only; host never fetches",
                 "actualLicenseFileEvidence": licences,
                 "closedBuiltAppInventoryFiles": len(app_inventory), "closedBuiltAppHashReadBytes": app_read_bytes,
+                "inventoryVerification": inventory_verification,
                 "licenseEvidence": "accepted runtime input declarations still require actual extracted-file verification; no unrestricted clearance claim"}
 
     def install_and_native(self, phase):
