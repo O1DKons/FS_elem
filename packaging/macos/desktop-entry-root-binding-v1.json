@@ -1,8 +1,8 @@
 {
   "status": "source-accepted",
   "entry": "scripts/start-macos-desktop.mjs",
-  "entryBytes": 10522,
-  "sourceSha256": "664f1a3279b84ee28a5559e26c26be1a0770e220b39d821853be1b23b4ae3732",
+  "entryBytes": 10555,
+  "sourceSha256": "29f53da2be93b7c80edd93c1a406c6c07d95a3cda1e9330038409310f6b6888a",
   "argv": [],
   "recipeEnvironmentVariable": "FS_ELEM_MAC_RECIPE",
   "userRootEnvironmentVariable": "FS_ELEM_MAC_USER_ROOT",
@@ -27,5 +27,5 @@
   "packageVersion": "0.2.6",
   "nodeMajor": 22,
   "offline": true,
-  "sourceAcceptanceSha256": "7976361d9ac77208dd1171013372a40e876bad1b94baedcefee39e834272b812"
+  "sourceAcceptanceSha256": "fbc9f5e5c76b2b39f38ba020cb082ab872176ea86f98ce796e4f8af0f407f0bf"
 }

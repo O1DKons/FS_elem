@@ -157,9 +157,9 @@
     "../services/analysis/process_owner.py": "8fbd5c1651a7ce84a3008d0b1d018ec6309f180a86113aeeed70905d4a8276d9",
     "../services/analysis/server.py": "2536291b06ead6f80106d4aa2f7abdde3fa590aba8eeeb383f3718225a229fd9",
     "../runtime/analyze_job.py": "e9dd22f346790c9b927b51b120c41be756172d9e02df5597ce9600ff13b34fa3",
-    "../scripts/macos-first-run.py": "3632b6f008548b4dc0bda22ff42f9dfa48495f64854d1b484d1fb1e51c363ba2",
-    "../scripts/macos-bundle.mjs": "acc3d8ba97a9d7a5d0c2cf593d43e173f15e139e7d8ce9777c50b48172e9ad94",
-    "../scripts/start-macos-desktop.mjs": "664f1a3279b84ee28a5559e26c26be1a0770e220b39d821853be1b23b4ae3732"
+    "../scripts/macos-first-run.py": "aaabca6457f8b076b85b152ec495cb0614d4e3bb2cdf91c70d0aa46bd85f07e5",
+    "../scripts/macos-bundle.mjs": "505709098365cc9d893ff7334a9ed20b0571ab106956a53af548a1904e1dfb48",
+    "../scripts/start-macos-desktop.mjs": "29f53da2be93b7c80edd93c1a406c6c07d95a3cda1e9330038409310f6b6888a"
   },
   "globalAthleteIndependenceVerified": false,
   "nominalGuard": "usableTorsoFrames>=3 and finiteSpectralFeatures>0",
@@ -207,9 +207,9 @@
       "../runtime/analyze_job.py": "e9dd22f346790c9b927b51b120c41be756172d9e02df5597ce9600ff13b34fa3",
       "../runtime/pipeline/support.py": "03c34eb770a089f543fc7369c22fdd9969a58ace4ae45eddf4c1b1a05ff193bf",
       "../runtime/pipeline/worker.py": "de033e64ad977435c8b92b173713f3737c1e50ea0693b5f0e4393362c2bf674d",
-      "../scripts/macos-first-run.py": "3632b6f008548b4dc0bda22ff42f9dfa48495f64854d1b484d1fb1e51c363ba2",
-      "../scripts/macos-bundle.mjs": "acc3d8ba97a9d7a5d0c2cf593d43e173f15e139e7d8ce9777c50b48172e9ad94",
-      "../scripts/start-macos-desktop.mjs": "664f1a3279b84ee28a5559e26c26be1a0770e220b39d821853be1b23b4ae3732"
+      "../scripts/macos-first-run.py": "aaabca6457f8b076b85b152ec495cb0614d4e3bb2cdf91c70d0aa46bd85f07e5",
+      "../scripts/macos-bundle.mjs": "505709098365cc9d893ff7334a9ed20b0571ab106956a53af548a1904e1dfb48",
+      "../scripts/start-macos-desktop.mjs": "29f53da2be93b7c80edd93c1a406c6c07d95a3cda1e9330038409310f6b6888a"
     },
     "runtimeBytes": {
       "../runtime/process_gate.py": 906,
@@ -219,9 +219,9 @@
       "../runtime/analyze_job.py": 1481,
       "../runtime/pipeline/support.py": 3339,
       "../runtime/pipeline/worker.py": 7475,
-      "../scripts/macos-first-run.py": 34057,
-      "../scripts/macos-bundle.mjs": 37260,
-      "../scripts/start-macos-desktop.mjs": 10522
+      "../scripts/macos-first-run.py": 35007,
+      "../scripts/macos-bundle.mjs": 37265,
+      "../scripts/start-macos-desktop.mjs": 10555
     },
     "status": "accepted shared Windows lineage; native Mac unknown; later exact owner binding supplement required",
     "parentAcceptanceSha256": "db126eae5e1261c4c8d779bcbc04206ed1eb2fd53af2d60dce93e0d27acd2a0b"
@@ -232,6 +232,8 @@
     "mainSourcePeerSha256": "64d475cfb372757cfe2dc6b9d1f4cde24d59e9af29ff835ce3b26b019e39eac7",
     "parentSha256": "25dbf103779cf7f345109e10473da14c13b5b25700a860beef38e2808b6bfb3e",
     "scientificFieldsUnchanged": true,
-    "nativeRuntimeVerified": false
+    "nativeRuntimeVerified": false,
+    "bytecodeCorrectionRootSha256": "fbc9f5e5c76b2b39f38ba020cb082ab872176ea86f98ce796e4f8af0f407f0bf",
+    "controlReaderCorrectionRootSha256": "9e1a2fc946dacb7eecc40794ced891624061d8a2fba97a0067d5f3f4597845a7"
   }
 }

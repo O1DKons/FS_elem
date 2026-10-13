@@ -8,8 +8,8 @@
   },
   "derived": {
     "path": "configs/axel-release-ort4-macos-app.json",
-    "bytes": 14716,
-    "sha256": "9c119e9721598859187bb79c5e0c4a37310a3291084de190dba379fdf6ac1d75"
+    "bytes": 14929,
+    "sha256": "ac78e4545d7e4165c93d84b2c0f2950f217e0c7e6ada0ba3a8ee0e0e40587bfd"
   },
   "modelManifest": {
     "path": "assets/models/manifest-offline-macos-v026.json",
@@ -20,20 +20,20 @@
     {
       "path": "scripts/macos-first-run.py",
       "key": "../scripts/macos-first-run.py",
-      "bytes": 34057,
-      "sha256": "3632b6f008548b4dc0bda22ff42f9dfa48495f64854d1b484d1fb1e51c363ba2"
+      "bytes": 35007,
+      "sha256": "aaabca6457f8b076b85b152ec495cb0614d4e3bb2cdf91c70d0aa46bd85f07e5"
     },
     {
       "path": "scripts/macos-bundle.mjs",
       "key": "../scripts/macos-bundle.mjs",
-      "bytes": 37260,
-      "sha256": "acc3d8ba97a9d7a5d0c2cf593d43e173f15e139e7d8ce9777c50b48172e9ad94"
+      "bytes": 37265,
+      "sha256": "505709098365cc9d893ff7334a9ed20b0571ab106956a53af548a1904e1dfb48"
     },
     {
       "path": "scripts/start-macos-desktop.mjs",
       "key": "../scripts/start-macos-desktop.mjs",
-      "bytes": 10522,
-      "sha256": "664f1a3279b84ee28a5559e26c26be1a0770e220b39d821853be1b23b4ae3732"
+      "bytes": 10555,
+      "sha256": "29f53da2be93b7c80edd93c1a406c6c07d95a3cda1e9330038409310f6b6888a"
     }
   ],
   "packagingProvenance": {
@@ -42,6 +42,8 @@
     "mainSourcePeerSha256": "64d475cfb372757cfe2dc6b9d1f4cde24d59e9af29ff835ce3b26b019e39eac7",
     "parentSha256": "25dbf103779cf7f345109e10473da14c13b5b25700a860beef38e2808b6bfb3e",
     "scientificFieldsUnchanged": true,
-    "nativeRuntimeVerified": false
+    "nativeRuntimeVerified": false,
+    "bytecodeCorrectionRootSha256": "fbc9f5e5c76b2b39f38ba020cb082ab872176ea86f98ce796e4f8af0f407f0bf",
+    "controlReaderCorrectionRootSha256": "9e1a2fc946dacb7eecc40794ced891624061d8a2fba97a0067d5f3f4597845a7"
   }
 }

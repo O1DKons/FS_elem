@@ -515,7 +515,7 @@ export async function runMacDesktop(appRoot,userRoot,{input=process.stdin,output
     }
     if(fs.realpathSync(process.execPath)!==fs.realpathSync(physical(appRoot,document.node.path,canonicalApp)))throw Error('Controller interpreter not bundled Node');
     const python=physical(appRoot,document.interpreters.science,canonicalApp),entry=physical(appRoot,'scripts/macos-first-run.py',canonicalApp);
-    phaseKind='bootstrap';phase=new OwnedPhase(python,[entry,'--app-root',appRoot,'--user-root',userRoot],{onMessage:row=>{if(row.type==='progress')emit(row);else if(row.type==='error')throw Error(row.message??'Bootstrap failed');}});
+    phaseKind='bootstrap';phase=new OwnedPhase(python,['-B',entry,'--app-root',appRoot,'--user-root',userRoot],{onMessage:row=>{if(row.type==='progress')emit(row);else if(row.type==='error')throw Error(row.message??'Bootstrap failed');}});
     await phase.waitClean(600000);
     // Child exit/EOF/group gone precedes independent receipt admission.
     phase=null;if(stopping)throw Error('Parent/control stopped before ready');

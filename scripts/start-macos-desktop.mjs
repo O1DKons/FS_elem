@@ -14,8 +14,8 @@ export function macServicePlan(appRoot,prepared,config,env){
   if(prepared.appRoot!==appRoot||userRoot!==prepared.userRoot||recipe!==prepared.configPath||webFile!==prepared.webConfigPath)throw Error('Selected receipt generation and explicit Mac environment differ');
   validateMacWebConfig(config,prepared);
   return {prepared,config,recipe,webFile,userRoot,
-    analysis:{executable:prepared.sciencePython,argv:[regular(path.join(appRoot,'services/analysis/server.py')),'--port',String(config.analysisPort),'--config',recipe,'--jobs',config.jobsDir,'--max-wall-seconds',String(config.maxWallSeconds)],cwd:appRoot,
-      env:{...env,FS_ELEM_CONTROL_STDIN:'1',PYTHONIOENCODING:'utf-8',PYTHONUTF8:'1'}},
+    analysis:{executable:prepared.sciencePython,argv:['-B',regular(path.join(appRoot,'services/analysis/server.py')),'--port',String(config.analysisPort),'--config',recipe,'--jobs',config.jobsDir,'--max-wall-seconds',String(config.maxWallSeconds)],cwd:appRoot,
+      env:{...env,FS_ELEM_CONTROL_STDIN:'1',PYTHONIOENCODING:'utf-8',PYTHONUTF8:'1',PYTHONDONTWRITEBYTECODE:'1'}},
     web:{executable:process.execPath,argv:[regular(path.join(appRoot,'scripts/release-owned-web-worker.mjs')),webFile],cwd:path.join(appRoot,'apps/web'),env:{...env}},
     url:'http://127.0.0.1:'+config.port+'/analysis',
     healthUrl:'http://127.0.0.1:'+config.port+'/api/analysis/health'};

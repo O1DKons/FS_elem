@@ -9,6 +9,7 @@ from pathlib import Path, PurePosixPath
 import platform
 import posixpath
 import re
+import select
 import signal
 import stat
 import subprocess
@@ -629,7 +630,7 @@ def validate_environments(binding):
             "'packages':{k:m.version(k) for k in json.loads(sys.argv[1])}}))")
     for name, declaration in NATIVE_PROFILE["environments"].items():
         python = checked_file(binding["app"], binding["bundle"]["interpreters"][name], binding["canonicalApp"])
-        output = bounded_environment_probe([str(python), "-c", code, json.dumps(list(declaration["packages"]))])
+        output = bounded_environment_probe([str(python), "-B", "-c", code, json.dumps(list(declaration["packages"]))])
         result = json.loads(output)
         if result != {"minor": declaration["pythonMinor"], "version": PYTHON_VERSIONS[name], "packages": declaration["packages"]}:
             raise ValueError("Bundled environment versions differ")
@@ -706,30 +707,56 @@ def main():
     parser.add_argument("--app-root", required=True, type=Path)
     parser.add_argument("--user-root", required=True, type=Path)
     args = parser.parse_args()
-    stopped = threading.Event()
+    stopped, done = threading.Event(), threading.Event()
     def control():
+        body = bytearray()
         try:
-            body = sys.stdin.buffer.readline(65537)
-            if not body or len(body) > 65536 or not body.endswith(b"\n"):
-                return
-            row = json.loads(body)
-            if not isinstance(row, dict) or row.get("type") != "shutdown":
-                return
+            fd = sys.stdin.fileno()
+            while not done.is_set():
+                ready, _, _ = select.select([fd], [], [], 0.05)
+                if not ready:
+                    continue
+                if done.is_set():
+                    return
+                chunk = os.read(fd, min(4096, 65537 - len(body)))
+                if not chunk:
+                    stopped.set()
+                    return
+                body.extend(chunk)
+                end = body.find(b"\n")
+                if end >= 0:
+                    frame = body[:end + 1]
+                    if len(frame) <= 65536:
+                        row = json.loads(frame)
+                        if isinstance(row, dict) and row.get("type") == "shutdown":
+                            stopped.set()
+                            return
+                    stopped.set()
+                    return
+                if len(body) > 65536:
+                    stopped.set()
+                    return
         except Exception:
-            return
-        finally:
             stopped.set()
-    threading.Thread(target=control, daemon=True).start()
+    reader = threading.Thread(target=control)
+    reader.start()
     for sig in (signal.SIGTERM, signal.SIGINT):
         signal.signal(sig, lambda *_: stopped.set())
     def emit(row):
         print(json.dumps(row, ensure_ascii=True, allow_nan=False), flush=True)
+    code = 0
     try:
         first_run(args.app_root, args.user_root, emit, stopped)
-        return 0
     except Exception as e:
         emit(dict(type="error", message=str(e)))
-        return 1
+        code = 1
+    finally:
+        done.set()
+        reader.join(timeout=1)
+        if reader.is_alive() and code == 0:
+            emit(dict(type="error", message="Control reader did not stop"))
+            code = 1
+    return code
 
 
 if __name__ == "__main__":
