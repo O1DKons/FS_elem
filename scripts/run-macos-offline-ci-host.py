@@ -239,13 +239,17 @@ class Phase:
             self.ownership_origins[key] = dict(row)  # Immutable initial ancestry/group provenance.
         else:
             need(self.host.native.same(origin, row)
-                 and all(origin[field] == row[field] for field in ("pgid", "uid")),
+                 and origin["uid"] == row["uid"] and row["pgid"] in (origin["pgid"], row["pid"]),
                  "OWN phase generation/UID/group changed " + witness)
         previous = self.known.get(key)
         if previous is not None and previous["ppid"] != row["ppid"]:
             self.owned_ppid_transition_count = getattr(self, "owned_ppid_transition_count", 0) + 1
             self.last_owned_ppid_transition = {"original": identity_view(origin),
                                               "previous": identity_view(previous), "current": identity_view(row)}
+        if previous is not None and previous["pgid"] != row["pgid"]:
+            self.owned_group_transition_count = getattr(self, "owned_group_transition_count", 0) + 1
+            self.last_owned_group_transition = {"original": identity_view(origin),
+                                               "previous": identity_view(previous), "current": identity_view(row)}
         if previous is not None and previous["executable"] != row["executable"]:
             self.owned_executable_refresh_count += 1
         self.known[key] = row
@@ -532,6 +536,8 @@ class Phase:
                 "ownedExecutableRefreshCount": self.owned_executable_refresh_count,
                 "ownedPpidTransitionCount": getattr(self, "owned_ppid_transition_count", 0),
                 "lastOwnedPpidTransition": getattr(self, "last_owned_ppid_transition", None),
+                "ownedGroupTransitionCount": getattr(self, "owned_group_transition_count", 0),
+                "lastOwnedGroupTransition": getattr(self, "last_owned_group_transition", None),
                 "knownOwnedOriginalIdentityCount": len(self.ownership_origins),
                 "incompleteResourceSampleCount": self.incomplete_resource_sample_count,
                 "disappearedMutablePathEventCount": self.disappeared_mutable_path_count,
